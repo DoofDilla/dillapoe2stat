@@ -102,9 +102,19 @@ def exalted_price(league: str = LEAGUE) -> Optional[float]:
     cur = fetch_category_prices("Currency", league)
     return cur.get(_norm("Exalted Orb")) or cur.get("exalted") or cur.get(_nopunct("Exalted Orb"))
 
+def _lookup_name(it: dict) -> str:
+    tl = it.get("typeLine") or ""
+    bt = it.get("baseType") or ""
+    name = tl or bt or it.get("name") or ""
+    nlow = _norm(name)
+    # Für Waystones lieber baseType (stabil), weil typeLine Magic/Rare-Titel hat
+    if "waystone" in nlow and bt:
+        return bt
+    return name
+
 # --- Category Guess (aus Inventory-Item) -------------------------------------
 def guess_category_from_item(it: dict) -> Optional[str]:
-    name = _norm(it.get("typeLine") or it.get("baseType") or it.get("name"))
+    name = name = _lookup_name(it)
     icon = _norm(it.get("icon") or "")
     frame = it.get("frameType")
     stack = it.get("stackSize")

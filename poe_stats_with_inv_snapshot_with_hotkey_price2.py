@@ -133,6 +133,7 @@ def log_run(char, added, removed):
             "name": "Unknown",
             "level": 0
         },
+        "map_value": map_value,
         "added_count": len(added),
         "removed_count": len(removed),
         "added": aggregate(added),       # ggf. strippen/kompakt machen
@@ -190,6 +191,7 @@ if __name__ == "__main__":
 
     def do_post():
         global pre_inv
+        global map_value
         if pre_inv is None:
             print("[POST] no PRE snapshot yet. Press F2 first.")
             return
@@ -234,11 +236,12 @@ if __name__ == "__main__":
                 print(f"\n[VALUE] Totals:  +{fmt(add_c)}c  /  -{fmt(rem_c)}c  =>  Net {fmt(net_c)}c")
                 if net_e is not None:
                     print(f"                 +{fmt(add_e)}ex /  -{fmt(rem_e)}ex =>  Net {fmt(net_e)}ex")
+                    map_value = net_e
             except Exception as pe:
                 print("[VALUE] price-check error:", pe)
 
             print("\n=== ready for next map ===\n")
-            notify('Hallo Dilla!', 'Map Run done!')
+            notify('Hallo Dilla!', 'Map Run done!' + (f', Value: {fmt(map_value)}ex' if map_value else ''))
             log_run(name, added, removed)  # (wenn du willst, erweitern um totals)
         except Exception as e:
             print("[POST] error:", e)
