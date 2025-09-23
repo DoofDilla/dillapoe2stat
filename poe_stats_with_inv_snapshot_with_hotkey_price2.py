@@ -10,6 +10,7 @@ from price_check_poe2 import valuate_items_raw, fmt  # fmt nur für hübsche Aus
 from client_parsing import get_last_map_from_client
 from poe_logging import log_run
 from poe_api import get_token, get_characters, snapshot_inventory
+from inventory_debug import InventoryDebugger
 
 CLIENT_ID = "dillapoe2stat"        # deine Client Id
 CLIENT_SECRET = "UgraAmlUXdP1"  # hier dein Secret eintragen
@@ -19,6 +20,11 @@ CHAR_TO_CHECK = "Mettmanwalking"
 LOG = Path(os.path.dirname(os.path.abspath(__file__))) / "runs.jsonl"
 
 CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # anpassen!
+
+# Debug settings
+DEBUG_ENABLED = True  # Set to False to disable debug output
+DEBUG_TO_FILE = True  # Set to False to only show debug in console
+DEBUG_SHOW_SUMMARY = True  # Show item summary instead of full JSON dump
 
 def inv_key(item):
     # eindeutiger Key pro Item (Fallback: typeline+pos)
@@ -37,7 +43,7 @@ def diff_inventories(before, after):
 
 
 class PoEStatsTracker:
-    def __init__(self, client_id, client_secret, character_name, client_log_path):
+    def __init__(self, client_id, client_secret, character_name, client_log_path, debug_enabled=False):
         self.client_id = client_id
         self.client_secret = client_secret
         self.character_name = character_name
@@ -55,6 +61,9 @@ class PoEStatsTracker:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.icon_path = os.path.join(script_dir, 'cat64x64.png')
         self.log_file = Path(script_dir) / "runs.jsonl"
+        
+        # Initialize debugger
+        self.debugger = InventoryDebugger(debug_enabled=debug_enabled)
     
     def initialize(self):
         """Initialize the tracker with API token and character validation"""
@@ -87,6 +96,20 @@ class PoEStatsTracker:
             
             self.pre_inventory = snapshot_inventory(self.token, self.character_name)
             print(f"[PRE] captured: {len(self.pre_inventory)} items")
+            
+            # Debug: dump inventory information
+            if DEBUG_SHOW_SUMMARY:
+                self.debugger.dump_item_summary(self.pre_inventory, "[PRE-SUMMARY]")
+            else:
+                self.debugger.dump_inventory_to_console(self.pre_inventory, "[PRE-DEBUG]")
+            
+            if DEBUG_TO_FILE:
+                metadata = {
+                    "character": self.character_name,
+                    "snapshot_type": "PRE",
+                    "map_info": self.current_map_info
+                }
+                self.debugger.dump_inventory_to_file(self.pre_inventory, "pre_inventory", metadata)
             
             self.current_map_info = get_last_map_from_client(self.client_log_path)
             if self.current_map_info:
@@ -150,6 +173,20 @@ class PoEStatsTracker:
             post_inventory = snapshot_inventory(self.token, self.character_name)
             print(f"[POST] captured: {len(post_inventory)} items")
             
+            # Debug: dump post inventory and comparison
+            if DEBUG_SHOW_SUMMARY:
+                self.debugger.dump_item_summary(post_inventory, "[POST-SUMMARY]")
+            else:
+                self.debugger.dump_inventory_to_console(post_inventory, "[POST-DEBUG]")
+            
+            if DEBUG_TO_FILE:
+                metadata = {
+                    "character": self.character_name,
+                    "snapshot_type": "POST",
+                    "map_info": self.current_map_info
+                }
+                self.debugger.dump_inventory_to_file(post_inventory, "post_inventory", metadata)
+            
             # Calculate map runtime
             map_runtime = None
             if self.map_start_time is not None:
@@ -159,6 +196,9 @@ class PoEStatsTracker:
                 print(f"[RUNTIME] Map completed in {minutes}m {seconds}s")
             
             added, removed = diff_inventories(self.pre_inventory, post_inventory)
+            
+            # Debug: show inventory comparison
+            self.debugger.compare_inventories(self.pre_inventory, post_inventory)
             
             self.display_inventory_changes(added, removed)
             self.display_price_analysis(added, removed)
@@ -175,10 +215,16 @@ class PoEStatsTracker:
             self.pre_inventory = None  # reset for next run
             self.map_start_time = None  # reset start time
     
+    def toggle_debug_mode(self):
+        """Toggle debug mode on/off"""
+        current_state = self.debugger.debug_enabled
+        self.debugger.set_debug_enabled(not current_state)
+    
     def setup_hotkeys(self):
         """Setup keyboard hotkeys"""
         keyboard.add_hotkey('f2', self.take_pre_snapshot)
         keyboard.add_hotkey('f3', self.take_post_snapshot)
+        keyboard.add_hotkey('f4', self.toggle_debug_mode)  # F4 to toggle debug mode
     
     def run(self):
         """Main application loop"""
@@ -198,6 +244,11 @@ if __name__ == "__main__":
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         character_name=CHAR_TO_CHECK,
-        client_log_path=CLIENT_LOG
+        client_log_path=CLIENT_LOG,
+        debug_enabled=DEBUG_ENABLED
     )
+    
+    if DEBUG_ENABLED:
+        print(f"[DEBUG MODE] Enabled - Debug to file: {DEBUG_TO_FILE}, Show summary: {DEBUG_SHOW_SUMMARY}")
+    
     tracker.run()
