@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from collections import Counter
 
-def log_run(char, added, removed, current_map_info=None, map_value=None, log_file=None):
+def log_run(char, added, removed, current_map_info=None, map_value=None, log_file=None, map_runtime=None):
     rec = {
         "run_id": str(uuid.uuid4()),
         "ts": dt.datetime.now().isoformat(timespec="seconds"),
@@ -18,6 +18,7 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
             "level": 0
         },
         "map_value": map_value,
+        "map_runtime": round(map_runtime, 2) if map_runtime is not None else None,
         "added_count": len(added),
         "removed_count": len(removed),
         "added": aggregate(added),       # ggf. strippen/kompakt machen
