@@ -25,6 +25,20 @@ CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # anpassen!
 DEBUG_ENABLED = True  # Set to False to disable debug output
 DEBUG_TO_FILE = True  # Set to False to only show debug in console
 DEBUG_SHOW_SUMMARY = True  # Show item summary instead of full JSON dump
+OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
+
+# ANSI color codes for console output
+class Colors:
+    GOLD = '\033[93m'
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    GRAY = '\033[90m'
+    BOLD = '\033[1m'
+    END = '\033[0m'
 
 def inv_key(item):
     # eindeutiger Key pro Item (Fallback: typeline+pos)
@@ -43,7 +57,7 @@ def diff_inventories(before, after):
 
 
 class PoEStatsTracker:
-    def __init__(self, client_id, client_secret, character_name, client_log_path, debug_enabled=False):
+    def __init__(self, client_id, client_secret, character_name, client_log_path, debug_enabled=False, output_mode="normal"):
         self.client_id = client_id
         self.client_secret = client_secret
         self.character_name = character_name
@@ -64,6 +78,7 @@ class PoEStatsTracker:
         
         # Initialize debugger
         self.debugger = InventoryDebugger(debug_enabled=debug_enabled)
+        self.output_mode = output_mode
     
     def initialize(self):
         """Initialize the tracker with API token and character validation"""
@@ -76,8 +91,9 @@ class PoEStatsTracker:
         
         notify('Starting DillaPoE2Stat', f'Watching character: {self.character_name}', 
                icon=f'file://{self.icon_path}')
-        print(f"Using character: {self.character_name}")
-        print("Hotkeys:  F2 = PRE snapshot   |   F3 = POST snapshot + diff   |   Esc = quit")
+        print(f"🎮 Using character: {Colors.CYAN}{self.character_name}{Colors.END}")
+        print(f"📋 Output mode: {Colors.BOLD}{self.output_mode.upper()}{Colors.END}")
+        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug | {Colors.RED}Esc{Colors.END}=Quit")
     
     def rate_limit(self, min_gap=2.5):
         """Enforce rate limiting for API calls"""
@@ -91,17 +107,17 @@ class PoEStatsTracker:
         """Take PRE-map inventory snapshot"""
         self.rate_limit()
         try:
-            # Record the start time for map runtime calculation
             self.map_start_time = time.time()
-            
             self.pre_inventory = snapshot_inventory(self.token, self.character_name)
-            print(f"[PRE] captured: {len(self.pre_inventory)} items")
             
-            # Debug: dump inventory information
-            if DEBUG_SHOW_SUMMARY:
-                self.debugger.dump_item_summary(self.pre_inventory, "[PRE-SUMMARY]")
-            else:
-                self.debugger.dump_inventory_to_console(self.pre_inventory, "[PRE-DEBUG]")
+            if self.output_mode == "comprehensive":
+                print(f"📦 [PRE] captured: {len(self.pre_inventory)} items")
+                
+                # Debug: dump inventory information
+                if DEBUG_SHOW_SUMMARY:
+                    self.debugger.dump_item_summary(self.pre_inventory, "[PRE-SUMMARY]")
+                else:
+                    self.debugger.dump_inventory_to_console(self.pre_inventory, "[PRE-DEBUG]")
             
             if DEBUG_TO_FILE:
                 metadata = {
@@ -113,24 +129,25 @@ class PoEStatsTracker:
             
             self.current_map_info = get_last_map_from_client(self.client_log_path)
             if self.current_map_info:
-                print(f"[MAP] {self.current_map_info['map_name']} (T{self.current_map_info['level']}, seed {self.current_map_info['seed']})")
+                print(f"🗺️  {Colors.BOLD}{self.current_map_info['map_name']}{Colors.END} {Colors.GRAY}(T{self.current_map_info['level']}, seed {self.current_map_info['seed']}){Colors.END}")
             
             mapname = self.current_map_info["map_name"] if self.current_map_info else "Unknown"
             notify('Hallo Dilla!', f'Starting Map Run! {mapname}')
         except Exception as e:
-            print("[PRE] error:", e)
+            print(f"❌ [PRE] error: {e}")
     
     def display_inventory_changes(self, added, removed):
         """Display added and removed items"""
-        print(f"\nAdded items ({len(added)}):")
-        for item in added:
-            stack = f" x{item['stackSize']}" if item.get("stackSize") else ""
-            print(" +", item.get("typeLine"), stack, "@", (item.get("x"), item.get("y")))
+        if self.output_mode == "comprehensive":
+            print(f"\n📥 Added items ({len(added)}):")
+            for item in added:
+                stack = f" x{item['stackSize']}" if item.get("stackSize") else ""
+                print(f"  {Colors.GREEN}+{Colors.END} {item.get('typeLine')}{stack} @ {Colors.GRAY}({item.get('x')},{item.get('y')}){Colors.END}")
 
-        print(f"\nRemoved items ({len(removed)}):")
-        for item in removed:
-            stack = f" x{item['stackSize']}" if item.get("stackSize") else ""
-            print(" -", item.get("typeLine"), stack)
+            print(f"\n📤 Removed items ({len(removed)}):")
+            for item in removed:
+                stack = f" x{item['stackSize']}" if item.get("stackSize") else ""
+                print(f"  {Colors.RED}-{Colors.END} {item.get('typeLine')}{stack}")
     
     def display_price_analysis(self, added, removed):
         """Display price analysis for added/removed items"""
@@ -138,29 +155,58 @@ class PoEStatsTracker:
             added_rows, (add_c, add_e) = valuate_items_raw(added)
             removed_rows, (rem_c, rem_e) = valuate_items_raw(removed)
 
-            print("\n[VALUE] Added:")
-            for r in added_rows:
-                print(f" + {r['name']} [{r.get('category') or 'n/a'}] x{r['qty']}  "
-                    f"=> {fmt(r['chaos_total'])}c"
-                    f"{'' if r['ex_total'] is None else ' | ' + fmt(r['ex_total']) + 'ex'}")
+            # Filter items with value for normal mode
+            valuable_added = [r for r in added_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+            valuable_removed = [r for r in removed_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
 
-            print("\n[VALUE] Removed:")
-            for r in removed_rows:
-                print(f" - {r['name']} [{r.get('category') or 'n/a'}] x{r['qty']}  "
-                    f"=> {fmt(r['chaos_total'])}c"
-                    f"{'' if r['ex_total'] is None else ' | ' + fmt(r['ex_total']) + 'ex'}")
+            if self.output_mode == "normal":
+                # Normal mode: Only show valuable items
+                if valuable_added:
+                    print(f"\n💰 {Colors.BOLD}Valuable Loot:{Colors.END}")
+                    for r in valuable_added:
+                        ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
+                        print(f"  {Colors.GREEN}+{Colors.END} {Colors.WHITE}{r['name']}{Colors.END} {Colors.GRAY}x{r['qty']}{Colors.END} "
+                              f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                
+                if valuable_removed:
+                    print(f"\n💸 {Colors.BOLD}Valuable Items Used:{Colors.END}")
+                    for r in valuable_removed:
+                        ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
+                        print(f"  {Colors.RED}-{Colors.END} {Colors.WHITE}{r['name']}{Colors.END} {Colors.GRAY}x{r['qty']}{Colors.END} "
+                              f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+            
+            else:  # comprehensive mode
+                print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
+                for r in added_rows:
+                    ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] is not None else ""
+                    print(f"  {Colors.GREEN}+{Colors.END} {r['name']} {Colors.GRAY}[{r.get('category') or 'n/a'}]{Colors.END} x{r['qty']} "
+                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
 
+                print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
+                for r in removed_rows:
+                    ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] is not None else ""
+                    print(f"  {Colors.RED}-{Colors.END} {r['name']} {Colors.GRAY}[{r.get('category') or 'n/a'}]{Colors.END} x{r['qty']} "
+                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+
+            # Calculate and display net value
             net_c = (add_c or 0) - (rem_c or 0)
             net_e = None
             if add_e is not None and rem_e is not None:
                 net_e = (add_e or 0) - (rem_e or 0)
 
-            print(f"\n[VALUE] Totals:  +{fmt(add_c)}c  /  -{fmt(rem_c)}c  =>  Net {fmt(net_c)}c")
-            if net_e is not None:
-                print(f"                 +{fmt(add_e)}ex /  -{fmt(rem_e)}ex =>  Net {fmt(net_e)}ex")
+            # Show totals (always show in both modes if there's value)
+            if net_c > 0.01 or (net_e and net_e > 0.01):
+                print(f"\n🏆 {Colors.BOLD}Net Value:{Colors.END} {Colors.GOLD}{fmt(net_c)}c{Colors.END}", end="")
+                if net_e is not None and net_e > 0.01:
+                    print(f" | {Colors.GOLD}{fmt(net_e)}ex{Colors.END}")
+                else:
+                    print()
                 self.map_value = net_e
+            else:
+                print(f"\n💰 {Colors.GRAY}No valuable loot this run{Colors.END}")
+                
         except Exception as pe:
-            print("[VALUE] price-check error:", pe)
+            print(f"❌ [VALUE] price-check error: {pe}")
     
     def take_post_snapshot(self):
         """Take POST-map inventory snapshot and analyze differences"""
@@ -171,21 +217,15 @@ class PoEStatsTracker:
         self.rate_limit()
         try:
             post_inventory = snapshot_inventory(self.token, self.character_name)
-            print(f"[POST] captured: {len(post_inventory)} items")
             
-            # Debug: dump post inventory and comparison
-            if DEBUG_SHOW_SUMMARY:
-                self.debugger.dump_item_summary(post_inventory, "[POST-SUMMARY]")
-            else:
-                self.debugger.dump_inventory_to_console(post_inventory, "[POST-DEBUG]")
-            
-            if DEBUG_TO_FILE:
-                metadata = {
-                    "character": self.character_name,
-                    "snapshot_type": "POST",
-                    "map_info": self.current_map_info
-                }
-                self.debugger.dump_inventory_to_file(post_inventory, "post_inventory", metadata)
+            if self.output_mode == "comprehensive":
+                print(f"📦 [POST] captured: {len(post_inventory)} items")
+                
+                # Debug: dump post inventory and comparison
+                if DEBUG_SHOW_SUMMARY:
+                    self.debugger.dump_item_summary(post_inventory, "[POST-SUMMARY]")
+                else:
+                    self.debugger.dump_inventory_to_console(post_inventory, "[POST-DEBUG]")
             
             # Calculate map runtime
             map_runtime = None
@@ -193,24 +233,25 @@ class PoEStatsTracker:
                 map_runtime = time.time() - self.map_start_time
                 minutes = int(map_runtime // 60)
                 seconds = int(map_runtime % 60)
-                print(f"[RUNTIME] Map completed in {minutes}m {seconds}s")
+                print(f"\n⏱️  {Colors.BOLD}Runtime:{Colors.END} {Colors.CYAN}{minutes}m {seconds}s{Colors.END}")
             
             added, removed = diff_inventories(self.pre_inventory, post_inventory)
             
-            # Debug: show inventory comparison
-            self.debugger.compare_inventories(self.pre_inventory, post_inventory)
+            # Debug: show inventory comparison (only in comprehensive mode)
+            if self.output_mode == "comprehensive":
+                self.debugger.compare_inventories(self.pre_inventory, post_inventory)
             
             self.display_inventory_changes(added, removed)
             self.display_price_analysis(added, removed)
             
-            print("\n=== ready for next map ===\n")
-            notify('Hallo Dilla!', 'Map Run done!' + (f', Value: {fmt(self.map_value)}ex' if self.map_value else '') + 
-                   (f', Time: {minutes}m {seconds}s' if map_runtime else ''))
+            print(f"\n{'='*50}")
+            print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
+            print(f"{'='*50}\n")
             
             log_run(self.character_name, added, removed, self.current_map_info, self.map_value, self.log_file, map_runtime)
             
         except Exception as e:
-            print("[POST] error:", e)
+            print(f"❌ [POST] error: {e}")
         finally:
             self.pre_inventory = None  # reset for next run
             self.map_start_time = None  # reset start time
@@ -220,11 +261,17 @@ class PoEStatsTracker:
         current_state = self.debugger.debug_enabled
         self.debugger.set_debug_enabled(not current_state)
     
+    def toggle_output_mode(self):
+        """Toggle between normal and comprehensive output mode"""
+        self.output_mode = "comprehensive" if self.output_mode == "normal" else "normal"
+        print(f"🔄 Output mode changed to: {Colors.BOLD}{self.output_mode.upper()}{Colors.END}")
+    
     def setup_hotkeys(self):
         """Setup keyboard hotkeys"""
         keyboard.add_hotkey('f2', self.take_pre_snapshot)
         keyboard.add_hotkey('f3', self.take_post_snapshot)
-        keyboard.add_hotkey('f4', self.toggle_debug_mode)  # F4 to toggle debug mode
+        keyboard.add_hotkey('f4', self.toggle_debug_mode)
+        keyboard.add_hotkey('f5', self.toggle_output_mode)  # F5 to toggle output mode
     
     def run(self):
         """Main application loop"""
@@ -245,7 +292,8 @@ if __name__ == "__main__":
         client_secret=CLIENT_SECRET,
         character_name=CHAR_TO_CHECK,
         client_log_path=CLIENT_LOG,
-        debug_enabled=DEBUG_ENABLED
+        debug_enabled=DEBUG_ENABLED,
+        output_mode=OUTPUT_MODE
     )
     
     if DEBUG_ENABLED:
