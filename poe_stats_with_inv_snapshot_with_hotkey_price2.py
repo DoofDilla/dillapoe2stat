@@ -248,6 +248,19 @@ class PoEStatsTracker:
             print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
             print(f"{'='*50}\n")
             
+            # Create notification message with runtime and value
+            notification_msg = ""
+            if map_runtime:
+                notification_msg += f"⏱️ Time: {minutes}m {seconds}s"
+            if self.map_value and self.map_value > 0.01:
+                notification_msg += f"\n💰 Value: {fmt(self.map_value)}ex"
+            elif net_c and net_c > 0.01:
+                notification_msg += f"\n💰 Value: {fmt(net_c)}c"
+            else:
+                notification_msg += "\n💰 No valuable loot"
+
+            notify('Map run complete', notification_msg, icon=f'file://{self.icon_path}')
+
             log_run(self.character_name, added, removed, self.current_map_info, self.map_value, self.log_file, map_runtime)
             
         except Exception as e:
