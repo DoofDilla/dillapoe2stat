@@ -65,26 +65,25 @@ def parse_dualsense(buf: bytes):
         print(f"Invalid report ID: {buf[0] if buf else 'None'}")
         return (False, False)
 
-    # USB-Layout (64-Byte Report):
-    #   R2 digital: byte 9, bit 3 ; R3: byte 9, bit 7
-    # BT-Layout (kürzerer Report):
-    #   R2 digital: byte 6, bit 3 ; R3: byte 6, bit 7
-    # Quelle / Mapping: nondebug/dualsense. :contentReference[oaicite:2]{index=2}
-    if len(buf) >= 11:  # wahrscheinlich USB
-        b9 = buf[9]
-        r2 = bool((b9 >> 3) & 1)
-        r3 = bool((b9 >> 7) & 1)
-        print(f"USB mode: byte[9]=0x{b9:02x}, R2={r2}, R3={r3}")
-        return (r2, r3)
-    elif len(buf) >= 7:  # wahrscheinlich BT
-        b6 = buf[6]
-        r2 = bool((b6 >> 3) & 1)
+    if len(buf) >= 10:
+        b6 = buf[6] if len(buf) >= 7 else 0
+        b9 = buf[9]  
+        
+        # R2 detection: byte[9] = 0xff when pressed (this works correctly)
+        r2 = (b9 == 0xff)
+        
+        # R3 detection: byte[6].bit7 (0x80)
         r3 = bool((b6 >> 7) & 1)
-        print(f"BT mode: byte[6]=0x{b6:02x}, R2={r2}, R3={r3}")
+        
+        print(f"BT Mode - R2: byte[9]=0x{b9:02x} -> {r2}, R3: byte[6].bit7=0x{b6:02x} -> {r3}")
+        
+        # Debug: Show key bytes
+        if len(buf) >= 12:
+            print(f"  Key bytes: b5=0x{buf[5]:02x}, b6=0x{b6:02x}, b8=0x{buf[8]:02x}, b9=0x{b9:02x}, b11=0x{buf[11]:02x}")
+        
         return (r2, r3)
-    else:
-        print(f"Buffer too short: {len(buf)} bytes")
-        return (False, False)
+    
+    return (False, False)
 
 # ---- WindowProc: WM_INPUT abfangen ------------------------------------------
 def wndproc(hWnd, msg, wParam, lParam):
