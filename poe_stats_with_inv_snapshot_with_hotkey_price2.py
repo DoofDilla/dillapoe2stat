@@ -1,6 +1,4 @@
-import requests
 import time
-from urllib.parse import quote
 import keyboard
 from win11toast import notify
 import json
@@ -13,6 +11,7 @@ import re
 from price_check_poe2 import valuate_items_raw, fmt  # fmt nur für hübsche Ausgabe
 from client_parsing import get_last_map_from_client
 from poe_logging import log_run
+from poe_api import get_token, get_characters, snapshot_inventory
 
 CLIENT_ID = "dillapoe2stat"        # deine Client Id
 CLIENT_SECRET = "UgraAmlUXdP1"  # hier dein Secret eintragen
@@ -22,44 +21,6 @@ CHAR_TO_CHECK = "Mettmanwalking"
 LOG = Path(os.path.dirname(os.path.abspath(__file__))) / "runs.jsonl"
 
 CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # anpassen!
-
-AUTH_URL = "https://www.pathofexile.com/oauth/token"
-API_URL = "https://api.pathofexile.com"
-
-USER_AGENT = "DillaPoE2Stat/0.1 (+you@example.com)"
-
-def get_token():
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "scope": "account:characters account:profile",
-    }
-    r = requests.post(AUTH_URL, data=data, headers={"User-Agent": USER_AGENT})
-    r.raise_for_status()
-    tok = r.json()
-    print("Got token, expires in", tok.get("expires_in"), "seconds")
-    return tok["access_token"]
-
-def get_characters(access_token):
-    headers = {"Authorization": f"Bearer {access_token}",
-               "User-Agent": USER_AGENT}
-    r = requests.get(f"{API_URL}/character/poe2", headers=headers)
-    r.raise_for_status()
-    return r.json()
-
-def get_character_details(access_token, name):
-    headers = {"Authorization": f"Bearer {access_token}",
-               "User-Agent": USER_AGENT}
-    r = requests.get(f"{API_URL}/character/poe2/{quote(name)}", headers=headers)
-    r.raise_for_status()
-    return r.json()
-
-def snapshot_inventory(access_token, name):
-    details = get_character_details(access_token, name)
-    char = details.get("character", {})
-    inv = char.get("inventory", [])
-    return inv
 
 def inv_key(item):
     # eindeutiger Key pro Item (Fallback: typeline+pos)
@@ -78,7 +39,7 @@ def diff_inventories(before, after):
 
 
 if __name__ == "__main__":
-    token = get_token()
+    token = get_token(CLIENT_ID, CLIENT_SECRET)
     chars = get_characters(token)
     if not chars.get("characters"):
         print("No characters found")
