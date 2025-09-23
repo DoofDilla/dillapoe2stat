@@ -1,0 +1,2798 @@
+{
+  "timestamp": "2025-09-23T20:14:41.628853",
+  "metadata": {
+    "character": "Mettmanwalking",
+    "snapshot_type": "POST",
+    "map_info": {
+      "timestamp": "2025/09/23 20:08:14",
+      "level": 80,
+      "map_code": "MapSevenWaters",
+      "map_name": "Seven Waters",
+      "seed": 555438908,
+      "raw": "2025/09/23 20:08:14 533585078 2caa1afc [DEBUG Client 35952] Generating level 80 area \"MapSevenWaters\" with seed 555438908"
+    }
+  },
+  "item_count": 53,
+  "items": [
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "d054170ed52f565282842817d1c1b00eb0c342abd392d2c0aa9196ae39b118db",
+      "name": "Putrid Compass",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+7%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+50%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+85%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+90%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 30% [Delirious]"
+      ],
+      "explicitMods": [
+        "Players are periodically [Curse|Cursed] with [ElementalWeakness|Elemental Weakness]",
+        "26% increased Monster Damage",
+        "Monsters deal 27% of Damage as Extra Cold",
+        "Monsters have 44% increased Accuracy Rating",
+        "Monsters are [MonsterExtraArmour1|Armoured]",
+        "50% less [BuffEffect|effect] of [Curse|Curses] on Monsters"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 0,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/17149586aa/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "c3fd115ff4028826b737151928a07cf711a611de5bc93b79c1d142d61620e453",
+      "name": "Fungus Expedition",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 82,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Magic Monsters",
+          "values": [
+            [
+              "+70%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 102
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+30%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+91%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+100%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "explicitMods": [
+        "Area has patches of [ChilledGround|Chilled Ground]",
+        "+35% Monster Elemental Resistances",
+        "Monsters have 73% increased Ailment Threshold",
+        "47% less [BuffEffect|effect] of [Curse|Curses] on Monsters",
+        "Monsters have 125% increased Freeze Buildup",
+        "Monsters inflict 125% increased [Flammability] [BuffMagnitude|Magnitude]",
+        "Monsters have 125% increased Shock Chance",
+        "Monsters have 78% increased Stun Threshold",
+        "Players have 25% less Cooldown Recovery Rate"
+      ],
+      "desecratedMods": [
+        "Abyss Pits in Area always have Rewards"
+      ],
+      "desecrated": true,
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 0,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "9772e3c64e04b1bffdcd66509c2fd3321f4ba5449bff0242e9b2686c7db87917",
+      "name": "Tranquil Panorama",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+8%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Magic Monsters",
+          "values": [
+            [
+              "+33%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 102
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+65%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+76%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+100%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 31% [Delirious]"
+      ],
+      "explicitMods": [
+        "Area has patches of [IgnitedGround|Ignited Ground]",
+        "Players are periodically [Curse|Cursed] with [ElementalWeakness|Elemental Weakness]",
+        "30% increased Monster Damage",
+        "Monsters deal 28% of Damage as Extra Cold",
+        "Monsters deal 26% of Damage as Extra Chaos",
+        "Monsters are [MonsterExtraArmour1|Armoured]"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 0,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+      "league": "Rise of the Abyssal",
+      "id": "36a1d69d914135151e027556a2437f45640421c0118445d62940018b10012380",
+      "name": "Armageddon Joy",
+      "typeLine": "Emerald",
+      "baseType": "Emerald",
+      "rarity": "Rare",
+      "ilvl": 82,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "[Jewel]",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "enchantMods": [
+        "Cannot be [Blind|Blinded]"
+      ],
+      "explicitMods": [
+        "2% increased [Attack] Speed",
+        "15% increased [Attack] Damage",
+        "Damage [Penetration|Penetrates] 6% [Resistances|Lightning Resistance]",
+        "[Debuff|Debuffs] on you expire 7% faster"
+      ],
+      "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+      "frameType": 2,
+      "x": 11,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/17149586aa/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "1a87cc1589f627fab27b8f75b830db4823153211e0c83e51af1e5b82b55b901b",
+      "name": "Rotting Course",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+10%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Magic Monsters",
+          "values": [
+            [
+              "+30%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 102
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+25%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+88%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+110%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "explicitMods": [
+        "Area has patches of [ChilledGround|Chilled Ground]",
+        "Players are periodically [Curse|Cursed] with [ElementalWeakness|Elemental Weakness]",
+        "Monsters have 278% increased [Critical|Critical Hit] Chance",
+        "+29% to Monster [CriticalDamageBonus|Critical Damage Bonus]",
+        "Monsters deal 30% of Damage as Extra Chaos",
+        "Monsters have 125% increased Stun Buildup",
+        "Players have 40% less Recovery Rate of Life and [EnergyShield|Energy Shield]",
+        "Rare Monsters have 1 additional Modifier"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 0,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "ff9dd3f45977e4617e51da663bc01556e4030516b4a914c2d1f0eaa7e63c651b",
+      "name": "Wraith Bearings",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+16%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+45%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+98%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+95%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 36% [Delirious]"
+      ],
+      "explicitMods": [
+        "Monsters deal 26% of Damage as Extra Cold",
+        "+39% Monster Elemental Resistances",
+        "Monsters gain 20% of maximum Life as Extra maximum [EnergyShield|Energy Shield]",
+        "Players have 28% less Cooldown Recovery Rate",
+        "Players have 36% less Recovery Rate of Life and [EnergyShield|Energy Shield]"
+      ],
+      "desecratedMods": [
+        "Abyssal Monsters grant 88% increased Experience"
+      ],
+      "desecrated": true,
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 0,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvQmFzZXR5cGVzL1ByaXNtYXRpY1JpbmciLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/a9bd534c46/PrismaticRing.png",
+      "league": "Rise of the Abyssal",
+      "id": "6e957a4893a8dea1e3ed6a4beaed003ee29d92b3c8bb1f638478c27b2a25872c",
+      "name": "Viper Turn",
+      "typeLine": "Prismatic Ring",
+      "baseType": "Prismatic Ring",
+      "rarity": "Rare",
+      "ilvl": 72,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Quality (Physical Modifiers)",
+          "values": [
+            [
+              "+20%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 6
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "56",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+8% to all [ElementalDamage|Elemental] [Resistances]"
+      ],
+      "explicitMods": [
+        "Adds 14 to 28 [Physical|Physical] Damage to [Attack|Attacks]",
+        "+41 to [Evasion] Rating",
+        "+29 to maximum Mana",
+        "+26 to [Intelligence|Intelligence]",
+        "+37% to [Resistances|Lightning Resistance]",
+        "Gain 20 Mana per Enemy Killed"
+      ],
+      "frameType": 2,
+      "x": 11,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "773c1cf8c531d89ddce721fc05a9eaf042140523ba0b1f19f17a0f95cedf6246",
+      "name": "Breeding Trajectory",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+7%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+75%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+79%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+100%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 30% [Delirious]"
+      ],
+      "explicitMods": [
+        "Area has patches of [ChilledGround|Chilled Ground]",
+        "47% more Monster Life",
+        "28% increased Monster Damage",
+        "Monsters [ArmourBreak|Break Armour] equal to 39% of [Physical|Physical Damage] dealt",
+        "Monsters have 39% chance to [Poison] on [HitDamage|Hit]",
+        "Monsters have 125% increased Freeze Buildup",
+        "Monsters inflict 125% increased [Flammability] [BuffMagnitude|Magnitude]",
+        "Monsters gain 20% of maximum Life as Extra maximum [EnergyShield|Energy Shield]",
+        "Monsters have 125% increased Shock Chance"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 1,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c27779a8b7/CurrencyUpgradeMagicToRare.png",
+      "stackSize": 3,
+      "maxStackSize": 20,
+      "iconTierText": "II",
+      "league": "Rise of the Abyssal",
+      "id": "9ff9d8ed558292763d1caf03ed48e8496fe956d1bf80d7f31e01ce4bb3f7bc10",
+      "name": "",
+      "typeLine": "Greater Regal Orb",
+      "baseType": "Greater Regal Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "3/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        },
+        {
+          "name": "[BetterCurrencyMinimumLevel|Minimum Modifier Level]",
+          "values": [
+            [
+              "35",
+              0
+            ]
+          ],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "Upgrades a [ItemRarity|Magic] item to a [ItemRarity|Rare] item, adding 1 modifier"
+      ],
+      "descrText": "Right click this item then left click a magic item to apply it. Current modifiers are retained and a new one is added.",
+      "frameType": 5,
+      "x": 4,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4ef5836606/CurrencyAddModToRare.png",
+      "stackSize": 1,
+      "maxStackSize": 20,
+      "iconTierText": "III",
+      "league": "Rise of the Abyssal",
+      "id": "0a18b299f7b02899f85d7d2ab9633ec4e2e703f5efb286db1a5aa6786f2393b6",
+      "name": "",
+      "typeLine": "Perfect Exalted Orb",
+      "baseType": "Perfect Exalted Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "1/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        },
+        {
+          "name": "[BetterCurrencyMinimumLevel|Minimum Modifier Level]",
+          "values": [
+            [
+              "50",
+              0
+            ]
+          ],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "Augments a [ItemRarity|Rare] item with a new random modifier"
+      ],
+      "descrText": "Right click this item then left click a rare item to apply it. Rare items can have up to six random modifiers.",
+      "frameType": 5,
+      "x": 4,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 2,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQwNSIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/510a304252/Belt05.png",
+      "league": "Rise of the Abyssal",
+      "id": "42b06e532c21e9e2db68724eb1f06a296ec4289e730a7bb0cf9a8af5f251c758",
+      "name": "Rapture Harness",
+      "typeLine": "Plate Belt",
+      "baseType": "Plate Belt",
+      "rarity": "Rare",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Belt",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "48",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+118 to [Armour]",
+        "Has 2 [Charm] Slots"
+      ],
+      "explicitMods": [
+        "12% increased [Charm] Effect Duration",
+        "+34% to [Resistances|Lightning Resistance]",
+        "15.9 Life Regeneration per second",
+        "19% reduced [Flask|Flask] Charges used"
+      ],
+      "frameType": 2,
+      "x": 5,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/20cd0159b7/CurrencyRerollRare.png",
+      "stackSize": 5,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "eed60d2ee7df61240f0c13f67b200ba710fa95f037a482254fca48ee011884fe",
+      "name": "",
+      "typeLine": "Chaos Orb",
+      "baseType": "Chaos Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "5/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Removes a random modifier and augments a [ItemRarity|Rare] item with a new random modifier"
+      ],
+      "descrText": "Right click this item then left click a rare item to apply it.",
+      "frameType": 5,
+      "x": 4,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvT21lbnMvVm9vZG9vT21lbnMzQmx1ZSIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/881b227986/VoodooOmens3Blue.png",
+      "stackSize": 2,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "b02521bac04d474e23e705f045be31445408d289cfda7d4ea6227af7a86b0781",
+      "name": "",
+      "typeLine": "Omen of Amelioration",
+      "baseType": "Omen of Amelioration",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "2/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "While this item is active in your inventory will\nprevent 75% of Experience loss when you die"
+      ],
+      "descrText": "Right click this item in your inventory to set it to be active. This item is consumed when triggered. Only one Omen can be triggered from combat in each instance.",
+      "frameType": 5,
+      "x": 10,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvQmFzZXR5cGVzL0dvbGRSaW5nIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/a138f2df65/GoldRing.png",
+      "league": "Rise of the Abyssal",
+      "id": "b3839b67d76adcc99f1407256892882883519d73239c10c9daca1b4d74448289",
+      "name": "Blood Coil",
+      "typeLine": "Gold Ring",
+      "baseType": "Gold Ring",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "60",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "11% increased [ItemRarity|Rarity of Items] found"
+      ],
+      "explicitMods": [
+        "Adds 12 to 18 [Cold] damage to [Attack|Attacks]",
+        "30% increased [Chaos] Damage",
+        "+51 to [Accuracy|Accuracy] Rating",
+        "+29 to [Intelligence|Intelligence]"
+      ],
+      "frameType": 2,
+      "x": 7,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBcm1vdXJRdWFsaXR5IiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/8518f80f8d/CurrencyArmourQuality.png",
+      "stackSize": 3,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "a236a2d9c66c2b5ff250f777f9e4be45eb4f8295e20cd14f1f8a324d76fe5197",
+      "name": "",
+      "typeLine": "Armourer's Scrap",
+      "baseType": "Armourer's Scrap",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "3/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Improves the [Quality|quality] of an armour"
+      ],
+      "descrText": "Right click this item then left click an armour to apply it. The maximum quality is 20%.",
+      "frameType": 5,
+      "x": 2,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRHZW5lcmljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/4fbc73f060/PrecursorTabletGeneric.png",
+      "league": "Rise of the Abyssal",
+      "id": "47ab682de8941a978b4646ab85546f4c31f26e6cc4f4a6ee04baf1a535eb9ac5",
+      "name": "",
+      "typeLine": "Precursor Tablet",
+      "baseType": "Precursor Tablet",
+      "rarity": "Normal",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Tablet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "implicitMods": [
+        "14 Maps in Range are [ContainsIrradiated|Irradiated]"
+      ],
+      "descrText": "Can be used in a completed Tower on your Atlas to influence surrounding Maps. Tablets are consumed once placed into a Tower.",
+      "frameType": 0,
+      "x": 3,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXREZWxpcml1bSIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/8c2fac816e/PrecursorTabletDelirium.png",
+      "league": "Rise of the Abyssal",
+      "id": "945087241869e378a06f6adfd7acb0225731f7e68a4e3dbe9438dec9508a51ac",
+      "name": "",
+      "typeLine": "Brimming Delirium Precursor Tablet of Phobia",
+      "baseType": "Delirium Precursor Tablet",
+      "rarity": "Magic",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Tablet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "implicitMods": [
+        "17 Maps in Range contain [ContainsDelirium|Mirrors of Delirium]"
+      ],
+      "explicitMods": [
+        "[ContainsDelirium|Delirium] Encounters in your Maps are 5% more likely to spawn [Rarity|Unique] Bosses",
+        "12% increased number of [Rarity|Rare] Monsters"
+      ],
+      "descrText": "Can be used in a completed Tower on your Atlas to influence surrounding Maps. Tablets are consumed once placed into a Tower.",
+      "frameType": 1,
+      "x": 5,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lWYWFsIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/2a4a95ff38/CurrencyVaal.png",
+      "stackSize": 9,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "8c70fec11b0b793491d832c770ecb071f24c157b710c3eaec7b4bc686e2c2c61",
+      "name": "",
+      "typeLine": "Vaal Orb",
+      "baseType": "Vaal Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "9/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Modifies an item unpredictably and [Corrupted|Corrupts] it"
+      ],
+      "descrText": "Right click this item then left click an item to corrupt it. Corrupted items cannot be modified again.",
+      "frameType": 5,
+      "x": 2,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWVTaGFyZCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f096031fb4/CurrencyUpgradeToUniqueShard.png",
+      "stackSize": 4,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "346a4bc92e7ea6eca0d40c06fb28f1681ba06d7c6020789c341455b4f5018278",
+      "name": "",
+      "typeLine": "Chance Shard",
+      "baseType": "Chance Shard",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "4/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "descrText": "A stack of 10 shards becomes an [OrbOfChance|Orb of Chance].",
+      "frameType": 5,
+      "x": 5,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/17149586aa/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "4a26bab7f6923270db1c447ce3a133bca4fb84bcac09825b4ef3ca9ea9c131c5",
+      "name": "Buried Path",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "2",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+9%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+54%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+60%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "explicitMods": [
+        "Area contains 12 additional packs of Plagued Monsters",
+        "Monster Damage Penetrates 15% Elemental Resistances",
+        "Players gain 30% reduced [Flask] Charges",
+        "Players have 26% less Cooldown Recovery Rate"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 7,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/17149586aa/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "f82fe813450259aaae26833f37953faa1ad59f0d774412c5ec0eec7120fd3db6",
+      "name": "",
+      "typeLine": "Eroding Waystone (Tier 15) of Drought",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Magic",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "4",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+9%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+23%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+35%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "explicitMods": [
+        "Players are periodically [Curse|Cursed] with [ElementalWeakness|Elemental Weakness]",
+        "Players gain 33% reduced [Flask] Charges"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 1,
+      "x": 7,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lHZW1RdWFsaXR5IiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/b813ef94bd/CurrencyGemQuality.png",
+      "stackSize": 4,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "4534644c00d9e7994f47c5dbef1e32df6c58ce06986d739ce588347a4d2a1912",
+      "name": "",
+      "typeLine": "Gemcutter's Prism",
+      "baseType": "Gemcutter's Prism",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "4/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Improves the [Quality|quality] of a skill gem"
+      ],
+      "descrText": "Right click this item then left click a skill gem to apply it. The maximum quality is 20%.",
+      "frameType": 5,
+      "x": 2,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 2,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+      "league": "Rise of the Abyssal",
+      "id": "891420e4ca2c4a38dbad10c35cfddecbce400f973d61afeeccfd57173388442d",
+      "name": "",
+      "typeLine": "Fecund Utility Belt of Resurgence",
+      "baseType": "Utility Belt",
+      "rarity": "Magic",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Belt",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "55",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "Has 1 [Charm] Slot",
+        "20% of [Flask|Flask] Recovery applied Instantly"
+      ],
+      "explicitMods": [
+        "+172 to maximum Life",
+        "26.3 Life Regeneration per second"
+      ],
+      "frameType": 1,
+      "x": 10,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQnJlYWNoL0JyZWFjaHN0b25lU3BsaW50ZXIiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/00c84e43a8/BreachstoneSplinter.png",
+      "stackSize": 76,
+      "maxStackSize": 300,
+      "league": "Rise of the Abyssal",
+      "id": "885937c4abd4cb7a990d93274609a96ab5883d1aa6aed7c6fcda90294eddc083",
+      "name": "",
+      "typeLine": "Breach Splinter",
+      "baseType": "Breach Splinter",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "76/300",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "descrText": "Consume at least 50 Splinters at the Realmgate to enter the Twisted Domain.",
+      "frameType": 5,
+      "x": 8,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+      "league": "Rise of the Abyssal",
+      "id": "de545bfe27a1bc7fb3d1171df1c56014d2456ec9155f2a247ab64c06855bdc00",
+      "name": "",
+      "typeLine": "Incandescent Gold Amulet of the Philosopher",
+      "baseType": "Gold Amulet",
+      "rarity": "Magic",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Amulet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "64",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "20% increased [ItemRarity|Rarity of Items] found"
+      ],
+      "explicitMods": [
+        "+85 to maximum [EnergyShield|Energy Shield]",
+        "+22 to [Intelligence|Intelligence]"
+      ],
+      "frameType": 1,
+      "x": 11,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvVW5pcXVlcy9IZWFydGJvdW5kTG9vcCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/dff515495d/HeartboundLoop.png",
+      "league": "Rise of the Abyssal",
+      "id": "7939a7ae376978cf11b8fe049656fd02b8f30c7a187eb81b130f5b67362df586",
+      "name": "Heartbound Loop",
+      "typeLine": "Pearl Ring",
+      "baseType": "Pearl Ring",
+      "rarity": "Unique",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "32",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "9% increased Cast Speed"
+      ],
+      "explicitMods": [
+        "[Minion|Minions] have 15% increased maximum Life",
+        "13.1 Life Regeneration per second",
+        "24% increased Mana Regeneration Rate",
+        "300 [Physical] Damage taken on [Minion] Death",
+        "[Minion|Minions] [Reviving|Revive] 10% faster"
+      ],
+      "flavourText": [
+        "When the axe finally fell, Seryl shared his pain,\r",
+        "and the last thought that flickered through his\r",
+        "fading mind was her broken, shattered scream."
+      ],
+      "frameType": 3,
+      "x": 6,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4ef5836606/CurrencyAddModToRare.png",
+      "stackSize": 8,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "0f274c98956152c76f6c14d858aff71d17620afe50dab27c6629be8c6bc75888",
+      "name": "",
+      "typeLine": "Exalted Orb",
+      "baseType": "Exalted Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "8/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Augments a [ItemRarity|Rare] item with a new random modifier"
+      ],
+      "descrText": "Right click this item then left click a rare item to apply it. Rare items can have up to six random modifiers.",
+      "frameType": 5,
+      "x": 1,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvQmFzZXR5cGVzL1J1YnlSaW5nIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/4f0e6f99c1/RubyRing.png",
+      "league": "Rise of the Abyssal",
+      "id": "987e00ec19896d5c1bd06cf91048c05423cb27a5805876614a33a73f127620c4",
+      "name": "Torment Spiral",
+      "typeLine": "Ruby Ring",
+      "baseType": "Ruby Ring",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "52",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+25% to [Resistances|Fire Resistance]"
+      ],
+      "explicitMods": [
+        "+86 to [Evasion] Rating",
+        "21% increased [ItemRarity|Rarity of Items] found",
+        "+19 to [Intelligence|Intelligence]",
+        "+15% to [Resistances|Lightning Resistance]",
+        "15.9 Life Regeneration per second"
+      ],
+      "frameType": 2,
+      "x": 11,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "7001c0043afdef852986df2a561b931b288fea0b5f9904b80317ec8833aeacba",
+      "name": "",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Normal",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "5",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 68% [Delirious]",
+        "30% increased [PrecursorTablet|Precursor Tablets] found in Area"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 0,
+      "x": 8,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQnJlYWNoL0JyZWFjaENhdGFseXN0TGlnaHRuaW5nIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/41ee780a36/BreachCatalystLightning.png",
+      "stackSize": 10,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "6ba2cd482b6a0b284180c5c28854fd5fb9f42dad1960807583af310fc4647f3e",
+      "name": "",
+      "typeLine": "Esh's Catalyst",
+      "baseType": "Esh's Catalyst",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "10/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Adds [Quality|quality] that enhances [Lightning] modifiers on a ring or amulet\r\nReplaces other quality types"
+      ],
+      "descrText": "Right click this item then left click a ring or amulet to apply it. The maximum quality is 20%.",
+      "frameType": 5,
+      "x": 9,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvQmFzZXR5cGVzL1ByaXNtYXRpY1JpbmciLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/a9bd534c46/PrismaticRing.png",
+      "league": "Rise of the Abyssal",
+      "id": "4e6c05de69f708a8d13c99bc9a42c76cedddc34f6b649b57b96754877441194a",
+      "name": "Kraken Eye",
+      "typeLine": "Prismatic Ring",
+      "baseType": "Prismatic Ring",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "44",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+8% to all [ElementalDamage|Elemental] [Resistances]"
+      ],
+      "explicitMods": [
+        "+58 to maximum Mana",
+        "16% increased [ItemRarity|Rarity of Items] found",
+        "+14 to [Strength|Strength]",
+        "52% increased Mana Regeneration Rate"
+      ],
+      "frameType": 2,
+      "x": 6,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRSaXR1YWxVbmlxdWUxIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/b2b710c500/PrecursorTabletRitualUnique1.png",
+      "league": "Rise of the Abyssal",
+      "id": "2c5855c3c5290427bec0fac5f932ff8b5c707801d95e57b95bfc30c2642a63e3",
+      "name": "Freedom of Faith",
+      "typeLine": "Ritual Precursor Tablet",
+      "baseType": "Ritual Precursor Tablet",
+      "rarity": "Unique",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Tablet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "implicitMods": [
+        "14 Maps in Range contain [ContainsRitual|Ritual Altars]"
+      ],
+      "explicitMods": [
+        "Favours at [ContainsRitual|Ritual Altars] in Area costs 14% increased Tribute",
+        "Can Reroll Favours at [ContainsRitual|Ritual Altars] in your Maps twice as many times"
+      ],
+      "descrText": "Can be used in a completed Tower on your Atlas to influence surrounding Maps. Tablets are consumed once placed into a Tower.",
+      "flavourText": [
+        "When darkness comes, we pray for light.\r",
+        "When darkness is all that there is,\r",
+        "we pray for death."
+      ],
+      "frameType": 3,
+      "x": 3,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9EZWxpcml1bVNwbGludGVyIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/e173499678/DeliriumSplinter.png",
+      "stackSize": 9,
+      "maxStackSize": 300,
+      "league": "Rise of the Abyssal",
+      "id": "945440cb531a0ba5f25b975ffa45204c367938d30f451bb3c28598e7f5fd2c39",
+      "name": "",
+      "typeLine": "Simulacrum Splinter",
+      "baseType": "Simulacrum Splinter",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "9/300",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "descrText": "Consume at least 50 Splinters at the Realmgate to enter the Simulacrum.",
+      "frameType": 5,
+      "x": 1,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+      "league": "Rise of the Abyssal",
+      "id": "a8811e28d187892f8b14399a26dddb66fdec9795f2cd6cef33294a51f336f0b0",
+      "name": "Maelström Eye",
+      "typeLine": "Emerald",
+      "baseType": "Emerald",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "[Jewel]",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "10% increased [Lightning] Damage",
+        "+1% to [MaximumResistances|Maximum Lightning Resistance]",
+        "13% increased Damage with Bows"
+      ],
+      "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+      "frameType": 2,
+      "x": 10,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUnVuZXMvQWNjdXJhY3lSdW5lVGllcjIiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c4e7964c3c/AccuracyRuneTier2.png",
+      "stackSize": 1,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "1d5700f877a643cf4745d3d31878fc9d8ea16a3cb970571e806d0cabd86df36e",
+      "name": "",
+      "typeLine": "Greater Vision Rune",
+      "baseType": "Greater Vision Rune",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "1/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "30",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "explicitMods": [
+        "[MartialWeapon|Martial Weapon]: +110 to [Accuracy|Accuracy] Rating",
+        "Armour: 12% increased Life and Mana Recovery from [Flask|Flasks]",
+        "Wand or Staff: 24% increased [Critical|Critical Hit Chance] for [Spell|Spells]"
+      ],
+      "descrText": "Place into an empty Rune Socket in a Weapon or Armour to apply its effect to that item. Once socketed it cannot be retrieved but can be replaced by other socketable items.",
+      "frameType": 5,
+      "x": 3,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvR2Vtcy9VbmN1dFN1cHBvcnRHZW0iLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/9cb67faf4c/UncutSupportGem.png",
+      "iconTierText": "V",
+      "league": "Rise of the Abyssal",
+      "id": "53f3b2b8019b069536b324abacfa714ad42ffa6d3648c44b7689992b09c1bfa6",
+      "name": "",
+      "typeLine": "Uncut Support Gem (Level 5)",
+      "baseType": "Uncut Support Gem (Level 5)",
+      "ilvl": 0,
+      "identified": true,
+      "explicitMods": [
+        "Creates a Support Gem"
+      ],
+      "descrText": "Right Click to engrave a Support Gem.",
+      "frameType": 5,
+      "x": 8,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/20cd0159b7/CurrencyRerollRare.png",
+      "stackSize": 1,
+      "maxStackSize": 20,
+      "iconTierText": "II",
+      "league": "Rise of the Abyssal",
+      "id": "53c2627d452e35e2a46327cc0ef808e3187f0f3544b1294c86cdc444dac42739",
+      "name": "",
+      "typeLine": "Greater Chaos Orb",
+      "baseType": "Greater Chaos Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "1/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        },
+        {
+          "name": "[BetterCurrencyMinimumLevel|Minimum Modifier Level]",
+          "values": [
+            [
+              "35",
+              0
+            ]
+          ],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "Removes a random modifier and augments a [ItemRarity|Rare] item with a new random modifier"
+      ],
+      "descrText": "Right click this item then left click a rare item to apply it.",
+      "frameType": 5,
+      "x": 7,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/af4036c345/CurrencyModValues.png",
+      "stackSize": 1,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "876fd1884c795681f47347e76a5fab82f872f1943420d3a2aaf93af2761e6783",
+      "name": "",
+      "typeLine": "Divine Orb",
+      "baseType": "Divine Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "1/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Randomises the numeric values of modifiers on an item"
+      ],
+      "descrText": "Right click this item then left click an item to apply it.",
+      "frameType": 5,
+      "x": 6,
+      "y": 1,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQnJlYWNoL0JyZWFjaENhdGFseXN0TGlmZSIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/bd0462f76b/BreachCatalystLife.png",
+      "stackSize": 2,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "b5d3c6d6346667d96cdc1ea0b93a56248b81dc3e44ae9b2d0f7183460184cc73",
+      "name": "",
+      "typeLine": "Flesh Catalyst",
+      "baseType": "Flesh Catalyst",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "2/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Adds [Quality|quality] that enhances Life modifiers on a ring or amulet\r\nReplaces other quality types"
+      ],
+      "descrText": "Right click this item then left click a ring or amulet to apply it. The maximum quality is 20%.",
+      "frameType": 5,
+      "x": 8,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU3RlbGxhckFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/a44db4cd4a/StellarAmulet.png",
+      "league": "Rise of the Abyssal",
+      "id": "fc38763c41d933d80bd2c75c563b00a5f38d8839f6c095ce0a17da0040f286c7",
+      "name": "Tempest Choker",
+      "typeLine": "Stellar Amulet",
+      "baseType": "Stellar Amulet",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Amulet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "52",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+7 to all [Attributes|Attributes]"
+      ],
+      "explicitMods": [
+        "44% increased [Armour]",
+        "+105 to maximum Life",
+        "+50 to [Spirit|Spirit]",
+        "+25 to [Dexterity|Dexterity]",
+        "+23 to [Intelligence|Intelligence]"
+      ],
+      "frameType": 2,
+      "x": 8,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRCcmVhY2giLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b45b6e660e/PrecursorTabletBreach.png",
+      "league": "Rise of the Abyssal",
+      "id": "76b771c01166eb61c44c4e2786de0d67b0c2e35c3b34f8190141eba41b6c2f2e",
+      "name": "",
+      "typeLine": "Collector's Breach Precursor Tablet of the Invasion",
+      "baseType": "Breach Precursor Tablet",
+      "rarity": "Magic",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Tablet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "implicitMods": [
+        "12 Maps in Range contain [ContainsBreach|Breaches]"
+      ],
+      "explicitMods": [
+        "[ContainsBreach|Breaches] in your Maps have 5% increased Monster density",
+        "7% increased [Rarity] of Items found in your Maps"
+      ],
+      "descrText": "Can be used in a completed Tower on your Atlas to influence surrounding Maps. Tablets are consumed once placed into a Tower.",
+      "frameType": 1,
+      "x": 9,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL1NhcHBoaXJlSmV3ZWwiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/976a8c1642/SapphireJewel.png",
+      "league": "Rise of the Abyssal",
+      "id": "ae446da140c8d028fc98d5edc2567065a87ffdbb0b4660a1f3a47703843067fd",
+      "name": "Dusk Breath",
+      "typeLine": "Sapphire",
+      "baseType": "Sapphire",
+      "rarity": "Rare",
+      "ilvl": 82,
+      "identified": true,
+      "properties": [
+        {
+          "name": "[Jewel]",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "19% increased maximum [EnergyShield|Energy Shield]",
+        "7% increased [Critical|Critical Hit] Chance",
+        "7% increased [Critical|Critical Hit Chance] for [Spell|Spells]",
+        "5% increased Area of Effect"
+      ],
+      "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+      "frameType": 2,
+      "x": 6,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/6f089a6497/CurrencyAddModToMagic.png",
+      "stackSize": 2,
+      "maxStackSize": 30,
+      "iconTierText": "III",
+      "league": "Rise of the Abyssal",
+      "id": "742997fc76d6c1868e57fc62bdecbbecef821d3bff7be2f8a4adfd9fcb1d4ef9",
+      "name": "",
+      "typeLine": "Perfect Orb of Augmentation",
+      "baseType": "Perfect Orb of Augmentation",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "2/30",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        },
+        {
+          "name": "[BetterCurrencyMinimumLevel|Minimum Modifier Level]",
+          "values": [
+            [
+              "70",
+              0
+            ]
+          ],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "Augments a [ItemRarity|Magic] item with a new random modifier"
+      ],
+      "descrText": "Right click this item then left click a magic item to apply it. Magic items can have up to two random modifiers.",
+      "frameType": 5,
+      "x": 7,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
+      "league": "Rise of the Abyssal",
+      "id": "3044290b8bca9c70a3285c63aa6a4b41b920d28ebda59e14d503977dabf65a90",
+      "name": "Ghoul Idol",
+      "typeLine": "Amber Amulet",
+      "baseType": "Amber Amulet",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Amulet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "60",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+10 to [Strength|Strength]"
+      ],
+      "explicitMods": [
+        "50% increased [Armour]",
+        "+35 to maximum Mana",
+        "13% increased [ItemRarity|Rarity of Items] found",
+        "32 Life Regeneration per second"
+      ],
+      "frameType": 2,
+      "x": 4,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/a5813cbccd/CurrencyUpgradeToUnique.png",
+      "stackSize": 2,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "41fef70cea20cc2200a6c7d563d9c0b2c62723665a6e5079c0e20392df7b8458",
+      "name": "",
+      "typeLine": "Orb of Chance",
+      "baseType": "Orb of Chance",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "2/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Unpredictably either upgrades a [ItemRarity|Normal] item to [ItemRarity|Unique] rarity or destroys it"
+      ],
+      "descrText": "Right click this item then left click a normal item to apply it.",
+      "frameType": 5,
+      "x": 1,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c27779a8b7/CurrencyUpgradeMagicToRare.png",
+      "stackSize": 6,
+      "maxStackSize": 20,
+      "league": "Rise of the Abyssal",
+      "id": "be9bd48afb6535eb10ee650b9e619e15e6c4a3baab5efb11ca88c52df905d329",
+      "name": "",
+      "typeLine": "Regal Orb",
+      "baseType": "Regal Orb",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "6/20",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "explicitMods": [
+        "Upgrades a [ItemRarity|Magic] item to a [ItemRarity|Rare] item, adding 1 modifier"
+      ],
+      "descrText": "Right click this item then left click a magic item to apply it. Current modifiers are retained and a new one is added.",
+      "frameType": 5,
+      "x": 3,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+      "league": "Rise of the Abyssal",
+      "id": "8d81a043149c3980bbe2aa8ec9cf152979cc40f5bf894c9edd8d1fce8cc2ca33",
+      "name": "Phoenix Wound",
+      "typeLine": "Emerald",
+      "baseType": "Emerald",
+      "rarity": "Rare",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "[Jewel]",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "12% increased [Projectile] Damage",
+        "9% increased Damage with [Crossbow|Crossbows]",
+        "14% increased Life [Flask|Flask] Charges gained"
+      ],
+      "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+      "frameType": 2,
+      "x": 5,
+      "y": 3,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL1J1YnlKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/8ef1a48ec8/RubyJewel.png",
+      "league": "Rise of the Abyssal",
+      "id": "03ffba3ec647d90cb283c9bc13836f4049947bcbab19401ee70230e41b188f4e",
+      "name": "Rapture Shine",
+      "typeLine": "Ruby",
+      "baseType": "Ruby",
+      "rarity": "Rare",
+      "ilvl": 80,
+      "identified": true,
+      "properties": [
+        {
+          "name": "[Jewel]",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "explicitMods": [
+        "16% increased [Stun] Buildup",
+        "15% increased [Totem|Totem] Damage",
+        "15% increased [BuffMagnitude|Magnitude] of [Bleeding|Bleeding] you inflict"
+      ],
+      "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+      "frameType": 2,
+      "x": 4,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 2,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvVW5pcXVlcy9CaXJ0aHJpZ2h0QnVja2xlIiwidyI6MiwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/5549f2f4ca/BirthrightBuckle.png",
+      "league": "Rise of the Abyssal",
+      "id": "44208ec94dcaff7b313b59a06d6d88f3cc4cbe4875bf6c90dbd1179992ba70da",
+      "name": "Birthright Buckle",
+      "typeLine": "Wide Belt",
+      "baseType": "Wide Belt",
+      "rarity": "Unique",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Belt",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "14",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "Has 2 [Charm] Slots",
+        "23% increased [Flask|Flask] Charges gained"
+      ],
+      "explicitMods": [
+        "+115 to [Armour]",
+        "11% reduced [Flask|Flask] Charges used",
+        "25% increased [Flask|Flask] Charges gained",
+        "Life [Flask|Flasks] used while on [LowLife|Low Life] apply Recovery Instantly",
+        "Mana [Flask|Flasks] used while on [LowMana|Low Mana] apply Recovery Instantly"
+      ],
+      "flavourText": [
+        "Some families have peculiar gifts..."
+      ],
+      "frameType": 3,
+      "x": 2,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUnVuZXMvRW5oYW5jZVJ1bmVUaWVyMiIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/6b729ab5a0/EnhanceRuneTier2.png",
+      "stackSize": 3,
+      "maxStackSize": 10,
+      "league": "Rise of the Abyssal",
+      "id": "8e13e2d2cb3aed3196fbd0d4e7b220163471ff3482e54cae6093aebc58ce6b17",
+      "name": "",
+      "typeLine": "Greater Iron Rune",
+      "baseType": "Greater Iron Rune",
+      "ilvl": 0,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Stack Size",
+          "values": [
+            [
+              "3/10",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 32
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "30",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "explicitMods": [
+        "[MartialWeapon|Martial Weapon]: 18% increased [Physical] Damage",
+        "Armour: 18% increased [Armour|Armour], [Evasion|Evasion] and [EnergyShield|Energy Shield]",
+        "Wand or Staff: 30% increased [Spell] Damage"
+      ],
+      "descrText": "Place into an empty Rune Socket in a Weapon or Armour to apply its effect to that item. Once socketed it cannot be retrieved but can be replaced by other socketable items.",
+      "frameType": 5,
+      "x": 5,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUmluZ3MvQmFzZXR5cGVzL0xhenVsaVJpbmciLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/53f4255f0b/LazuliRing.png",
+      "league": "Rise of the Abyssal",
+      "id": "38b8a19eb989b39966d069fd9ff490b483e6ddceda7dc622437f97bc50f8f938",
+      "name": "Blood Twirl",
+      "typeLine": "Lazuli Ring",
+      "baseType": "Lazuli Ring",
+      "rarity": "Rare",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Ring",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "requirements": [
+        {
+          "name": "Level",
+          "values": [
+            [
+              "43",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 62
+        }
+      ],
+      "implicitMods": [
+        "+22 to maximum Mana"
+      ],
+      "explicitMods": [
+        "+35 to maximum Life",
+        "13% increased [ItemRarity|Rarity of Items] found",
+        "5.3 Life Regeneration per second",
+        "[ManaLeech|Leech] 6.87% of [Physical] [Attack] Damage as Mana"
+      ],
+      "frameType": 2,
+      "x": 2,
+      "y": 4,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvUHJlY3Vyc29yVGFibGV0cy9QcmVjdXJzb3JUYWJsZXRHZW5lcmljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/4fbc73f060/PrecursorTabletGeneric.png",
+      "league": "Rise of the Abyssal",
+      "id": "e41c3ede8dc35f2d4e84a7120b45e0a16424309a348e04d0c75f6d86e5d99f48",
+      "name": "",
+      "typeLine": "Collector's Precursor Tablet of Shrines",
+      "baseType": "Precursor Tablet",
+      "rarity": "Magic",
+      "ilvl": 81,
+      "identified": true,
+      "properties": [
+        {
+          "name": "Tablet",
+          "values": [],
+          "displayMode": 0
+        }
+      ],
+      "implicitMods": [
+        "14 Maps in Range are [ContainsIrradiated|Irradiated]"
+      ],
+      "explicitMods": [
+        "8% increased [Rarity] of Items found in your Maps",
+        "Your Maps have 49% increased chance to contain [Shrine|Shrines]"
+      ],
+      "descrText": "Can be used in a completed Tower on your Atlas to influence surrounding Maps. Tablets are consumed once placed into a Tower.",
+      "frameType": 1,
+      "x": 9,
+      "y": 2,
+      "inventoryId": "MainInventory"
+    },
+    {
+      "realm": "poe2",
+      "verified": false,
+      "w": 1,
+      "h": 1,
+      "icon": "https://web.poecdn.com/gen/image/WzI4LDE0LHsiZiI6IjJESXRlbXMvTWFwcy9FbmRnYW1lTWFwcy9FbmRnYW1lTWFwMTUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIiwibWQiOnRydWV9XQ/770ea5e75a/EndgameMap15.png",
+      "iconTierText": "XV",
+      "league": "Rise of the Abyssal",
+      "id": "a91b5b02b83bbc00daeb87df1d6122a40c1892bd0e93911694c454ddd6d088d6",
+      "name": "Desecrated Course",
+      "typeLine": "Waystone (Tier 15)",
+      "baseType": "Waystone (Tier 15)",
+      "rarity": "Rare",
+      "ilvl": 82,
+      "identified": true,
+      "corrupted": true,
+      "properties": [
+        {
+          "name": "Waystone",
+          "values": [],
+          "displayMode": 0
+        },
+        {
+          "name": "Waystone Tier",
+          "values": [
+            [
+              "15",
+              0
+            ]
+          ],
+          "displayMode": 0,
+          "type": 1
+        },
+        {
+          "name": "[LimitedRespawn|Revives Available]",
+          "values": [
+            [
+              "0",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 98
+        },
+        {
+          "name": "Monster Pack Size",
+          "values": [
+            [
+              "+10%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 4
+        },
+        {
+          "name": "Magic Monsters",
+          "values": [
+            [
+              "+87%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 102
+        },
+        {
+          "name": "Rare Monsters",
+          "values": [
+            [
+              "+51%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 103
+        },
+        {
+          "name": "Item Rarity",
+          "values": [
+            [
+              "+70%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 3
+        },
+        {
+          "name": "Waystone Drop Chance",
+          "values": [
+            [
+              "+105%",
+              1
+            ]
+          ],
+          "displayMode": 0,
+          "type": 66
+        }
+      ],
+      "enchantMods": [
+        "Players in Area are 21% [Delirious]"
+      ],
+      "explicitMods": [
+        "Players are periodically [Curse|Cursed] with [ElementalWeakness|Elemental Weakness]",
+        "43% more Monster Life",
+        "Monsters have 260% increased [Critical|Critical Hit] Chance",
+        "+30% to Monster [CriticalDamageBonus|Critical Damage Bonus]",
+        "Monsters deal 29% of Damage as Extra Cold",
+        "Monsters have 15% chance to inflict [Bleeding] on [HitDamage|Hit]",
+        "Monster Damage Penetrates 13% Elemental Resistances",
+        "Rare Monsters have 1 additional Modifier"
+      ],
+      "descrText": "Can be used in a Map Device, allowing you to enter a Map. Waystones can only be used once.",
+      "frameType": 2,
+      "x": 1,
+      "y": 0,
+      "inventoryId": "MainInventory"
+    }
+  ]
+}
