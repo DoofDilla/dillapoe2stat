@@ -11,6 +11,8 @@ import os
 from collections import Counter
 import re
 from price_check_poe2 import valuate_items_raw, fmt  # fmt nur für hübsche Ausgabe
+from client_parsing import get_last_map_from_client
+from poe_logging import log_run
 
 CLIENT_ID = "dillapoe2stat"        # deine Client Id
 CLIENT_SECRET = "UgraAmlUXdP1"  # hier dein Secret eintragen
@@ -18,52 +20,13 @@ CLIENT_SECRET = "UgraAmlUXdP1"  # hier dein Secret eintragen
 CHAR_TO_CHECK = "Mettmanwalking"
 # make sure the path is where the script is located
 LOG = Path(os.path.dirname(os.path.abspath(__file__))) / "runs.jsonl"
+
 CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # anpassen!
 
 AUTH_URL = "https://www.pathofexile.com/oauth/token"
 API_URL = "https://api.pathofexile.com"
 
 USER_AGENT = "DillaPoE2Stat/0.1 (+you@example.com)"
-
-# passt auf die von dir gezeigte Zeile
-GEN_RE = re.compile(
-    r'^(?P<ts>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}).*?Generating level (?P<lvl>\d+) area "(?P<code>[^"]+)" with seed (?P<seed>\d+)',
-    re.IGNORECASE
-)
-
-def code_to_title(code: str) -> str:
-    # "MapAzmerianRanges" -> "Azmerian Ranges"
-    if code.startswith("Map"):
-        code = code[3:]
-    out = []
-    for i, ch in enumerate(code):
-        if i and ch.isupper() and (not code[i-1].isupper()):
-            out.append(" ")
-        out.append(ch)
-    return "".join(out).strip()
-
-def get_last_map_from_client(client_path, scan_bytes=1_500_000):
-    size = os.path.getsize(client_path)
-    with open(client_path, "rb") as f:
-        f.seek(max(0, size - scan_bytes))
-        buf = f.read()
-    text = buf.decode("utf-8", errors="ignore")
-    for line in reversed(text.splitlines()):
-        m = GEN_RE.search(line)
-        if m:
-            ts  = m.group("ts")
-            lvl = int(m.group("lvl"))
-            code = m.group("code")
-            seed = int(m.group("seed"))
-            return {
-                "timestamp": ts,
-                "level": lvl,
-                "map_code": code,
-                "map_name": code_to_title(code),
-                "seed": seed,
-                "raw": line
-            }
-    return None
 
 def get_token():
     data = {
@@ -113,37 +76,6 @@ def diff_inventories(before, after):
     removed = [before_keys[k] for k in before_keys if k not in after_keys]
     return added, removed
 
-def aggregate(items):
-    c = Counter()
-    for it in items:
-        c[it.get("typeLine")] += int(it.get("stackSize") or 1)
-    # Liste aus Dicts (besser fürs Lesen)
-    return [{"name": n, "stack": s} for n, s in c.items()]
-
-def log_run(char, added, removed):
-    global current_map_info
-    rec = {
-        "run_id": str(uuid.uuid4()),
-        "ts": dt.datetime.now().isoformat(timespec="seconds"),
-        "character": char,
-        "map": {
-            "name": current_map_info["map_name"],
-            "level": current_map_info["level"]
-        } if current_map_info else {
-            "name": "Unknown",
-            "level": 0
-        },
-        "map_value": map_value,
-        "added_count": len(added),
-        "removed_count": len(removed),
-        "added": aggregate(added),       # ggf. strippen/kompakt machen
-        "removed": aggregate(removed),
-    }
-    LOG.parent.mkdir(parents=True, exist_ok=True)
-    with LOG.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-
-
 
 if __name__ == "__main__":
     token = get_token()
@@ -153,12 +85,17 @@ if __name__ == "__main__":
         raise SystemExit
 
     name = CHAR_TO_CHECK
-    notify('Starting DillaPoE2Stat', f'Watching character: {name}', icon='file://C:/temp/PythonPlayground/Dillapoe2stat/cat64x64.png')
+    # get the current absolute path of the script and create the string for the icon
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    icon_path = os.path.join(script_dir, 'cat64x64.png')
+
+    notify('Starting DillaPoE2Stat', f'Watching character: {name}', icon=f'file://{icon_path}')
     print(f"Using character: {name}")
     print("Hotkeys:  F2 = PRE snapshot   |   F3 = POST snapshot + diff   |   Esc = quit")
 
     pre_inv = None
-    current_map_info = None  # global variable to store current map info
+    current_map_info = None
+    map_value = None
     last_call = 0.0  # timestamp of last API call
 
     def rate_limit(min_gap=2.5):
@@ -190,8 +127,7 @@ if __name__ == "__main__":
             print("[PRE] error:", e)
 
     def do_post():
-        global pre_inv
-        global map_value
+        global pre_inv, map_value, current_map_info
         if pre_inv is None:
             print("[POST] no PRE snapshot yet. Press F2 first.")
             return
@@ -242,7 +178,7 @@ if __name__ == "__main__":
 
             print("\n=== ready for next map ===\n")
             notify('Hallo Dilla!', 'Map Run done!' + (f', Value: {fmt(map_value)}ex' if map_value else ''))
-            log_run(name, added, removed)  # (wenn du willst, erweitern um totals)
+            log_run(name, added, removed, current_map_info, map_value, LOG)  # (wenn du willst, erweitern um totals)
         except Exception as e:
             print("[POST] error:", e)
         finally:
