@@ -182,12 +182,12 @@ class PoEStatsTracker:
             
             self.display.display_completion_separator()
             
-            # Create notification
+            # Update session tracking FIRST
+            self.session_manager.add_completed_map(map_value)
+            
+            # Create notification AFTER session update
             if self.config.NOTIFICATION_ENABLED:
                 self._create_completion_notification(map_runtime, map_value, self.current_map_info)
-            
-            # Update session tracking
-            self.session_manager.add_completed_map(map_value)
             
             # Display session progress
             progress = self.session_manager.get_session_progress()
@@ -233,7 +233,12 @@ class PoEStatsTracker:
         session_time = self._format_time(progress['runtime_seconds']) if progress else "N/A"
         session_value = fmt(progress['total_value']) if progress else "0"
         
-        notification_msg = f"🗺️ {map_name}\n⏰ Session: {session_time}\n💰 Session Value: {session_value}ex"
+        # Optimized for 4-line toast limit
+        maps_completed = progress['maps_completed'] if progress else 0
+        notification_msg = (f"🗺️ {map_name}\n"
+                           f"⏰ Session: {session_time} | 🗺️ Maps: {maps_completed}\n"
+                           f"💰 Session Value: {session_value}ex\n"
+                           f"🚀 Starting new map run!")
         
         notify('Starting Map Run!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
     
@@ -247,11 +252,21 @@ class PoEStatsTracker:
         session_time = self._format_time(progress['runtime_seconds']) if progress else "N/A"
         session_value = fmt(progress['total_value']) if progress else "0"
         
+        # Optimized for 4-line toast limit
         notification_msg = (f"🗺️ {map_name}\n"
-                           f"⏱️ Map Time: {map_time}\n"
-                           f"💰 Map Value: {map_val}ex\n"
-                           f"⏰ Session: {session_time}\n"
-                           f"💰 Session Value: {session_value}ex")
+                           f"⏱️ Runtime: {map_time} | 💰 Value: {map_val}ex\n"
+                           f"⏰ Session: {session_time} | 💰 Total: {session_value}ex\n"
+                           f"✅ Map completed!")
+        
+        # Debug: Print notification content to console for troubleshooting
+        if self.config.DEBUG_ENABLED:
+            print(f"[DEBUG] POST notification content:")
+            print(f"  map_name: '{map_name}'")
+            print(f"  map_time: '{map_time}'")
+            print(f"  map_val: '{map_val}'")
+            print(f"  session_time: '{session_time}'")
+            print(f"  session_value: '{session_value}'")
+            print(f"  notification_msg: '{notification_msg}'")
         
         notify('Map Completed!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
     
@@ -271,9 +286,10 @@ class PoEStatsTracker:
             else:
                 value_str = "No valuable items"
             
-            notification_msg = (f"💼 {total_items} items total\\n"
-                               f"💎 {len(valuable_items)} valuable items\\n"
-                               f"💰 Total Value: {value_str}")
+            notification_msg = (f"💼 {total_items} items scanned\n"
+                               f"💎 {len(valuable_items)} valuable items found\n"
+                               f"💰 Total Value: {value_str}\n"
+                               f"✅ Inventory check complete!")
             
             notify('Inventory Check', notification_msg, icon=f'file://{self.config.get_icon_path()}')
         except Exception:
@@ -284,19 +300,21 @@ class PoEStatsTracker:
         session_id_short = session_info["session_id"][:8]
         start_time = session_info["start_time_str"]
         
-        notification_msg = (f"🆔 ID: {session_id_short}...\\n"
-                           f"🚀 Character: {self.config.CHAR_TO_CHECK}\\n"
-                           f"🕐 Started: {start_time}")
+        notification_msg = (f"🚀 Character: {self.config.CHAR_TO_CHECK}\n"
+                           f"🆔 ID: {session_id_short}...\n"
+                           f"� Started: {start_time}\n"
+                           f"✅ New session ready!")
         
         notify('New Session Started!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
     
     def _create_startup_notification(self, session_info):
-        """Create notification for application startup"""
+        """Create notification for application startup - 7 lines test"""
         session_id_short = session_info["session_id"][:8]
         
-        notification_msg = (f"🎮 Character: {self.config.CHAR_TO_CHECK}\\n"
-                           f"🆔 Session: {session_id_short}...\\n"
-                           f"⌨️ Ready for F2/F3/F5 hotkeys!")
+        notification_msg = (f"🎮 Character: {self.config.CHAR_TO_CHECK}\n"
+                           f"🆔 Session: {session_id_short}...\n"
+                           f"⌨️ F2=PRE | F3=POST | F5=Inventory\n"
+                           f"✅ Ready! Press F2 to start mapping")
         
         notify('DillaPoE2Stat Started!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
     
