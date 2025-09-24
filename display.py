@@ -138,9 +138,9 @@ class DisplayManager:
     
     def display_completion_separator(self):
         """Display completion separator"""
-        print(f"\n{'='*50}")
-        print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
-        print(f"{'='*50}\n")
+        print(f"\n{'-'*50}")
+        print(f"✅ {Colors.GRAY}Map completed{Colors.END}")
+        print(f"{'-'*50}")
     
     def display_session_header(self, session_id, start_time_str):
         """Display new session header"""
@@ -197,7 +197,9 @@ class DisplayManager:
             print(f"📊 Avg/Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END} | "
                   f"⏱️  Avg Time: {Colors.CYAN}{avg_time:.1f}m{Colors.END}")
         
-        print(f"{'-'*30}")
+        print(f"\n{'='*50}")
+        print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
+        print(f"{'='*50}\n")
     
     def display_session_completion(self, maps_completed, total_value):
         """Display session completion summary"""
