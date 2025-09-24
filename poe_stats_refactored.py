@@ -253,6 +253,30 @@ class PoEStatsTracker:
             notify('New Session Started!', f'Session ID: {session_info["session_id"][:8]}...', 
                    icon=f'file://{self.config.get_icon_path()}')
     
+    def check_current_inventory_value(self):
+        """Check and display the value of the current inventory"""
+        self.rate_limit()
+        try:
+            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            
+            self.display.display_inventory_count(len(current_inventory), "[CURRENT]")
+            
+            # Debug output
+            if self.config.DEBUG_SHOW_SUMMARY:
+                self.debugger.dump_item_summary(current_inventory, "[CURRENT-SUMMARY]")
+            elif self.config.DEBUG_ENABLED:
+                self.debugger.dump_inventory_to_console(current_inventory, "[CURRENT-DEBUG]")
+            
+            # Display current inventory value
+            self.display.display_current_inventory_value(current_inventory)
+            
+            if self.config.NOTIFICATION_ENABLED:
+                notify('Inventory Check', 'Current inventory value calculated!', 
+                       icon=f'file://{self.config.get_icon_path()}')
+                
+        except Exception as e:
+            self.display.display_error("INVENTORY CHECK", str(e))
+    
     def display_session_stats(self):
         """Display current session statistics"""
         stats = self.session_manager.get_current_session_stats(self.config.get_log_file_path())

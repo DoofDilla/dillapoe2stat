@@ -74,9 +74,10 @@ class HotkeyManager:
             ('f2', tracker_instance.take_pre_snapshot, 'Take PRE-map snapshot'),
             ('f3', tracker_instance.take_post_snapshot, 'Take POST-map snapshot'),
             ('f4', tracker_instance.toggle_debug_mode, 'Toggle debug mode'),
-            ('f5', tracker_instance.toggle_output_mode, 'Toggle output mode'),
+            ('f5', tracker_instance.check_current_inventory_value, 'Check current inventory value'),
             ('f6', tracker_instance.start_new_session, 'Start new session'),
             ('f7', tracker_instance.display_session_stats, 'Display session stats'),
+            ('f8', tracker_instance.toggle_output_mode, 'Toggle output mode'),
         ]
         
         successful_registrations = 0
