@@ -6,6 +6,7 @@
 - [Overview](#overview)
 - [Feature Highlights](#feature-highlights)
 - [Repository Layout](#repository-layout)
+- [Installation (Windows)](#installation-windows)
 - [Quick Start](#quick-start)
   - [1. Gather prerequisites](#1-gather-prerequisites)
   - [2. Configure the tracker](#2-configure-the-tracker)
@@ -56,6 +57,25 @@ DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming se
 
 Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey_price2.py`, `poeninja_price_check*.py`, etc.) remain in the repository for reference.
 
+## Installation (Windows)
+
+1. **Install Python (if needed):** Follow the [official Python for Windows installation guide](https://docs.python.org/3/using/windows.html#installing-python). The tracker assumes a working Python 3.10+ environment is already configured on your system.
+2. **Download the project:** Clone this repository or extract a ZIP of the latest release into a convenient folder, e.g. `C:\Tools\DillaPoE2Stat`.
+3. **(Recommended) Create a virtual environment:**
+   ```powershell
+   cd C:\Tools\DillaPoE2Stat
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+4. **Install required packages:** Use `pip` to install the dependencies listed in [`requirements.txt`](requirements.txt).
+   ```powershell
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+5. **Verify optional tools:** If you plan to experiment with auxiliary scripts (e.g., DualSense helpers), also install any optional packages they mention in their module headers.
+
+> **Tip:** When re-opening a new PowerShell session, reactivate the virtual environment with `.\.venv\Scripts\Activate.ps1` before running the tracker.
+
 ## Quick Start
 
 ### 1. Gather prerequisites
@@ -63,11 +83,7 @@ Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey
 - **Python:** 3.10 or newer is recommended.
 - **Path of Exile account:** Create an OAuth client ID/secret via the [Path of Exile Developer Portal](https://www.pathofexile.com/developer/docs/api) with `account:characters` and `account:profile` scopes.
 - **Game log access:** Locate your `Client.txt` log (typically under `Documents\My Games\Path of Exile 2\logs` or your custom install path).
-- **Python dependencies:**
-  ```bash
-  pip install requests keyboard win11toast
-  ```
-  Optional utilities (used by side scripts): `pywin32`, `pydualsense`, `pynput`.
+- **Python dependencies:** Install the core libraries with `pip install -r requirements.txt`. Optional utilities (used by side scripts) include `pywin32`, `pydualsense`, and `pynput`.
 
 ### 2. Configure the tracker
 1. Open [`config.py`](config.py) and adjust:
