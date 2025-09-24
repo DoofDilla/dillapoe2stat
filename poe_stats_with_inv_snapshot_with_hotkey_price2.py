@@ -8,7 +8,7 @@ from collections import Counter
 import re
 from price_check_poe2 import valuate_items_raw, fmt  # fmt nur für hübsche Ausgabe
 from client_parsing import get_last_map_from_client
-from poe_logging import log_run
+from poe_logging import log_run, log_session_start, log_session_end, get_session_stats
 from poe_api import get_token, get_characters, snapshot_inventory
 from inventory_debug import InventoryDebugger
 
@@ -23,7 +23,7 @@ CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # anpassen!
 
 # Debug settings
 DEBUG_ENABLED = True  # Set to False to disable debug output
-DEBUG_TO_FILE = True  # Set to False to only show debug in console
+DEBUG_TO_FILE = False  # Set to False to only show debug in console
 DEBUG_SHOW_SUMMARY = True  # Show item summary instead of full JSON dump
 OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
 
@@ -71,10 +71,17 @@ class PoEStatsTracker:
         self.last_api_call = 0.0
         self.map_start_time = None
         
+        # Session tracking
+        self.session_id = str(uuid.uuid4())
+        self.session_start_time = time.time()
+        self.session_maps_completed = 0
+        self.session_total_value = 0
+        
         # Setup paths
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.icon_path = os.path.join(script_dir, 'cat64x64.png')
         self.log_file = Path(script_dir) / "runs.jsonl"
+        self.session_log_file = Path(script_dir) / "sessions.jsonl"
         
         # Initialize debugger
         self.debugger = InventoryDebugger(debug_enabled=debug_enabled)
@@ -89,11 +96,15 @@ class PoEStatsTracker:
             print("No characters found")
             raise SystemExit
         
+        # Start new session
+        self.start_new_session()
+        
         notify('Starting DillaPoE2Stat', f'Watching character: {self.character_name}', 
                icon=f'file://{self.icon_path}')
         print(f"🎮 Using character: {Colors.CYAN}{self.character_name}{Colors.END}")
         print(f"📋 Output mode: {Colors.BOLD}{self.output_mode.upper()}{Colors.END}")
-        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug | {Colors.RED}Esc{Colors.END}=Quit")
+        print(f"🆔 Session ID: {Colors.GRAY}{self.session_id[:8]}...{Colors.END}")
+        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug | {Colors.GREEN}F6{Colors.END}=New Session | {Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.RED}Esc{Colors.END}=Quit")
     
     def rate_limit(self, min_gap=2.5):
         """Enforce rate limiting for API calls"""
@@ -251,17 +262,23 @@ class PoEStatsTracker:
             # Create notification message with runtime and value
             notification_msg = ""
             if map_runtime:
-                notification_msg += f"⏱️ Time: {minutes}m {seconds}s"
+                notification_msg += f"\n⏱️ Time: {minutes}m {seconds}s"
             if self.map_value and self.map_value > 0.01:
                 notification_msg += f"\n💰 Value: {fmt(self.map_value)}ex"
-            elif net_c and net_c > 0.01:
-                notification_msg += f"\n💰 Value: {fmt(net_c)}c"
             else:
                 notification_msg += "\n💰 No valuable loot"
-
-            notify('Map run complete', notification_msg, icon=f'file://{self.icon_path}')
-
-            log_run(self.character_name, added, removed, self.current_map_info, self.map_value, self.log_file, map_runtime)
+            
+            notify('Map Completed!', notification_msg, icon=f'file://{self.icon_path}')
+            
+            # Update session tracking
+            self.session_maps_completed += 1
+            if self.map_value and self.map_value > 0:
+                self.session_total_value += self.map_value
+            
+            # Display session progress after each run
+            self.display_session_progress()
+            
+            log_run(self.character_name, added, removed, self.current_map_info, self.map_value, self.log_file, map_runtime, self.session_id)
             
         except Exception as e:
             print(f"❌ [POST] error: {e}")
@@ -279,12 +296,101 @@ class PoEStatsTracker:
         self.output_mode = "comprehensive" if self.output_mode == "normal" else "normal"
         print(f"🔄 Output mode changed to: {Colors.BOLD}{self.output_mode.upper()}{Colors.END}")
     
+    def start_new_session(self):
+        """Start a new session"""
+        # Log end of previous session if it exists
+        if hasattr(self, 'session_id') and self.session_maps_completed > 0:
+            session_runtime = time.time() - self.session_start_time
+            log_session_end(self.session_id, self.character_name, session_runtime, 
+                          self.session_total_value, self.session_maps_completed, self.session_log_file)
+        
+        # Start new session
+        self.session_id = str(uuid.uuid4())
+        self.session_start_time = time.time()
+        self.session_maps_completed = 0
+        self.session_total_value = 0
+        
+        log_session_start(self.session_id, self.character_name, self.session_log_file)
+        
+        session_time = time.strftime("%H:%M:%S", time.localtime(self.session_start_time))
+        print(f"\n🎬 {Colors.BOLD}NEW SESSION STARTED{Colors.END}")
+        print(f"🆔 Session ID: {Colors.CYAN}{self.session_id[:8]}...{Colors.END}")
+        print(f"🕐 Started at: {Colors.GRAY}{session_time}{Colors.END}")
+        print(f"{'='*50}\n")
+        
+        notify('New Session Started!', f'Session ID: {self.session_id[:8]}...', 
+               icon=f'file://{self.icon_path}')
+    
+    def display_session_stats(self):
+        """Display current session statistics"""
+        current_time = time.time()
+        session_runtime = current_time - self.session_start_time
+        hours = int(session_runtime // 3600)
+        minutes = int((session_runtime % 3600) // 60)
+        seconds = int(session_runtime % 60)
+        
+        # Get detailed session stats from log
+        session_stats = get_session_stats(self.session_id, self.log_file)
+        
+        print(f"\n📊 {Colors.BOLD}CURRENT SESSION STATS{Colors.END}")
+        print(f"🆔 Session ID: {Colors.CYAN}{self.session_id[:8]}...{Colors.END}")
+        print(f"⏱️  Total Time: {Colors.CYAN}{hours}h {minutes}m {seconds}s{Colors.END}")
+        print(f"🗺️  Maps Completed: {Colors.GREEN}{self.session_maps_completed}{Colors.END}")
+        
+        if self.session_total_value > 0:
+            print(f"💰 Total Value: {Colors.GOLD}{fmt(self.session_total_value)}ex{Colors.END}")
+            if self.session_maps_completed > 0:
+                avg_value = self.session_total_value / self.session_maps_completed
+                print(f"📈 Average per Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END}")
+        else:
+            print(f"💰 Total Value: {Colors.GRAY}0ex{Colors.END}")
+        
+        if session_stats['maps']:
+            print(f"\n📜 {Colors.BOLD}Recent Maps:{Colors.END}")
+            for i, map_run in enumerate(session_stats['maps'][-5:], 1):  # Show last 5 maps
+                map_name = map_run['map']['name']
+                map_level = map_run['map']['level']
+                map_value = map_run.get('map_value', 0) or 0
+                runtime = map_run.get('map_runtime')
+                
+                time_str = f"{int(runtime//60)}m {int(runtime%60)}s" if runtime else "N/A"
+                value_str = f"{fmt(map_value)}ex" if map_value > 0.01 else "0ex"
+                
+                print(f"  {i}. {Colors.WHITE}{map_name}{Colors.END} {Colors.GRAY}(T{map_level}){Colors.END} "
+                      f"- {Colors.CYAN}{time_str}{Colors.END} - {Colors.GOLD}{value_str}{Colors.END}")
+        
+        print(f"{'='*50}\n")
+    
+    def display_session_progress(self):
+        """Display session progress after each map completion"""
+        current_time = time.time()
+        session_runtime = current_time - self.session_start_time
+        hours = int(session_runtime // 3600)
+        minutes = int((session_runtime % 3600) // 60)
+        
+        session_time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+        
+        print(f"\n📈 {Colors.BOLD}SESSION PROGRESS{Colors.END}")
+        print(f"🕐 Session Time: {Colors.CYAN}{session_time_str}{Colors.END} | "
+              f"🗺️  Maps: {Colors.GREEN}{self.session_maps_completed}{Colors.END} | "
+              f"💰 Total Value: {Colors.GOLD}{fmt(self.session_total_value)}ex{Colors.END}")
+        
+        if self.session_maps_completed > 0:
+            avg_value = self.session_total_value / self.session_maps_completed
+            avg_time = session_runtime / self.session_maps_completed / 60  # in minutes
+            print(f"📊 Avg/Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END} | "
+                  f"⏱️  Avg Time: {Colors.CYAN}{avg_time:.1f}m{Colors.END}")
+        
+        print(f"{'-'*30}")
+    
     def setup_hotkeys(self):
         """Setup keyboard hotkeys"""
         keyboard.add_hotkey('f2', self.take_pre_snapshot)
         keyboard.add_hotkey('f3', self.take_post_snapshot)
         keyboard.add_hotkey('f4', self.toggle_debug_mode)
         keyboard.add_hotkey('f5', self.toggle_output_mode)  # F5 to toggle output mode
+        keyboard.add_hotkey('f6', self.start_new_session)   # F6 to start new session
+        keyboard.add_hotkey('f7', self.display_session_stats)  # F7 to view session stats
     
     def run(self):
         """Main application loop"""
@@ -292,10 +398,18 @@ class PoEStatsTracker:
         self.setup_hotkeys()
         
         try:
-            keyboard.wait('esc')
+            keyboard.wait('ctrl+esc')  # Use Ctrl+Esc to exit
         except KeyboardInterrupt:
             pass
         finally:
+            # Log session end on exit
+            if self.session_maps_completed > 0:
+                session_runtime = time.time() - self.session_start_time
+                log_session_end(self.session_id, self.character_name, session_runtime, 
+                              self.session_total_value, self.session_maps_completed, self.session_log_file)
+                print(f"\n📊 {Colors.BOLD}Session completed!{Colors.END}")
+                print(f"🗺️  Total maps: {Colors.GREEN}{self.session_maps_completed}{Colors.END}")
+                print(f"💰 Total value: {Colors.GOLD}{fmt(self.session_total_value)}ex{Colors.END}")
             print("Bye.")
 
 

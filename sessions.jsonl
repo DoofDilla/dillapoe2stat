@@ -1,0 +1,2 @@
+{"event_type": "session_start", "session_id": "5bb27bac-fe35-40b7-9ae5-f2e97ac5e5c6", "ts": "2025-09-24T01:06:02", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "5bb27bac-fe35-40b7-9ae5-f2e97ac5e5c6", "ts": "2025-09-24T02:04:31", "character": "Mettmanwalking", "session_runtime": 3508.68, "total_value": 1505.8484800468589, "total_maps": 6}
