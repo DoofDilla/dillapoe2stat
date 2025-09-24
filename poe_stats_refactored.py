@@ -82,8 +82,7 @@ class PoEStatsTracker:
         
         # Display startup information
         if self.config.NOTIFICATION_ENABLED:
-            notify('Starting DillaPoE2Stat', f'Watching character: {self.config.CHAR_TO_CHECK}', 
-                   icon=f'file://{self.config.get_icon_path()}')
+            self._create_startup_notification(session_info)
         
         self.display.display_startup_info(
             self.config.CHAR_TO_CHECK, 
@@ -137,8 +136,7 @@ class PoEStatsTracker:
             self.display.display_map_info(self.current_map_info)
             
             if self.config.NOTIFICATION_ENABLED:
-                mapname = self.current_map_info["map_name"] if self.current_map_info else "Unknown"
-                notify('Hallo Dilla!', f'Starting Map Run! {mapname}')
+                self._create_pre_map_notification(self.current_map_info)
                 
         except Exception as e:
             self.display.display_error("PRE", str(e))
@@ -186,7 +184,7 @@ class PoEStatsTracker:
             
             # Create notification
             if self.config.NOTIFICATION_ENABLED:
-                self._create_completion_notification(map_runtime, map_value)
+                self._create_completion_notification(map_runtime, map_value, self.current_map_info)
             
             # Update session tracking
             self.session_manager.add_completed_map(map_value)
@@ -214,20 +212,93 @@ class PoEStatsTracker:
             self.pre_inventory = None
             self.map_start_time = None
     
-    def _create_completion_notification(self, map_runtime, map_value):
-        """Create notification for map completion"""
-        notification_msg = ""
-        if map_runtime:
-            minutes = int(map_runtime // 60)
-            seconds = int(map_runtime % 60)
-            notification_msg += f"\n⏱️ Time: {minutes}m {seconds}s"
+    def _format_time(self, seconds):
+        """Format seconds into a readable time string"""
+        if seconds is None:
+            return "N/A"
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = int(seconds % 60)
         
-        if map_value and map_value > 0.01:
-            notification_msg += f"\n💰 Value: {fmt(map_value)}ex"
+        if hours > 0:
+            return f"{hours}h {minutes}m"
         else:
-            notification_msg += "\n💰 No valuable loot"
+            return f"{minutes}m {secs}s"
+    
+    def _create_pre_map_notification(self, map_info):
+        """Create notification for PRE-map snapshot"""
+        progress = self.session_manager.get_session_progress()
+        
+        map_name = map_info["map_name"] if map_info else "Unknown Map"
+        session_time = self._format_time(progress['runtime_seconds']) if progress else "N/A"
+        session_value = fmt(progress['total_value']) if progress else "0"
+        
+        notification_msg = f"🗺️ {map_name}\n⏰ Session: {session_time}\n💰 Session Value: {session_value}ex"
+        
+        notify('Starting Map Run!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
+    
+    def _create_completion_notification(self, map_runtime, map_value, map_info):
+        """Create notification for map completion"""
+        progress = self.session_manager.get_session_progress()
+        
+        map_name = map_info["map_name"] if map_info else "Unknown Map"
+        map_time = self._format_time(map_runtime)
+        map_val = fmt(map_value) if map_value and map_value > 0.01 else "0"
+        session_time = self._format_time(progress['runtime_seconds']) if progress else "N/A"
+        session_value = fmt(progress['total_value']) if progress else "0"
+        
+        notification_msg = (f"🗺️ {map_name}\n"
+                           f"⏱️ Map Time: {map_time}\n"
+                           f"💰 Map Value: {map_val}ex\n"
+                           f"⏰ Session: {session_time}\n"
+                           f"💰 Session Value: {session_value}ex")
         
         notify('Map Completed!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
+    
+    def _create_inventory_check_notification(self, inventory_items):
+        """Create notification for inventory check"""
+        try:
+            from price_check_poe2 import valuate_items_raw
+            rows, (total_c, total_e) = valuate_items_raw(inventory_items)
+            
+            valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+            total_items = len([r for r in rows if r['qty'] > 0])
+            
+            if total_e and total_e > 0.01:
+                value_str = f"{fmt(total_e)}ex"
+            elif total_c and total_c > 0.01:
+                value_str = f"{fmt(total_c)}c"
+            else:
+                value_str = "No valuable items"
+            
+            notification_msg = (f"💼 {total_items} items total\\n"
+                               f"💎 {len(valuable_items)} valuable items\\n"
+                               f"💰 Total Value: {value_str}")
+            
+            notify('Inventory Check', notification_msg, icon=f'file://{self.config.get_icon_path()}')
+        except Exception:
+            notify('Inventory Check', 'Current inventory scanned!', icon=f'file://{self.config.get_icon_path()}')
+    
+    def _create_session_start_notification(self, session_info):
+        """Create notification for new session start"""
+        session_id_short = session_info["session_id"][:8]
+        start_time = session_info["start_time_str"]
+        
+        notification_msg = (f"🆔 ID: {session_id_short}...\\n"
+                           f"🚀 Character: {self.config.CHAR_TO_CHECK}\\n"
+                           f"🕐 Started: {start_time}")
+        
+        notify('New Session Started!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
+    
+    def _create_startup_notification(self, session_info):
+        """Create notification for application startup"""
+        session_id_short = session_info["session_id"][:8]
+        
+        notification_msg = (f"🎮 Character: {self.config.CHAR_TO_CHECK}\\n"
+                           f"🆔 Session: {session_id_short}...\\n"
+                           f"⌨️ Ready for F2/F3/F5 hotkeys!")
+        
+        notify('DillaPoE2Stat Started!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
     
     def toggle_debug_mode(self):
         """Toggle debug mode on/off"""
@@ -250,8 +321,7 @@ class PoEStatsTracker:
         )
         
         if self.config.NOTIFICATION_ENABLED:
-            notify('New Session Started!', f'Session ID: {session_info["session_id"][:8]}...', 
-                   icon=f'file://{self.config.get_icon_path()}')
+            self._create_session_start_notification(session_info)
     
     def check_current_inventory_value(self):
         """Check and display the value of the current inventory"""
@@ -271,8 +341,7 @@ class PoEStatsTracker:
             self.display.display_current_inventory_value(current_inventory)
             
             if self.config.NOTIFICATION_ENABLED:
-                notify('Inventory Check', 'Current inventory value calculated!', 
-                       icon=f'file://{self.config.get_icon_path()}')
+                self._create_inventory_check_notification(current_inventory)
                 
         except Exception as e:
             self.display.display_error("INVENTORY CHECK", str(e))

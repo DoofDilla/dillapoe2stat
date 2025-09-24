@@ -20,9 +20,23 @@ class Config:
     # File Paths
     CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
     
-    # Debug Settings
-    DEBUG_ENABLED = True
+    # Debug Settings - Control what debug information is displayed and logged
+    # DEBUG_ENABLED: Master switch for debug mode. When True, enables additional debug output
+    #                and console logging. Can be toggled at runtime with F4 hotkey.
+    #                - False: Normal operation, minimal debug output
+    #                - True: Enhanced debugging with detailed item information
+    DEBUG_ENABLED = False
+    
+    # DEBUG_TO_FILE: Controls whether debug snapshots are saved to JSON files in /debug folder
+    #                Useful for troubleshooting inventory parsing issues or API responses
+    #                - False: No file output, debug info only shown in console
+    #                - True: Saves PRE/POST inventory snapshots as timestamped JSON files
     DEBUG_TO_FILE = False
+    
+    # DEBUG_SHOW_SUMMARY: When debug is enabled, controls the level of detail shown
+    #                     This setting determines console output verbosity in debug mode
+    #                     - True: Show concise item summaries (name, quantity, location)
+    #                     - False: Show full detailed item dumps (all properties, IDs, etc.)
     DEBUG_SHOW_SUMMARY = True
     
     # Display Settings
