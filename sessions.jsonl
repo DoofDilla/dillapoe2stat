@@ -1,2 +1,4 @@
 {"event_type": "session_start", "session_id": "5bb27bac-fe35-40b7-9ae5-f2e97ac5e5c6", "ts": "2025-09-24T01:06:02", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "5bb27bac-fe35-40b7-9ae5-f2e97ac5e5c6", "ts": "2025-09-24T02:04:31", "character": "Mettmanwalking", "session_runtime": 3508.68, "total_value": 1505.8484800468589, "total_maps": 6}
+{"event_type": "session_start", "session_id": "c4ab55b3-7389-497b-b01a-1f6f014234a1", "ts": "2025-09-24T12:46:35", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "c4ab55b3-7389-497b-b01a-1f6f014234a1", "ts": "2025-09-24T12:46:48", "character": "Mettmanwalking", "session_runtime": 12.22, "total_value": 0.0, "total_maps": 0}
