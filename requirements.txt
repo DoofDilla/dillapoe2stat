@@ -1,0 +1,3 @@
+keyboard
+requests
+win11toast
