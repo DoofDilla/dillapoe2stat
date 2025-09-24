@@ -96,9 +96,10 @@ You will see a configuration summary, receive a Windows toast that monitoring ha
 | `F2` | Capture the **pre-map** inventory snapshot and read the latest map info from `Client.txt`. |
 | `F3` | Capture the **post-map** inventory, diff changes, evaluate loot value, and log the run. |
 | `F4` | Toggle debug mode (enables verbose inventory dumps and file exports via `InventoryDebugger`). |
-| `F5` | Switch between `normal` (valuable items only) and `comprehensive` output modes. |
+| `F5` | Run an on-demand inventory scan and display your current stash value. |
 | `F6` | End the active session (persist summary) and immediately start a fresh one. |
 | `F7` | Print the current session dashboard, including the last five maps. |
+| `F8` | Switch between `normal` (valuable items only) and `comprehensive` output modes. |
 | `Ctrl+Esc` | Gracefully exit the tracker and unregister all hotkeys. |
 
 > Tip: The hotkeys are registered globally through the `keyboard` package—no terminal focus required.
@@ -106,11 +107,17 @@ You will see a configuration summary, receive a Windows toast that monitoring ha
 ### Output modes
 - **Normal:** Minimal clutter; highlights only items whose chaos/exalt totals exceed 0.01.
 - **Comprehensive:** Prints every added/removed item, category tags, stack counts, and raw chaos/exalt conversions.
-Switch modes on the fly with `F5`.
+Switch modes on the fly with `F8`.
+
+### Inventory value check
+- Tap `F5` at any time (even mid-map) to snapshot your current inventory and display a full valuation breakdown.
+- The console highlights valuable finds, total chaos/exalt tallies, and how many items met the value threshold.
+- When notifications are enabled you'll also receive a toast summarizing item counts and value.
 
 ### Notifications
-- Session start, map start, and map completion pop toast notifications (icon provided in `cat64x64.png`).
-- Completion toasts include runtime and exalt-equivalent value when available.
+- Startup, new session, map start, map completion, and manual inventory checks pop toast notifications (icon provided in `cat64x64.png`).
+- Map start toasts include the current session runtime and total value so far.
+- Completion toasts report map runtime/value alongside the running session totals.
 - Disable notifications by setting `NOTIFICATION_ENABLED = False` in `config.py`.
 
 ## Data & Logs
