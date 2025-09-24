@@ -36,8 +36,9 @@ class DisplayManager:
         print(f"📋 Output mode: {Colors.BOLD}{output_mode.upper()}{Colors.END}")
         print(f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}")
         print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.GREEN}F3{Colors.END}=POST | "
-              f"{Colors.GREEN}F4{Colors.END}=Debug | {Colors.GREEN}F6{Colors.END}=New Session | "
-              f"{Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.RED}Esc{Colors.END}=Quit")
+              f"{Colors.GREEN}F4{Colors.END}=Debug | {Colors.GREEN}F5{Colors.END}=Inventory")
+        print(f"         {Colors.GREEN}F6{Colors.END}=New Session | {Colors.GREEN}F7{Colors.END}=Session Stats | "
+              f"{Colors.GREEN}F8{Colors.END}=Output Mode | {Colors.RED}Ctrl+Esc{Colors.END}=Quit")
     
     def display_map_info(self, map_info):
         """Display current map information"""
@@ -216,6 +217,48 @@ class DisplayManager:
     def display_error(self, error_type, error_message):
         """Display error messages"""
         print(f"❌ [{error_type}] error: {error_message}")
+    
+    def display_current_inventory_value(self, inventory_items):
+        """Display value analysis of current inventory"""
+        try:
+            from price_check_poe2 import valuate_items_raw
+            rows, (total_c, total_e) = valuate_items_raw(inventory_items)
+            
+            print(f"\n💼 {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
+            print(f"{'='*50}")
+            
+            # Filter valuable items for display
+            valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+            
+            if valuable_items:
+                print(f"\n💰 {Colors.BOLD}Valuable Items:{Colors.END}")
+                for r in valuable_items:
+                    ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
+                    print(f"  💎 {Colors.WHITE}{r['name']}{Colors.END} "
+                          f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
+                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                
+                # Display totals
+                print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
+                print(f"💰 Chaos: {Colors.GOLD}{fmt(total_c)}c{Colors.END}")
+                if total_e is not None and total_e > 0.01:
+                    print(f"💰 Exalted: {Colors.GOLD}{fmt(total_e)}ex{Colors.END}")
+                
+                # Show percentage of valuable vs total items
+                valuable_count = len(valuable_items)
+                total_count = len([r for r in rows if r['qty'] > 0])
+                if total_count > valuable_count:
+                    worthless_count = total_count - valuable_count
+                    print(f"\n📊 {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} worthless{Colors.END}")
+            else:
+                print(f"\n💰 {Colors.GRAY}No valuable items found in current inventory{Colors.END}")
+                total_items = len([r for r in rows if r['qty'] > 0])
+                print(f"📦 Total items: {total_items}")
+            
+            print(f"{'='*50}\n")
+                
+        except Exception as e:
+            print(f"❌ [INVENTORY VALUE] error: {e}")
     
     def display_info_message(self, message):
         """Display general info messages"""
