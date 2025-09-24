@@ -185,7 +185,7 @@ class DisplayManager:
                   f"- {Colors.CYAN}{time_str}{Colors.END} - {Colors.GOLD}{value_str}{Colors.END}")
     
     def display_session_progress(self, session_time_str, maps_completed, total_value, 
-                                avg_value=None, avg_time=None):
+                                avg_value=None, avg_time=None, runtime_seconds=None):
         """Display session progress after each map completion"""
         print(f"\n📈 {Colors.BOLD}SESSION PROGRESS{Colors.END}")
         print(f"🕐 Session Time: {Colors.CYAN}{session_time_str}{Colors.END} | "

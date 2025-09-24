@@ -18,7 +18,7 @@ class Config:
     CHAR_TO_CHECK = "Mettmanwalking"  # Change this to your character name
     
     # File Paths
-    CLIENT_LOG = r"D:\G\Path of Exile 2\logs\Client.txt"  # Update this path
+    CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
     
     # Debug Settings
     DEBUG_ENABLED = True
