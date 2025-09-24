@@ -69,10 +69,10 @@ class Config:
         warnings = []
         
         # Check required settings
-        if cls.CLIENT_SECRET == "UgraAmlUXdP1":
+        if cls.CLIENT_SECRET == "":
             warnings.append("Using default CLIENT_SECRET - please update with your actual secret")
         
-        if cls.CHAR_TO_CHECK == "Mettmanwalking":
+        if cls.CHAR_TO_CHECK == "":
             warnings.append("Using default character name - please update CHAR_TO_CHECK")
         
         # Check file paths
