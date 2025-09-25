@@ -341,6 +341,146 @@ class PoEStatsTracker:
         if self.config.NOTIFICATION_ENABLED:
             self._create_session_start_notification(session_info)
     
+    def _find_waystone_in_inventory(self, inventory):
+        """Find waystone in top-left inventory position (0,0)"""
+        for item in inventory:
+            if (item.get('x') == 0 and item.get('y') == 0 and 
+                'Waystone' in item.get('typeLine', '')):
+                return item
+        return None
+    
+    def _parse_waystone_info(self, waystone_item):
+        """Extract name and prefixes from waystone item"""
+        if not waystone_item:
+            return None
+        
+        # Extract basic info
+        name = waystone_item.get('name', 'Unknown Waystone')
+        type_line = waystone_item.get('typeLine', '')
+        
+        # Extract tier from typeLine (e.g., "Waystone (Tier 15)")
+        tier = "Unknown"
+        if 'Tier' in type_line:
+            import re
+            tier_match = re.search(r'Tier (\d+)', type_line)
+            if tier_match:
+                tier = tier_match.group(1)
+        
+        # Extract prefixes from explicit mods
+        prefixes = []
+        explicit_mods = waystone_item.get('explicitMods', [])
+        for mod in explicit_mods:
+            # Clean up mod text and extract meaningful prefixes
+            clean_mod = mod.strip()
+            if clean_mod:
+                prefixes.append(clean_mod)
+        
+        # Extract suffixes from implicit mods
+        suffixes = []
+        implicit_mods = waystone_item.get('implicitMods', [])
+        for mod in implicit_mods:
+            # Clean up mod text and extract meaningful suffixes
+            clean_mod = mod.strip()
+            if clean_mod:
+                suffixes.append(clean_mod)
+        
+        return {
+            'name': name,
+            'tier': tier,
+            'prefixes': prefixes,
+            'suffixes': suffixes,
+            'type_line': type_line,
+            'full_item': waystone_item
+        }
+    
+    def take_experimental_pre_snapshot(self):
+        """Experimental PRE-map snapshot using waystone from inventory"""
+        self.rate_limit()
+        try:
+            self.map_start_time = time.time()
+            self.pre_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            
+            self.display.display_inventory_count(len(self.pre_inventory), "[EXPERIMENTAL PRE]")
+            
+            # Find and parse waystone
+            waystone = self._find_waystone_in_inventory(self.pre_inventory)
+            waystone_info = self._parse_waystone_info(waystone)
+            
+            if waystone_info:
+                # Store waystone info as current map info
+                self.current_map_info = {
+                    'map_name': waystone_info['name'],
+                    'level': waystone_info['tier'],
+                    'prefixes': waystone_info['prefixes'],
+                    'suffixes': waystone_info['suffixes'],
+                    'source': 'waystone_inventory',
+                    'seed': 'experimental'  # We don't have seed from waystone
+                }
+                
+                # Display waystone info with prefixes
+                self.display.display_experimental_waystone_info(waystone_info)
+                
+                # Debug output
+                if self.config.DEBUG_ENABLED:
+                    print(f"[DEBUG] Waystone found: {waystone_info}")
+                
+            else:
+                print("⚠️  No waystone found in top-left inventory position (0,0)")
+                self.current_map_info = {
+                    'map_name': 'No Waystone Found',
+                    'level': 'Unknown',
+                    'prefixes': [],
+                    'suffixes': [],
+                    'source': 'waystone_inventory',
+                    'seed': 'experimental'
+                }
+            
+            # Standard debug output
+            if self.config.DEBUG_SHOW_SUMMARY:
+                self.debugger.dump_item_summary(self.pre_inventory, "[EXP-PRE-SUMMARY]")
+            elif self.config.DEBUG_ENABLED:
+                self.debugger.dump_inventory_to_console(self.pre_inventory, "[EXP-PRE-DEBUG]")
+            
+            if self.config.DEBUG_TO_FILE:
+                metadata = {
+                    "character": self.config.CHAR_TO_CHECK,
+                    "snapshot_type": "EXPERIMENTAL_PRE",
+                    "waystone_info": waystone_info,
+                    "map_info": self.current_map_info
+                }
+                self.debugger.dump_inventory_to_file(self.pre_inventory, "exp_pre_inventory", metadata)
+            
+            if self.config.NOTIFICATION_ENABLED:
+                self._create_experimental_pre_map_notification(waystone_info)
+                
+        except Exception as e:
+            self.display.display_error("EXPERIMENTAL PRE", str(e))
+    
+    def _create_experimental_pre_map_notification(self, waystone_info):
+        """Create notification for experimental PRE-map snapshot"""
+        progress = self.session_manager.get_session_progress()
+        
+        if waystone_info:
+            map_name = waystone_info['name']
+            tier = waystone_info['tier']
+            prefix_count = len(waystone_info['prefixes'])
+            suffix_count = len(waystone_info['suffixes'])
+        else:
+            map_name = "No Waystone"
+            tier = "?"
+            prefix_count = 0
+            suffix_count = 0
+        
+        session_time = self._format_time(progress['runtime_seconds']) if progress else "N/A"
+        maps_completed = progress['maps_completed'] if progress else 0
+        
+        notification_msg = (f"🧪 {map_name} (T{tier})\n"
+                           f"⚗️ Prefixes: {prefix_count} | � Suffixes: {suffix_count}\n"
+                           f"🗺️ Maps: {maps_completed} | ⏰ Session: {session_time}\n"
+                           f"🚀 Experimental mode activated!")
+        
+        notify('Experimental Map Run!', notification_msg, icon=f'file://{self.config.get_icon_path()}')
+    
     def check_current_inventory_value(self):
         """Check and display the value of the current inventory"""
         self.rate_limit()

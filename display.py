@@ -35,10 +35,11 @@ class DisplayManager:
         print(f"🎮 Using character: {Colors.CYAN}{character_name}{Colors.END}")
         print(f"📋 Output mode: {Colors.BOLD}{output_mode.upper()}{Colors.END}")
         print(f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}")
-        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.GREEN}F3{Colors.END}=POST | "
-              f"{Colors.GREEN}F4{Colors.END}=Debug | {Colors.GREEN}F5{Colors.END}=Inventory")
-        print(f"         {Colors.GREEN}F6{Colors.END}=New Session | {Colors.GREEN}F7{Colors.END}=Session Stats | "
-              f"{Colors.GREEN}F8{Colors.END}=Output Mode | {Colors.RED}Ctrl+Esc{Colors.END}=Quit")
+        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Exp.PRE | "
+              f"{Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug")
+        print(f"         {Colors.GREEN}F5{Colors.END}=Inventory | {Colors.GREEN}F6{Colors.END}=New Session | "
+              f"{Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.GREEN}F8{Colors.END}=Output Mode")
+        print(f"         {Colors.RED}Ctrl+Esc{Colors.END}=Quit | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Experimental waystone mode")
     
     def display_map_info(self, map_info):
         """Display current map information"""
@@ -261,6 +262,34 @@ class DisplayManager:
                 
         except Exception as e:
             print(f"❌ [INVENTORY VALUE] error: {e}")
+    
+    def display_experimental_waystone_info(self, waystone_info):
+        """Display experimental waystone information with prefixes"""
+        if not waystone_info:
+            print("⚠️  No waystone information available")
+            return
+        
+        print(f"🧪 {Colors.BOLD}EXPERIMENTAL MODE{Colors.END} - Waystone Analysis")
+        print(f"🗺️  {Colors.BOLD}{waystone_info['name']}{Colors.END} "
+              f"{Colors.GRAY}(Tier {waystone_info['tier']}){Colors.END}")
+        
+        # Display prefixes (explicit mods)
+        if waystone_info['prefixes']:
+            print(f"⚗️  {Colors.BOLD}Prefixes ({len(waystone_info['prefixes'])}){Colors.END}:")
+            for i, prefix in enumerate(waystone_info['prefixes'], 1):
+                print(f"   {Colors.MAGENTA}{i}.{Colors.END} {Colors.WHITE}{prefix}{Colors.END}")
+        else:
+            print(f"⚗️  {Colors.GRAY}No prefixes found{Colors.END}")
+        
+        # Display suffixes (implicit mods)
+        if waystone_info['suffixes']:
+            print(f"🔮 {Colors.BOLD}Suffixes ({len(waystone_info['suffixes'])}){Colors.END}:")
+            for i, suffix in enumerate(waystone_info['suffixes'], 1):
+                print(f"   {Colors.CYAN}{i}.{Colors.END} {Colors.WHITE}{suffix}{Colors.END}")
+        else:
+            print(f"🔮 {Colors.GRAY}No suffixes found{Colors.END}")
+        
+        print(f"{Colors.GRAY}Source: Waystone from inventory position (0,0){Colors.END}")
     
     def display_info_message(self, message):
         """Display general info messages"""
