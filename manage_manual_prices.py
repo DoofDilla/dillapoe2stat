@@ -7,36 +7,39 @@ from manual_prices import get_manual_price_database
 
 
 def add_price_interactive():
-    """Interactive tool to add a new manual price"""
+    """Interactive tool to add a new manual item mapping"""
     db = get_manual_price_database()
     
-    print("=== Add Manual Price ===")
+    print("=== Add Manual Item Mapping ===")
     item_name = input("Item name: ").strip()
     if not item_name:
         print("Item name cannot be empty!")
         return
     
-    print("\nAvailable currencies:")
-    print("1. chaos - Chaos Orb")
-    print("2. exalted - Exalted Orb") 
-    print("3. orb_of_annulment - Orb of Annulment")
-    print("4. divine_orb - Divine Orb")
-    print("5. orb_of_fusing - Orb of Fusing")
+    print("\nCommon currencies to map to:")
+    print("1. Orb of Annulment")
+    print("2. Divine Orb")
+    print("3. Orb of Fusing")
+    print("4. Chaos Orb")
+    print("5. Exalted Orb")
+    print("6. Vaal Orb")
+    print("Or type any other item/currency name")
     
-    currency_choice = input("\nSelect currency (1-5 or type custom): ").strip()
+    currency_choice = input("\nSelect target item (1-6 or type custom): ").strip()
     
     currency_map = {
-        '1': 'chaos',
-        '2': 'exalted',
-        '3': 'orb_of_annulment',
-        '4': 'divine_orb',
-        '5': 'orb_of_fusing'
+        '1': 'Orb of Annulment',
+        '2': 'Divine Orb',
+        '3': 'Orb of Fusing',
+        '4': 'Chaos Orb',
+        '5': 'Exalted Orb',
+        '6': 'Vaal Orb'
     }
     
-    currency = currency_map.get(currency_choice, currency_choice)
+    maps_to = currency_map.get(currency_choice, currency_choice)
     
     try:
-        amount = float(input(f"Amount of {currency}: ").strip())
+        amount = float(input(f"Amount of '{maps_to}': ").strip())
     except ValueError:
         print("Invalid amount!")
         return
@@ -44,74 +47,73 @@ def add_price_interactive():
     category = input("Category (optional): ").strip() or "Manual"
     description = input("Description (optional): ").strip()
     
-    db.add_item_price(item_name, currency, amount, category, description)
-    print(f"\n✅ Added: {item_name} = {amount} {currency}")
+    db.add_item_mapping(item_name, maps_to, amount, category, description)
+    print(f"\n✅ Added mapping: {item_name} → {amount} {maps_to}")
     
-    # Show converted values
+    # Show converted values using real market prices
     result = db.get_item_price(item_name)
     if result:
         chaos_val, ex_val, cat = result
-        print(f"   Converted: {chaos_val:.2f}c | {ex_val:.3f}ex | Category: {cat}")
+        print(f"   Current market value: {chaos_val:.2f}c | {ex_val:.3f}ex | Category: {cat}")
 
 
 def list_manual_prices():
-    """List all manual prices"""
+    """List all manual item mappings"""
     db = get_manual_price_database()
     items = db.list_manual_items()
     
     if not items:
-        print("No manual prices found.")
+        print("No manual item mappings found.")
         return
     
-    print("=== Manual Prices ===")
+    print("=== Manual Item Mappings ===")
     for item_name, data in items.items():
         result = db.get_item_price(item_name)
         if result:
             chaos_val, ex_val, category = result
             print(f"{item_name}:")
-            print(f"  Original: {data['amount']} {data['currency']}")
-            print(f"  Converted: {chaos_val:.2f}c | {ex_val:.3f}ex")
+            print(f"  Maps to: {data['amount']} × {data['maps_to']}")
+            print(f"  Current value: {chaos_val:.2f}c | {ex_val:.3f}ex")
             print(f"  Category: {category}")
             if data.get('description'):
                 print(f"  Description: {data['description']}")
             print()
 
 
-def update_currency_rates():
-    """Update currency conversion rates"""
+def test_item_lookup():
+    """Test looking up an existing item mapping"""
     db = get_manual_price_database()
     
-    print("=== Update Currency Rates ===")
-    print("Current rates:")
-    rates = db.list_currency_rates()
-    for currency, data in rates.items():
-        print(f"  {currency}: {data['chaos_value']}c | {data['exalted_value']}ex")
-    
-    print("\nUpdate a rate (or press Enter to skip):")
-    currency = input("Currency name: ").strip()
-    if not currency:
+    print("=== Test Item Lookup ===")
+    item_name = input("Enter item name to test: ").strip()
+    if not item_name:
+        print("Item name cannot be empty!")
         return
     
-    try:
-        chaos_value = float(input(f"Chaos value for {currency}: ").strip())
-        exalted_value = float(input(f"Exalted value for {currency}: ").strip())
-    except ValueError:
-        print("Invalid values!")
-        return
-    
-    description = input("Description (optional): ").strip()
-    
-    db.update_currency_rate(currency, chaos_value, exalted_value, description)
-    print(f"✅ Updated {currency} rates: {chaos_value}c | {exalted_value}ex")
+    result = db.get_item_price(item_name)
+    if result:
+        chaos_val, ex_val, category = result
+        print(f"\n✅ Found: {item_name}")
+        print(f"   Current market value: {chaos_val:.2f}c | {ex_val:.3f}ex")
+        print(f"   Category: {category}")
+        
+        # Show mapping details
+        mappings = db.list_manual_items()
+        if item_name in mappings:
+            data = mappings[item_name]
+            print(f"   Maps to: {data['amount']} × {data['maps_to']}")
+    else:
+        print(f"\n❌ No mapping found for: {item_name}")
+        print("Use option 1 to add a new mapping.")
 
 
 def main():
     """Main menu"""
     while True:
         print("\n=== Manual Price Manager ===")
-        print("1. Add new manual price")
-        print("2. List all manual prices")
-        print("3. Update currency rates")
+        print("1. Add new item mapping")
+        print("2. List all item mappings")
+        print("3. Test item lookup")
         print("4. Exit")
         
         choice = input("\nSelect option (1-4): ").strip()
@@ -121,7 +123,7 @@ def main():
         elif choice == '2':
             list_manual_prices()
         elif choice == '3':
-            update_currency_rates()
+            test_item_lookup()
         elif choice == '4':
             print("Goodbye!")
             break
