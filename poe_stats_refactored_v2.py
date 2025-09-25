@@ -51,6 +51,7 @@ class PoEStatsTracker:
         self.current_map_info = None
         self.last_api_call = 0.0
         self.map_start_time = None
+        self.cached_waystone_info = None  # Cache for waystone info from Ctrl+F2
     
     def initialize(self):
         """Initialize the tracker with API token and character validation"""
@@ -128,11 +129,29 @@ class PoEStatsTracker:
                 }
                 self.debugger.dump_inventory_to_file(self.pre_inventory, "pre_inventory", metadata)
             
-            # Get current map info
-            self.current_map_info = get_last_map_from_client(
+            # Get current map info from client.txt
+            client_map_info = get_last_map_from_client(
                 self.config.CLIENT_LOG, 
                 self.config.CLIENT_LOG_SCAN_BYTES
             )
+            
+            # Combine client.txt info with cached waystone info if available
+            if self.cached_waystone_info and client_map_info:
+                # Use map name from client.txt but add waystone attributes
+                self.current_map_info = {
+                    'map_name': client_map_info['map_name'],
+                    'level': client_map_info['level'],
+                    'seed': client_map_info['seed'],
+                    'source': 'client_log_with_waystone',
+                    # Add waystone attributes for logging (but not prefixes/suffixes)
+                    'waystone_tier': self.cached_waystone_info['tier'],
+                    'area_modifiers': self.cached_waystone_info['area_modifiers'],
+                    'modifier_count': len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes'])
+                }
+                print(f"📊 Enhanced with waystone data: T{self.cached_waystone_info['tier']}, {self.current_map_info['modifier_count']} modifiers")
+            else:
+                # Use standard client.txt info
+                self.current_map_info = client_map_info
             
             self.display.display_map_info(self.current_map_info)
             
@@ -143,28 +162,44 @@ class PoEStatsTracker:
         except Exception as e:
             self.display.display_error("PRE", str(e))
     
-    def take_experimental_pre_snapshot(self):
-        """Experimental PRE-map snapshot using waystone from inventory"""
+    def analyze_waystone(self):
+        """Analyze waystone from inventory (experimental) - display only, no map start"""
         self.rate_limit()
         
-        # Set map start time
-        self.map_start_time = get_current_timestamp()
-        
-        # Use waystone analyzer for experimental functionality
-        result = self.waystone_analyzer.take_experimental_pre_snapshot(
-            self.token, 
-            self.config.CHAR_TO_CHECK, 
-            self.session_manager,
-            lambda: setattr(self, 'map_start_time', get_current_timestamp())
-        )
-        
-        if result:
-            self.pre_inventory = result['inventory']
-            self.current_map_info = result['map_info']
+        try:
+            # Take inventory snapshot for waystone analysis only
+            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
             
-            # Send experimental PRE-map notification
-            progress = self.session_manager.get_session_progress()
-            self.notification_manager.notify_experimental_pre_map(result['waystone_info'], progress)
+            # Find and parse waystone
+            waystone = self.waystone_analyzer.find_waystone_in_inventory(current_inventory)
+            waystone_info = self.waystone_analyzer.parse_waystone_info(waystone)
+            
+            if waystone_info:
+                print("🧪 EXPERIMENTAL WAYSTONE ANALYSIS")
+                self.display.display_experimental_waystone_info(waystone_info)
+                
+                # Cache waystone info for later use by F2
+                self.cached_waystone_info = waystone_info
+                print(f"💾 Waystone info cached for F2 map start")
+                
+                # Debug output
+                if self.config.DEBUG_ENABLED:
+                    print(f"[DEBUG] Waystone analyzed: {waystone_info['name']} T{waystone_info['tier']}")
+                
+                # Send experimental analysis notification
+                progress = self.session_manager.get_session_progress()
+                self.notification_manager.notify_experimental_pre_map(waystone_info, progress)
+                
+            else:
+                print("⚠️  No waystone found in top-left inventory position (0,0)")
+                self.cached_waystone_info = None
+                
+        except Exception as e:
+            self.display.display_error("WAYSTONE ANALYSIS", str(e))
+    
+    def take_experimental_pre_snapshot(self):
+        """Backwards compatibility - redirect to analyze_waystone"""
+        self.analyze_waystone()
     
     def take_post_snapshot(self):
         """Take POST-map inventory snapshot and analyze differences"""
@@ -259,6 +294,16 @@ class PoEStatsTracker:
         except Exception as e:
             self.display.display_error("INVENTORY CHECK", str(e))
     
+    def debug_item_by_name(self, item_name):
+        """Debug a specific item by searching current inventory"""
+        self.rate_limit()
+        try:
+            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            print(f"🔍 Searching current inventory for: '{item_name}'")
+            self.debugger.find_and_analyze_item_by_name(current_inventory, item_name, "[ITEM_DEBUG]")
+        except Exception as e:
+            self.display.display_error("ITEM DEBUG", str(e))
+    
     def display_session_stats(self):
         """Display current session statistics"""
         stats = self.session_manager.get_current_session_stats(self.config.get_log_file_path())
@@ -309,19 +354,30 @@ class PoEStatsTracker:
     
     def _cleanup(self):
         """Clean up resources and display final statistics"""
+        print("\n🔄 Shutting down...")
+        
         # Unregister hotkeys
         self.hotkey_manager.unregister_all()
         
         # End session and show final stats
         if self.session_manager.is_session_active():
+            # Show final session stats with modified header
+            print("\n🎬 FINAL SESSION STATS")
+            self.display_session_stats()
+            
+            # End the session
             session_end_info = self.session_manager.end_current_session()
-            if session_end_info and session_end_info['maps_completed'] > 0:
+            
+            # Show completion toast if there were maps
+            if session_end_info and session_end_info.get('maps_completed', 0) > 0:
                 self.display.display_session_completion(
                     session_end_info['maps_completed'],
                     session_end_info['total_value']
                 )
+        else:
+            print("ℹ️ No active session to end")
         
-        print("Bye.")
+        print("👋 Bye!")
 
 
 def main():

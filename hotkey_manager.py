@@ -72,7 +72,7 @@ class HotkeyManager:
         """
         hotkey_mappings = [
             ('f2', tracker_instance.take_pre_snapshot, 'Take PRE-map snapshot'),
-            ('ctrl+f2', tracker_instance.take_experimental_pre_snapshot, 'Experimental waystone-based PRE snapshot'),
+            ('ctrl+f2', tracker_instance.analyze_waystone, 'Analyze waystone (experimental)'),
             ('f3', tracker_instance.take_post_snapshot, 'Take POST-map snapshot'),
             ('f4', tracker_instance.toggle_debug_mode, 'Toggle debug mode'),
             ('f5', tracker_instance.check_current_inventory_value, 'Check current inventory value'),

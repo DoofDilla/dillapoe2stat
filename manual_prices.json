@@ -5,6 +5,12 @@
       "amount": 1,
       "description": "Unique idol worth 1 Orb of Annulment",
       "category": "Unique Idol"
+    },
+    "The Grand Project": {
+      "maps_to": "Orb of Annulment",
+      "amount": 2.0,
+      "category": "Precursor Tablet",
+      "description": "Unique Precursor Tablet"
     }
   },
   "description": "Manual item mappings - maps special items to existing currency/items with known market prices",

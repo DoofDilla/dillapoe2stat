@@ -176,10 +176,21 @@ def get_value_for_inventory_item(it: dict, league: str = LEAGUE) -> Tuple[Option
     # 0) Check manual prices first (highest priority)
     try:
         from manual_prices import get_manual_item_price
-        manual_result = get_manual_item_price(name)
-        if manual_result:
-            chaos, ex, category = manual_result
-            return chaos, ex, f"Manual-{category}"
+        
+        # Try multiple name fields for manual lookup
+        potential_names = [
+            it.get("name"),          # For uniques like "The Grand Project"
+            it.get("typeLine"),      # For normal items
+            it.get("baseType"),      # Fallback
+        ]
+        
+        for potential_name in potential_names:
+            if potential_name:
+                manual_result = get_manual_item_price(potential_name)
+                if manual_result:
+                    chaos, ex, category = manual_result
+                    return chaos, ex, f"Manual-{category}"
+                    
     except ImportError:
         pass  # Manual prices module not available
     except Exception as e:

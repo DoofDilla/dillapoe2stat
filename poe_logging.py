@@ -13,7 +13,13 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
         "character": char,
         "map": {
             "name": current_map_info["map_name"],
-            "level": current_map_info["level"]
+            "level": current_map_info["level"],
+            "seed": current_map_info.get("seed"),
+            "source": current_map_info.get("source", "client_log"),
+            # Include waystone attributes if available (but not prefixes/suffixes)
+            "waystone_tier": current_map_info.get("waystone_tier"),
+            "area_modifiers": current_map_info.get("area_modifiers", {}),
+            "modifier_count": current_map_info.get("modifier_count")
         } if current_map_info else {
             "name": "Unknown",
             "level": 0

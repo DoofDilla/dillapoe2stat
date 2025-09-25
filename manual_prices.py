@@ -77,7 +77,7 @@ class ManualPriceDatabase:
         item_data = mappings[item_name]
         target_item = item_data['maps_to']
         amount = item_data['amount']
-        category = item_data.get('category', 'Manual')
+        display_name = item_data.get('description', item_data.get('category', 'Manual'))
         
         # Use existing price lookup methods
         try:
@@ -101,7 +101,7 @@ class ManualPriceDatabase:
             total_chaos = chaos_per_unit * amount
             total_ex = ex_per_unit * amount if ex_per_unit else None
             
-            return total_chaos, total_ex, category
+            return total_chaos, total_ex, display_name
             
         except ImportError as e:
             print(f"Error importing price lookup functions: {e}")
