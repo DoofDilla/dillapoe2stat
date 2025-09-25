@@ -1,0 +1,12 @@
+{
+  "item_mappings": {
+    "Idol of Estazunti": {
+      "maps_to": "Orb of Annulment",
+      "amount": 1,
+      "description": "Unique idol worth 1 Orb of Annulment",
+      "category": "Unique Idol"
+    }
+  },
+  "description": "Manual item mappings - maps special items to existing currency/items with known market prices",
+  "last_updated": "2025-09-25"
+}
