@@ -267,7 +267,6 @@ class DisplayManager:
             rows, (total_c, total_e) = valuate_items_raw(inventory_items)
             
             print(f"\n💼 {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
-            self._display_session_footer()
             
             # Filter valuable items for display
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
