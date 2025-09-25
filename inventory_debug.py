@@ -58,8 +58,8 @@ class InventoryDebugger:
         print(f"{'#':<3} {'Type':<25} {'Stack':<6} {'Rarity':<10} {'Position':<10} {'ID':<10}")
         print("-" * 80)
         
-        # Track important items for detailed analysis
-        important_items = []
+        # In debug mode, show all items for detailed analysis
+        items_for_analysis = []
         
         for i, item in enumerate(inventory):
             item_type = item.get('typeLine', 'Unknown')[:24]
@@ -69,22 +69,22 @@ class InventoryDebugger:
             position = f"({item.get('x', '?')},{item.get('y', '?')})"
             item_id = item.get('id', 'No ID')[:9]
             
-            # Mark important items for detailed analysis
-            if any(keyword in item_type.lower() for keyword in ['precursor', 'tablet', 'grand', 'project', 'divine', 'exalted', 'jeweller', 'orb']):
-                important_items.append((i+1, item))
-                marker = "⭐"
-            else:
-                marker = "  "
+            # Mark important items but in debug mode, analyze ALL items
+            is_important = any(keyword in item_type.lower() for keyword in ['precursor', 'tablet', 'grand', 'project', 'divine', 'exalted', 'jeweller', 'orb'])
+            items_for_analysis.append((i+1, item, is_important))
             
+            marker = "⭐" if is_important else "  "
             print(f"{marker}{i+1:<3} {item_type:<25} {stack_size:<6} {rarity:<10} {position:<10} {item_id:<10}")
         
-        # Show detailed analysis for important items
-        if important_items:
-            print(f"\n{prefix} 🔍 DETAILED ANALYSIS for important items:")
+        # Show detailed analysis for ALL items in debug mode
+        if items_for_analysis:
+            print(f"\n{prefix} 🔍 DETAILED ANALYSIS for ALL items (Debug Mode):")
             print("=" * 80)
             
-            for item_num, item in important_items:
-                print(f"\n--- Item #{item_num}: {item.get('typeLine', 'Unknown')} ---")
+            for item_num, item, is_important in items_for_analysis:
+                # Show marker for important items
+                importance_marker = "⭐ IMPORTANT: " if is_important else ""
+                print(f"\n--- Item #{item_num}: {importance_marker}{item.get('typeLine', 'Unknown')} ---")
                 print(f"  🏷️  Type Line: '{item.get('typeLine', 'N/A')}'")
                 print(f"  📦 Base Type: '{item.get('baseType', 'N/A')}'")
                 print(f"  🔤 Name: '{item.get('name', 'N/A')}'")
