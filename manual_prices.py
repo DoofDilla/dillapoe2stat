@@ -101,7 +101,7 @@ class ManualPriceDatabase:
             total_chaos = chaos_per_unit * amount
             total_ex = ex_per_unit * amount if ex_per_unit else None
             
-            return total_chaos, total_ex, f"Manual-{category}"
+            return total_chaos, total_ex, category
             
         except ImportError as e:
             print(f"Error importing price lookup functions: {e}")
