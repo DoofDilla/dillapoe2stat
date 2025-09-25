@@ -289,6 +289,14 @@ class DisplayManager:
         else:
             print(f"🔮 {Colors.GRAY}No suffixes found{Colors.END}")
         
+        # Display area modifiers (the bonus stats from properties)
+        if waystone_info['area_modifiers']:
+            print(f"📊 {Colors.BOLD}Area Modifiers ({len(waystone_info['area_modifiers'])}){Colors.END}:")
+            for key, modifier in waystone_info['area_modifiers'].items():
+                print(f"   {Colors.GREEN}▶{Colors.END} {Colors.WHITE}{modifier['display']}{Colors.END}")
+        else:
+            print(f"📊 {Colors.GRAY}No area modifiers found{Colors.END}")
+        
         print(f"{Colors.GRAY}Source: Waystone from inventory position (0,0){Colors.END}")
     
     def display_info_message(self, message):
