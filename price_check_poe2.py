@@ -173,6 +173,18 @@ def get_value_for_inventory_item(it: dict, league: str = LEAGUE) -> Tuple[Option
     if not name:
         return None, None, None
 
+    # 0) Check manual prices first (highest priority)
+    try:
+        from manual_prices import get_manual_item_price
+        manual_result = get_manual_item_price(name)
+        if manual_result:
+            chaos, ex, category = manual_result
+            return chaos, ex, f"Manual-{category}"
+    except ImportError:
+        pass  # Manual prices module not available
+    except Exception as e:
+        print(f"Warning: Manual price lookup failed for '{name}': {e}")
+
     # 1) Heuristik
     cat = guess_category_from_item(it)
     tried = set()
