@@ -384,11 +384,42 @@ class PoEStatsTracker:
             if clean_mod:
                 suffixes.append(clean_mod)
         
+        # Extract area modifiers from properties (Magic Monsters, Item Rarity, etc.)
+        area_modifiers = {}
+        properties = waystone_item.get('properties', [])
+        
+        # Look for specific area modifier properties
+        modifier_names = {
+            'Magic Monsters': 'magic_monsters',
+            'Rare Monsters': 'rare_monsters', 
+            'Item Rarity': 'item_rarity',
+            'Item Quantity': 'item_quantity',
+            'Waystone Drop Chance': 'waystone_drop_chance',
+            'Pack Size': 'pack_size'
+        }
+        
+        for prop in properties:
+            prop_name = prop.get('name', '')
+            prop_values = prop.get('values', [])
+            
+            # Check if this property is one of our area modifiers
+            if prop_name in modifier_names and prop_values:
+                # Extract the value (usually the first value in the list)
+                if len(prop_values) > 0:
+                    value = prop_values[0]
+                    if isinstance(value, list) and len(value) > 0:
+                        area_modifiers[modifier_names[prop_name]] = {
+                            'name': prop_name,
+                            'value': value[0],  # The actual value string like "+70%"
+                            'display': f"{prop_name}: {value[0]}"
+                        }
+        
         return {
             'name': name,
             'tier': tier,
             'prefixes': prefixes,
             'suffixes': suffixes,
+            'area_modifiers': area_modifiers,
             'type_line': type_line,
             'full_item': waystone_item
         }
@@ -413,6 +444,7 @@ class PoEStatsTracker:
                     'level': waystone_info['tier'],
                     'prefixes': waystone_info['prefixes'],
                     'suffixes': waystone_info['suffixes'],
+                    'area_modifiers': waystone_info['area_modifiers'],
                     'source': 'waystone_inventory',
                     'seed': 'experimental'  # We don't have seed from waystone
                 }
@@ -431,6 +463,7 @@ class PoEStatsTracker:
                     'level': 'Unknown',
                     'prefixes': [],
                     'suffixes': [],
+                    'area_modifiers': {},
                     'source': 'waystone_inventory',
                     'seed': 'experimental'
                 }
