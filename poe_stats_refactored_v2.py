@@ -361,9 +361,19 @@ class PoEStatsTracker:
         
         # End session and show final stats
         if self.session_manager.is_session_active():
-            # Show final session stats with modified header
-            print("\n🎬 FINAL SESSION STATS")
-            self.display_session_stats()
+            # Get final session stats and display with custom header
+            stats = self.session_manager.get_current_session_stats(self.config.get_log_file_path())
+            if stats:
+                self.display.display_session_stats(
+                    stats['session_id'],
+                    stats['runtime']['hours'],
+                    stats['runtime']['minutes'],
+                    stats['runtime']['seconds'],
+                    stats['maps_completed'],
+                    stats['total_value'],
+                    stats['detailed_stats'],
+                    custom_header="🎬 FINAL SESSION STATS"
+                )
             
             # End the session
             session_end_info = self.session_manager.end_current_session()
