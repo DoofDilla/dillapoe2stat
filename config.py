@@ -42,6 +42,42 @@ class Config:
     # Display Settings
     OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
     
+    # ASCII Art Configuration - Customize the visual appearance
+    # Footer design elements - can be customized for different themes
+    ASCII_FOOTER = {
+        "left_decoration": "●▬▬▬๑۩۩๑▬▬▬",
+        "right_decoration": "▬▬▬๑۩۩๑▬▬▬●", 
+        "middle_char": "─",
+        "total_width": 80,
+        "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+        "decoration_color": "CYAN",  # Single color for all decorations
+        "middle_color": "CYAN",      # Color for middle line
+        "timestamp_color": "GRAY"    # Color for timestamp
+    }
+    
+    # Alternative ASCII designs (uncomment to use):
+    # ASCII_FOOTER = {
+    #     "left_decoration": "▬▬ι═══════ﺤ",
+    #     "right_decoration": "ﺤ═══════ι▬▬",
+    #     "middle_char": "═",
+    #     "total_width": 50,
+    #     "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+    #     "decoration_color": "GOLD",
+    #     "middle_color": "CYAN", 
+    #     "timestamp_color": "GRAY"
+    # }
+    
+    # ASCII_FOOTER = {
+    #     "left_decoration": "(¯`·._.·",
+    #     "right_decoration": "·._.·´¯)",
+    #     "middle_char": "~",
+    #     "total_width": 50,
+    #     "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+    #     "decoration_color": "MAGENTA",
+    #     "middle_color": "CYAN",
+    #     "timestamp_color": "GRAY"
+    # }
+    
     # Rate Limiting
     API_RATE_LIMIT = 2.5  # Minimum seconds between API calls
     

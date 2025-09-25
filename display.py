@@ -40,6 +40,7 @@ class DisplayManager:
         print(f"         {Colors.GREEN}F5{Colors.END}=Inventory | {Colors.GREEN}F6{Colors.END}=New Session | "
               f"{Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.GREEN}F8{Colors.END}=Output Mode")
         print(f"         {Colors.RED}Ctrl+Esc{Colors.END}=Quit | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Experimental waystone mode")
+        self._display_session_footer()
     
     def display_map_info(self, map_info):
         """Display current map information"""
@@ -148,7 +149,7 @@ class DisplayManager:
         print(f"\n🎬 {Colors.BOLD}NEW SESSION STARTED{Colors.END}")
         print(f"🆔 Session ID: {Colors.CYAN}{session_id[:8]}...{Colors.END}")
         print(f"🕐 Started at: {Colors.GRAY}{start_time_str}{Colors.END}")
-        print(f"{'='*50}\n")
+        self._display_session_footer()
     
     def display_session_stats(self, session_id, hours, minutes, seconds, maps_completed, 
                              total_value, session_stats, custom_header=None):
@@ -170,7 +171,7 @@ class DisplayManager:
         if session_stats['maps']:
             self._display_recent_maps(session_stats['maps'])
         
-        print(f"{'='*50}\n")
+        self._display_session_footer()
     
     def _display_recent_maps(self, maps):
         """Display recent maps from session"""
@@ -199,9 +200,46 @@ class DisplayManager:
             print(f"📊 Avg/Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END} | "
                   f"⏱️  Avg Time: {Colors.CYAN}{avg_time:.1f}m{Colors.END}")
         
-        print(f"\n{'='*50}")
+        self._display_session_footer()
         print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
-        print(f"{'='*50}\n")
+        self._display_session_footer()
+    
+    def _display_session_footer(self):
+        """Display a beautiful PoE2-style footer with timestamp using config settings"""
+        from datetime import datetime
+        from config import Config
+        
+        # Get ASCII configuration
+        ascii_config = Config.ASCII_FOOTER
+        
+        # Get current timestamp in configured format
+        timestamp = datetime.now().strftime(ascii_config["timestamp_format"])
+        
+        # Get colors from config
+        deco_color = getattr(Colors, ascii_config.get("decoration_color", "CYAN"))
+        middle_color = getattr(Colors, ascii_config.get("middle_color", "CYAN"))
+        timestamp_color = getattr(Colors, ascii_config.get("timestamp_color", "GRAY"))
+        
+        # Apply single color to decorations
+        left_raw = ascii_config["left_decoration"]
+        right_raw = ascii_config["right_decoration"]
+        
+        left_deco = f"{deco_color}{left_raw}{Colors.END}"
+        right_deco = f"{deco_color}{right_raw}{Colors.END}"
+        
+        # Calculate padding for centered timestamp
+        total_width = ascii_config["total_width"]
+        timestamp_text = f" {timestamp} "
+        deco_width = len(left_raw) + len(right_raw)  # Width without color codes
+        available_width = total_width - len(timestamp_text) - deco_width
+        padding = max(0, available_width // 2)
+        
+        # Create the beautiful footer line
+        middle_char = ascii_config["middle_char"]
+        middle_line = f"{middle_color}{middle_char * padding}{Colors.END}"
+        footer_line = f"{left_deco}{middle_line}{timestamp_color}{timestamp_text}{Colors.END}{middle_line}{right_deco}"
+        
+        print(f"\n{footer_line}\n")
     
     def display_session_completion(self, maps_completed, total_value):
         """Display session completion summary"""
@@ -229,7 +267,7 @@ class DisplayManager:
             rows, (total_c, total_e) = valuate_items_raw(inventory_items)
             
             print(f"\n💼 {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
-            print(f"{'='*50}")
+            self._display_session_footer()
             
             # Filter valuable items for display
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
@@ -259,7 +297,7 @@ class DisplayManager:
                 total_items = len([r for r in rows if r['qty'] > 0])
                 print(f"📦 Total items: {total_items}")
             
-            print(f"{'='*50}\n")
+            self._display_session_footer()
                 
         except Exception as e:
             print(f"❌ [INVENTORY VALUE] error: {e}")
