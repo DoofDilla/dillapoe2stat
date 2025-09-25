@@ -151,9 +151,10 @@ class DisplayManager:
         print(f"{'='*50}\n")
     
     def display_session_stats(self, session_id, hours, minutes, seconds, maps_completed, 
-                             total_value, session_stats):
+                             total_value, session_stats, custom_header=None):
         """Display comprehensive session statistics"""
-        print(f"\n📊 {Colors.BOLD}CURRENT SESSION STATS{Colors.END}")
+        header = custom_header if custom_header else "CURRENT SESSION STATS"
+        print(f"\n📊 {Colors.BOLD}{header}{Colors.END}")
         print(f"🆔 Session ID: {Colors.CYAN}{session_id[:8]}...{Colors.END}")
         print(f"⏱️  Total Time: {Colors.CYAN}{hours}h {minutes}m {seconds}s{Colors.END}")
         print(f"🗺️  Maps Completed: {Colors.GREEN}{maps_completed}{Colors.END}")
