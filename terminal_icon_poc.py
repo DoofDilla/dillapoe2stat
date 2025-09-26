@@ -346,10 +346,9 @@ class TerminalIconTester:
                     background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
                     img = background
                 
-                # Braille chars are 2x4 pixels, so we need 2:1 width:height ratio
-                # Each braille char = 2 pixels wide, 4 pixels tall
-                target_width = 32
-                target_height = 16  # 2:1 ratio for proper proportions
+                # Use 1:1 ratio for square icons - simpler and more accurate
+                target_width = 24
+                target_height = 24  # Square ratio for round icons
                 img = img.resize((target_width, target_height))
                 img = img.convert('L')
                 
@@ -627,8 +626,8 @@ class TerminalIconTester:
                     background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
                     img = background
                 
-                # Resize for braille (each braille char represents 2x4 pixels)
-                img = img.resize((32, 16))
+                # Use 1:1 ratio for square icons - the terminal will handle the rest
+                img = img.resize((24, 24))
                 img = img.convert('L')  # Grayscale
                 
                 braille_art = []
