@@ -17,6 +17,8 @@ class Colors:
     WHITE = '\033[97m'
     GRAY = '\033[90m'
     YELLOW = '\033[93m'  # Same as GOLD for compatibility
+    BROWN = '\033[38;5;137m'  # Light brown for main numbers (was 130)
+    DARK_BROWN = '\033[38;5;52m'  # Much darker brown for decimals (was 88)
     BOLD = '\033[1m'
     END = '\033[0m'
 
@@ -397,6 +399,24 @@ class DisplayManager:
 
     
     # Helper methods for reducing code duplication
+    def _format_colored_number(self, value, precision=2, suffix=""):
+        """Format number with brown main digits, darker brown decimals, and gold suffix"""
+        if value is None or value == 0:
+            return f"{Colors.GRAY}-{Colors.END}"
+        
+        # Format with specified precision
+        formatted = f"{value:.{precision}f}".rstrip("0").rstrip(".")
+        
+        # Split into integer and decimal parts
+        if "." in formatted:
+            integer_part, decimal_part = formatted.split(".")
+            # If integer part is 0, don't display it (0.02 becomes .02)
+            if integer_part == "0":
+                return f"{Colors.DARK_BROWN}.{decimal_part}{Colors.END} {Colors.GOLD}{suffix}{Colors.END}"
+            else:
+                return f"{Colors.BROWN}{integer_part}{Colors.END}{Colors.DARK_BROWN}.{decimal_part}{Colors.END} {Colors.GOLD}{suffix}{Colors.END}"
+        else:
+            return f"{Colors.BROWN}{formatted}{Colors.END} {Colors.GOLD}{suffix}{Colors.END}"
     
     def _get_category_emoji(self, category):
         """Get emoji based on item category"""
@@ -578,19 +598,36 @@ class DisplayManager:
             item_name_colored = f"{emoji} {Colors.WHITE}{r['name']}{Colors.END}"
             
             category = (r.get('category') or 'n/a')[:self.config.TABLE_CATEGORY_WIDTH]
-            chaos_val = f"{fmt(r['chaos_total'])}c"
-            ex_val = f"{fmt(r['ex_total'])}ex" if r['ex_total'] and r['ex_total'] > 0.01 else "-"
             
-            # Calculate padding for colored item name
+            # Get plain text values for width calculation (matching the colored format)
+            def get_plain_value(val, suffix):
+                if not val or val < 0.005:
+                    return "-"
+                formatted = f"{val:.2f}".rstrip("0").rstrip(".")
+                # Remove leading zero for values < 1 (to match colored format)
+                if formatted.startswith("0."):
+                    formatted = formatted[1:]  # Remove the "0"
+                return f"{formatted} {suffix}"
+            
+            chaos_plain = get_plain_value(r['chaos_total'], "c")
+            ex_plain = get_plain_value(r['ex_total'], "ex")
+            
+            # Get colored values
+            chaos_val = self._format_colored_number(r['chaos_total'], 2, "c")
+            ex_val = self._format_colored_number(r['ex_total'], 2, "ex") if r['ex_total'] and r['ex_total'] >= 0.005 else f"{Colors.GRAY}-{Colors.END}"
+            
+            # Calculate padding for each column
             name_padding = name_width - len(item_name_visible)
+            chaos_padding = self.config.TABLE_CHAOS_WIDTH - len(chaos_plain)
+            ex_padding = self.config.TABLE_EXALTED_WIDTH - len(ex_plain)
             
             # Format row with proper padding
             row = (
                 f"{item_name_colored}{' ' * name_padding} "
                 f"{Colors.CYAN}{r['qty']:>{self.config.TABLE_QTY_WIDTH}}{Colors.END} "
                 f"{Colors.GRAY}{category:<{self.config.TABLE_CATEGORY_WIDTH}}{Colors.END} "
-                f"{Colors.GOLD}{chaos_val:>{self.config.TABLE_CHAOS_WIDTH}}{Colors.END} "
-                f"{Colors.GOLD}{ex_val:>{self.config.TABLE_EXALTED_WIDTH}}{Colors.END}"
+                f"{' ' * chaos_padding}{chaos_val} "
+                f"{' ' * ex_padding}{ex_val}"
             )
             print(row)
     
