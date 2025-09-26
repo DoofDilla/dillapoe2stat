@@ -148,3 +148,12 @@
 {"event_type": "session_end", "session_id": "ea2ff49f-5780-4cd9-bf68-09104772c789", "ts": "2025-09-26T14:43:30", "character": "Mettmanwalking", "session_runtime": 11.48, "total_value": 0.0, "total_maps": 0}
 {"event_type": "session_start", "session_id": "0991323f-ac9d-488a-8450-06b7b2da6a71", "ts": "2025-09-26T14:45:12", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "0991323f-ac9d-488a-8450-06b7b2da6a71", "ts": "2025-09-26T14:45:20", "character": "Mettmanwalking", "session_runtime": 8.1, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "d663fd63-5055-4ea8-8a92-dfe7bb914276", "ts": "2025-09-26T17:42:08", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "d663fd63-5055-4ea8-8a92-dfe7bb914276", "ts": "2025-09-26T17:51:03", "character": "Mettmanwalking", "session_runtime": 534.65, "total_value": 45.158527314428845, "total_maps": 1}
+{"event_type": "session_start", "session_id": "c6a3c05e-77da-43d9-89a8-7130cb663caf", "ts": "2025-09-26T17:55:20", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "c6a3c05e-77da-43d9-89a8-7130cb663caf", "ts": "2025-09-26T17:55:37", "character": "Mettmanwalking", "session_runtime": 17.01, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "92f2034a-61a7-4459-a0f9-f930cf7b5580", "ts": "2025-09-26T17:58:59", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "92f2034a-61a7-4459-a0f9-f930cf7b5580", "ts": "2025-09-26T17:59:15", "character": "Mettmanwalking", "session_runtime": 15.72, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "bee3b63c-b0a4-439e-be23-f546c885bf6f", "ts": "2025-09-26T18:02:20", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "bee3b63c-b0a4-439e-be23-f546c885bf6f", "ts": "2025-09-26T18:18:38", "character": "Mettmanwalking", "session_runtime": 977.44, "total_value": 535.5415892908708, "total_maps": 1}
+{"event_type": "session_start", "session_id": "73f52549-277c-4508-bed7-20083c34c31e", "ts": "2025-09-26T18:20:27", "character": "Mettmanwalking"}

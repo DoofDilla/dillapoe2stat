@@ -79,11 +79,15 @@ class DisplayManager:
                 stack = f" x{item['stackSize']}" if item.get("stackSize") else ""
                 print(f"  {Colors.RED}-{Colors.END} {item.get('typeLine')}{stack}")
     
-    def display_price_analysis(self, added, removed):
-        """Display price analysis for added/removed items"""
+    def display_price_analysis(self, added, removed, post_inventory=None, pre_inventory=None):
+        """Display price analysis for added/removed items with optional inventory data for better emoji analysis"""
         try:
             # Get price data for all items
             price_data = self._get_price_data(added, removed)
+            
+            # Store inventory data for emoji analysis
+            self._current_post_inventory = post_inventory
+            self._current_pre_inventory = pre_inventory
             
             # Display prices based on current mode
             self._display_prices_by_mode(price_data)
@@ -132,35 +136,27 @@ class DisplayManager:
     def _display_normal_mode_prices(self, valuable_added, valuable_removed):
         """Display prices in normal mode (only valuable items)"""
         if valuable_added:
-            print(f"\n💰 {Colors.BOLD}Valuable Loot:{Colors.END}")
-            # Get smart emojis for added items
-            item_emojis = self._get_smart_emojis_for_items(valuable_added)
-            for r in valuable_added:
-                emoji = item_emojis.get(r['name'])
-                print(self._format_item_value_line(r, "+", Colors.GREEN, emoji))
+            # Display valuable loot with unified display logic
+            self._display_valuable_items_list("💰 Valuable Loot:", valuable_added)
         
         if valuable_removed:
-            print(f"\n💸 {Colors.BOLD}Valuable Items Used:{Colors.END}")
-            # Get smart emojis for removed items  
-            item_emojis = self._get_smart_emojis_for_items(valuable_removed)
-            for r in valuable_removed:
-                emoji = item_emojis.get(r['name'])
-                print(self._format_item_value_line(r, "-", Colors.RED, emoji))
+            # Display used items with unified display logic  
+            self._display_valuable_items_list("💸 Valuable Items Used:", valuable_removed)
     
-    def _display_comprehensive_mode_prices(self, added_rows, removed_rows):
+    def _display_comprehensive_prices(self, added_rows, removed_rows):
         """Display prices in comprehensive mode (all items)"""
         print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
-        # Get smart emojis for added items
+        # Get emojis using unified analysis
         added_emojis = self._get_smart_emojis_for_items(added_rows)
         for r in added_rows:
-            emoji = added_emojis.get(r['name'])
+            emoji = added_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
             print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
 
         print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
-        # Get smart emojis for removed items
+        # Get emojis using unified analysis
         removed_emojis = self._get_smart_emojis_for_items(removed_rows)
         for r in removed_rows:
-            emoji = removed_emojis.get(r['name'])
+            emoji = removed_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
             print(self._format_comprehensive_item_line(r, "-", Colors.RED, emoji))
     
     def _display_net_value(self, net_c, net_e):
@@ -324,17 +320,8 @@ class DisplayManager:
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
             
             if valuable_items:
-                print(f"\n💰 {Colors.BOLD}Valuable Items:{Colors.END}")
-                
-                # Get colored emojis using icon analysis
-                item_emojis = self._get_colored_emojis_for_items(inventory_items, valuable_items)
-                
-                for r in valuable_items:
-                    ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                    emoji = item_emojis.get(r['name'], '💎')  # fallback to diamond
-                    print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
-                          f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
-                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                # Display valuable items with unified emoji analysis (includes header)
+                self._display_valuable_items_list("💰 Valuable Items:", valuable_items, inventory_items)
                 
                 # Display totals
                 print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
@@ -356,62 +343,7 @@ class DisplayManager:
         except Exception as e:
             print(f"❌ [INVENTORY VALUE] error: {e}")
     
-    def _get_colored_emojis_for_items(self, inventory_items, valuable_items):
-        """
-        Get colored emojis using icon analysis
-        
-        Args:
-            inventory_items: Original inventory items from API (with icon URLs)
-            valuable_items: Filtered valuable items from price analysis
-            
-        Returns:
-            dict: Mapping of item names to colored emojis
-        """
-        try:
-            from icon_cache_manager import get_icon_cache_manager
-            from icon_color_analyzer import get_color_analyzer, get_icon_color_mapper
-            
-            cache_manager = get_icon_cache_manager()
-            color_analyzer = get_color_analyzer()
-            color_mapper = get_icon_color_mapper()
-            
-            # Create mapping of valuable item names
-            valuable_names = {item['name'] for item in valuable_items}
-            
-            # Filter inventory items to only valuable ones
-            valuable_inventory_items = [
-                item for item in inventory_items 
-                if (item.get('typeLine') or item.get('name', '')) in valuable_names
-            ]
-            
-            result = {}
-            for item in valuable_inventory_items:
-                item_name = item.get('typeLine') or item.get('name', 'Unknown')
-                icon_url = item.get('icon')
-                
-                if icon_url:
-                    # Try to get cached icon
-                    cached_icon = cache_manager.get_cached_icon_path(icon_url)
-                    if not cached_icon.exists():
-                        # Download if not cached
-                        cached_icon = cache_manager.download_icon(icon_url)
-                    
-                    if cached_icon and cached_icon.exists():
-                        # Analyze color
-                        dominant_color = color_analyzer.get_dominant_color(cached_icon)
-                        color_category = color_analyzer.categorize_color(dominant_color)
-                        result[item_name] = color_mapper.get_emoji_for_item(item, color_category)
-                    else:
-                        result[item_name] = color_mapper.get_emoji_for_item(item)
-                else:
-                    result[item_name] = color_mapper.get_emoji_for_item(item)
-            
-            return result
-            
-        except Exception as e:
-            print(f"[ICON] Warning: Could not get colored emojis: {e}")
-            # Fallback to simple emojis
-            return {item['name']: '💎' for item in valuable_items}
+
     
     def display_experimental_waystone_info(self, waystone_info):
         """Display experimental waystone information with prefixes"""
@@ -524,85 +456,7 @@ class DisplayManager:
             self.display_ascii_themes()
             return False
     
-    def _get_smart_emojis_for_items(self, items_data):
-        """
-        Get smart emojis for a list of items using the icon system
-        
-        Args:
-            items_data: List of item data dicts (from price analysis)
-            
-        Returns:
-            dict: Mapping of item names to emojis
-        """
-        try:
-            # Try to get the smart icon system
-            from smart_icon_system import get_smart_icon_system
-            icon_system = get_smart_icon_system()
-            
-            # Convert price analysis items back to API format for icon analysis
-            api_items = []
-            for item in items_data:
-                # Create a mock API item dict
-                api_item = {
-                    'typeLine': item['name'],
-                    'name': item['name'],
-                    # Add more fields if available from original data
-                }
-                api_items.append(api_item)
-            
-            # Get emojis (limit downloads to avoid delays)
-            return icon_system.batch_analyze_items(api_items, max_downloads=5)
-            
-        except Exception as e:
-            from config import Config
-            if Config.DEBUG_ENABLED:
-                print(f"[ICON] Warning: Could not get smart emojis: {e}")
-            # Fallback to simple emojis
-            return {item['name']: '⚪' for item in items_data}
-    
-    def _get_smart_emojis_for_current_inventory(self, inventory_items, valuable_items):
-        """
-        Get smart emojis for current inventory items (has access to original API data)
-        
-        Args:
-            inventory_items: Original inventory items from API (with icon URLs)
-            valuable_items: Filtered valuable items from price analysis
-            
-        Returns:
-            dict: Mapping of item names to emojis
-        """
-        try:
-            from smart_icon_system import get_smart_icon_system
-            icon_system = get_smart_icon_system()
-            
-            # Create mapping of valuable item names
-            valuable_names = {item['name'] for item in valuable_items}
-            
-            # Filter inventory items to only valuable ones
-            valuable_inventory_items = [
-                item for item in inventory_items 
-                if (item.get('typeLine') or item.get('name', '')) in valuable_names
-            ]
-            
-            # Only show debug message in debug mode
-            from config import Config
-            if Config.DEBUG_ENABLED:
-                print(f"[ICON] Analyzing {len(valuable_inventory_items)} valuable items...")
-            
-            # Get emojis using original API data (has icon URLs)
-            result = icon_system.batch_analyze_items(valuable_inventory_items, max_downloads=10)
-            
-            return result
-            
-        except Exception as e:
-            import traceback
-            from config import Config
-            if Config.DEBUG_ENABLED:
-                print(f"[ICON] Warning: Could not get smart emojis for inventory: {e}")
-                print(f"[ICON] Full traceback:")
-                traceback.print_exc()
-            # Fallback to simple emojis
-            return {item['name']: '💎' for item in valuable_items}
+
     
     # Helper methods for reducing code duplication
     def _format_ex_value(self, ex_value):
@@ -610,6 +464,167 @@ class DisplayManager:
         if ex_value and ex_value > 0.01:
             return f" | {Colors.GOLD}{fmt(ex_value)}ex{Colors.END}"
         return ""
+    
+    def _get_category_emoji(self, category):
+        """Get emoji based on item category"""
+        category_lower = (category or '').lower()
+        
+        emoji_map = {
+            'currency': '🟡',  # Gold for currency
+            'delirium': '⚫',   # Black for delirium
+            'catalysts': '⚡',  # Lightning for catalysts
+            'runes': '🔵',     # Blue for runes
+            'ritual': '🟠',    # Orange for ritual
+            'fragments': '🔴', # Red for fragments
+            'maps': '🗺️',      # Map emoji for maps
+            'jewels': '💎',    # Diamond for jewels
+            'armour': '🛡️',    # Shield for armour
+            'weapons': '⚔️',   # Sword for weapons
+            'accessories': '💍', # Ring for accessories
+            'gems': '🔮',      # Crystal for gems
+            'divination': '📜', # Scroll for divination cards
+            'essence': '🧪',   # Flask for essences
+            'fossil': '🪨',    # Rock for fossils
+            'breach': '🔴',    # Red for breach
+            'harbinger': '🌟', # Star for harbinger
+            'legion': '⚫',    # Black for legion
+            'metamorph': '🟢', # Green for metamorph
+            'blight': '🍄',    # Mushroom for blight
+            'syndicate': '🎭', # Mask for syndicate
+            'bestiary': '🐺',  # Wolf for bestiary
+            'incursion': '🏛️',  # Temple for incursion
+            'delve': '⛏️',     # Pickaxe for delve
+        }
+        
+        # Try exact match first
+        if category_lower in emoji_map:
+            return emoji_map[category_lower]
+        
+        # Try partial matches
+        for cat, emoji in emoji_map.items():
+            if cat in category_lower:
+                return emoji
+        
+        # Fallback based on item characteristics
+        if 'orb' in category_lower:
+            return '🟡'  # Gold for orbs
+        elif 'catalyst' in category_lower:
+            return '⚡'  # Lightning for catalysts
+        elif 'splinter' in category_lower:
+            return '🔴'  # Red for splinters
+        elif 'liquid' in category_lower:
+            return '⚫'  # Black for liquids
+        elif 'rune' in category_lower:
+            return '🔵'  # Blue for runes
+        
+        return '⚪'  # White circle as fallback
+    
+    def _get_smart_emojis_for_items(self, items_data, inventory_items=None):
+        """
+        Unified emoji analysis for all item displays
+        
+        Args:
+            items_data: List of item data dicts (from price analysis)
+            inventory_items: Optional original inventory items from API (with icon URLs)
+            
+        Returns:
+            dict: Mapping of item names to emojis (smart icons or category fallback)
+        """
+        # Check if we have inventory data (either passed or from display_price_analysis)
+        if inventory_items is None:
+            inventory_items = getattr(self, '_current_post_inventory', None)
+        
+        if inventory_items:
+            # We have inventory data! Use full icon analysis
+            try:
+                from icon_cache_manager import get_icon_cache_manager  
+                from icon_color_analyzer import get_color_analyzer, get_icon_color_mapper
+                
+                cache_manager = get_icon_cache_manager()
+                color_analyzer = get_color_analyzer()
+                color_mapper = get_icon_color_mapper()
+                
+                # Create mapping of item names we want emojis for
+                item_names = {item['name'] for item in items_data}
+                
+                # Filter inventory items to only the ones we need
+                relevant_inventory_items = [
+                    item for item in inventory_items 
+                    if (item.get('typeLine') or item.get('name', '')) in item_names
+                ]
+                
+                from config import Config
+                if Config.DEBUG_ENABLED:
+                    print(f"[ICON] Analyzing {len(relevant_inventory_items)} items with icon analysis...")
+                
+                result = {}
+                for item in relevant_inventory_items:
+                    item_name = item.get('typeLine') or item.get('name', 'Unknown')
+                    icon_url = item.get('icon')
+                    
+                    if icon_url:
+                        # Try to get cached icon
+                        cached_icon = cache_manager.get_cached_icon_path(icon_url)
+                        if not cached_icon.exists():
+                            # Download if not cached (limit downloads)
+                            cached_icon = cache_manager.download_icon(icon_url)
+                        
+                        if cached_icon and cached_icon.exists():
+                            # Analyze color and get emoji
+                            dominant_color = color_analyzer.get_dominant_color(cached_icon)
+                            color_category = color_analyzer.categorize_color(dominant_color)
+                            result[item_name] = color_mapper.get_emoji_for_item(item, color_category)
+                        else:
+                            # Fallback to item-based emoji without color
+                            result[item_name] = color_mapper.get_emoji_for_item(item)
+                    else:
+                        # No icon URL, use item-based emoji
+                        result[item_name] = color_mapper.get_emoji_for_item(item)
+                
+                # Fill in missing items with category emojis
+                for item in items_data:
+                    if item['name'] not in result:
+                        result[item['name']] = self._get_category_emoji(item.get('category', 'Unknown'))
+                
+                return result
+                
+            except Exception as e:
+                from config import Config
+                if Config.DEBUG_ENABLED:
+                    print(f"[ICON] Icon analysis unavailable, using category emojis: {e}")
+        
+        # Fallback to category-based emojis for all items
+        result = {}
+        for item in items_data:
+            emoji = self._get_category_emoji(item.get('category', 'Unknown'))
+            result[item['name']] = emoji
+        
+        return result
+    
+    def _display_valuable_items_list(self, header, items_data, inventory_items=None):
+        """
+        Unified display function for valuable items (used by both POST-map and Current Inventory)
+        
+        Args:
+            header: Display header (e.g., "💰 Valuable Loot:" or "💰 Valuable Items:")
+            items_data: List of item data dicts (from price analysis)
+            inventory_items: Optional original inventory items for enhanced emoji analysis
+        """
+        if not items_data:
+            return
+            
+        print(f"\n{Colors.BOLD}{header}{Colors.END}")
+        
+        # Get emojis using unified analysis
+        item_emojis = self._get_smart_emojis_for_items(items_data, inventory_items)
+        
+        # Display each item with consistent formatting
+        for r in items_data:
+            emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
+            ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
+            print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
+                  f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
+                  f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
     
     def _format_item_value_line(self, item_data, prefix_symbol, prefix_color, item_emoji=None):
         """Format a single item value line with consistent styling"""
