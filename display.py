@@ -121,7 +121,22 @@ class DisplayManager:
         if self.output_mode == "normal":
             self._display_normal_mode_prices(price_data['valuable_added'], price_data['valuable_removed'])
         else:  # comprehensive mode
-            self._display_comprehensive_mode_prices(price_data['added_rows'], price_data['removed_rows'])
+            # Display all items in comprehensive mode
+            added_rows, removed_rows = price_data['added_rows'], price_data['removed_rows']
+            
+            if added_rows:
+                print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
+                added_emojis = self._get_smart_emojis_for_items(added_rows)
+                for r in added_rows:
+                    emoji = added_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
+                    print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
+            
+            if removed_rows:
+                print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
+                removed_emojis = self._get_smart_emojis_for_items(removed_rows)
+                for r in removed_rows:
+                    emoji = removed_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
+                    print(self._format_comprehensive_item_line(r, "-", Colors.RED, emoji))
     
     def _calculate_and_display_net_value(self, price_data):
         """Calculate net value and display it"""
@@ -143,21 +158,7 @@ class DisplayManager:
             # Display used items with unified display logic  
             self._display_valuable_items_list("💸 Valuable Items Used:", valuable_removed)
     
-    def _display_comprehensive_prices(self, added_rows, removed_rows):
-        """Display prices in comprehensive mode (all items)"""
-        print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
-        # Get emojis using unified analysis
-        added_emojis = self._get_smart_emojis_for_items(added_rows)
-        for r in added_rows:
-            emoji = added_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-            print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
 
-        print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
-        # Get emojis using unified analysis
-        removed_emojis = self._get_smart_emojis_for_items(removed_rows)
-        for r in removed_rows:
-            emoji = removed_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-            print(self._format_comprehensive_item_line(r, "-", Colors.RED, emoji))
     
     def _display_net_value(self, net_c, net_e):
         """Display net value and return the exalt value"""
@@ -385,85 +386,11 @@ class DisplayManager:
         """Display general info messages"""
         print(message)
     
-    def display_icon_system_stats(self):
-        """Display statistics about the smart icon system"""
-        try:
-            from smart_icon_system import get_smart_icon_system
-            icon_system = get_smart_icon_system()
-            stats = icon_system.get_system_stats()
-            
-            print(f"\n🎨 {Colors.BOLD}SMART ICON SYSTEM STATS{Colors.END}")
-            print(f"📁 Cached Icons: {Colors.GREEN}{stats['cached_icons']}{Colors.END}")
-            print(f"💾 Cache Size: {Colors.CYAN}{stats['cache_size_mb']:.1f} MB{Colors.END}")
-            print(f"🎨 Analyzed Colors: {Colors.YELLOW}{stats['analyzed_colors']}{Colors.END}")
-            print(f"📂 Cache Directory: {Colors.GRAY}{stats.get('cache_dir', 'N/A')}{Colors.END}")
-            self._display_session_footer()
-            
-        except Exception as e:
-            print(f"❌ Could not get icon system stats: {e}")
-    
-    def test_smart_icons(self, sample_items=None):
-        """Test the smart icon system with sample items"""
-        if not sample_items:
-            # Create some sample items for testing
-            sample_items = [
-                {'typeLine': 'Chaos Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyRerollRare.png'},
-                {'typeLine': 'Exalted Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyAddModToRare.png'},
-                {'typeLine': 'Divine Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyModValues.png'},
-                {'typeLine': 'Iron Sword', 'icon': None},  # Test fallback
-                {'typeLine': 'Test Item', 'icon': 'invalid_url'}  # Test error handling
-            ]
-        
-        try:
-            from smart_icon_system import get_smart_icon_system
-            icon_system = get_smart_icon_system()
-            
-            print(f"\n🧪 {Colors.BOLD}TESTING SMART ICON SYSTEM{Colors.END}")
-            
-            for item in sample_items:
-                emoji = icon_system.get_item_emoji(item, enable_downloads=True)
-                icon_status = "📡" if item.get('icon') else "🔄"
-                print(f"  {icon_status} {emoji} {Colors.WHITE}{item['typeLine']}{Colors.END}")
-            
-            self._display_session_footer()
-            
-        except Exception as e:
-            print(f"❌ Smart icon test failed: {e}")
-            import traceback
-            traceback.print_exc()
-    
-    def display_ascii_themes(self):
-        """Display available ASCII themes"""
-        from config import Config
-        print(f"\n🎨 {Colors.BOLD}ASCII THEMES{Colors.END}")
-        themes_info = Config.list_ascii_themes()
-        print(themes_info)
-        print(f"\nTo change theme, use: Config.set_ascii_theme('theme_name')")
-        self._display_session_footer()
-    
-    def change_ascii_theme(self, theme_name):
-        """Change the ASCII theme and show preview"""
-        from config import Config
-        
-        if Config.set_ascii_theme(theme_name):
-            print(f"🎨 Theme changed to: {Colors.BOLD}{theme_name}{Colors.END}")
-            preview = Config.preview_ascii_theme(theme_name)
-            print(f"Preview:\n{preview}")
-            self._display_session_footer()
-            return True
-        else:
-            print(f"❌ Theme '{theme_name}' not found")
-            self.display_ascii_themes()
-            return False
+
     
 
     
     # Helper methods for reducing code duplication
-    def _format_ex_value(self, ex_value):
-        """Format exalted value display string"""
-        if ex_value and ex_value > 0.01:
-            return f" | {Colors.GOLD}{fmt(ex_value)}ex{Colors.END}"
-        return ""
     
     def _get_category_emoji(self, category):
         """Get emoji based on item category"""
@@ -626,16 +553,11 @@ class DisplayManager:
                   f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
                   f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
     
-    def _format_item_value_line(self, item_data, prefix_symbol, prefix_color, item_emoji=None):
-        """Format a single item value line with consistent styling"""
-        ex_str = self._format_ex_value(item_data.get('ex_total'))
-        emoji_str = f"{item_emoji} " if item_emoji else ""
-        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {emoji_str}{Colors.WHITE}{item_data['name']}{Colors.END} "
-                f"{Colors.GRAY}x{item_data['qty']}{Colors.END} => {Colors.GOLD}{fmt(item_data['chaos_total'])}c{Colors.END}{ex_str}")
+
     
     def _format_comprehensive_item_line(self, item_data, prefix_symbol, prefix_color, item_emoji=None):
         """Format comprehensive mode item line with category info"""
-        ex_str = self._format_ex_value(item_data.get('ex_total'))
+        ex_str = f" | {Colors.GOLD}{fmt(item_data['ex_total'])}ex{Colors.END}" if item_data.get('ex_total') and item_data['ex_total'] > 0.01 else ""
         category = item_data.get('category') or 'n/a'
         emoji_str = f"{item_emoji} " if item_emoji else ""
         return (f"  {prefix_color}{prefix_symbol}{Colors.END} {emoji_str}{item_data['name']} {Colors.GRAY}[{category}]{Colors.END} "
