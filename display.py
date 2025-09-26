@@ -31,42 +31,7 @@ class DisplayManager:
         """Set output mode: 'normal' or 'comprehensive'"""
         self.output_mode = mode
     
-    def get_unicode_display_width(self, char):
-        """Get actual terminal display width of a single Unicode character"""
-        code = ord(char)
-        
-        # Emoji ranges (typically 2 columns wide)
-        if (0x1F600 <= code <= 0x1F64F or  # Emoticons
-            0x1F300 <= code <= 0x1F5FF or  # Misc Symbols
-            0x1F680 <= code <= 0x1F6FF or  # Transport
-            0x1F1E0 <= code <= 0x1F1FF or  # Flags
-            0x2600 <= code <= 0x26FF or    # Misc symbols
-            0x2700 <= code <= 0x27BF):     # Dingbats
-            return 2
-            
-        # Special Unicode symbols (1 column wide)
-        elif (0x2000 <= code <= 0x2BFF or  # General punctuation, symbols
-              0x25A0 <= code <= 0x25FF or  # Geometric shapes (⬛, ▲, ◇, etc.)
-              0x2600 <= code <= 0x26FF):   # Misc symbols
-            return 1
-            
-        # ASCII and most other characters
-        else:
-            return 1
-    
-    def get_text_display_width(self, text):
-        """Calculate actual terminal display width of text"""
-        return sum(self.get_unicode_display_width(char) for char in text)
-    
-    def pad_to_display_width(self, text, target_width):
-        """Pad text to exact display width"""
-        current_width = self.get_text_display_width(text)
-        if current_width < target_width:
-            return text + ' ' * (target_width - current_width)
-        elif current_width > target_width:
-            # Truncate if too long
-            return text[:target_width-3] + "..."
-        return text
+
     
     def display_startup_info(self, character_name, session_id, output_mode):
         """Display startup information"""
@@ -361,18 +326,15 @@ class DisplayManager:
             if valuable_items:
                 print(f"\n💰 {Colors.BOLD}Valuable Items:{Colors.END}")
                 
-                # Get smart emojis for valuable items - use original inventory items for icon analysis
-                item_emojis = self._get_smart_emojis_for_current_inventory(inventory_items, valuable_items)
+                # Get colored emojis using icon analysis
+                item_emojis = self._get_colored_emojis_for_items(inventory_items, valuable_items)
                 
                 for r in valuable_items:
                     ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                    emoji = item_emojis.get(r['name'], '◆')  # fallback to diamond
-                    
-                    # Simple table formatting with fixed column widths
-                    name_padded = f"{r['name']:<26}"  # 26 chars for name
-                    qty_padded = f"x{r['qty']:<4}"    # 5 chars for quantity 
-                    
-                    print(f"  {emoji} {Colors.WHITE}{name_padded}{Colors.END}{Colors.GRAY}{qty_padded}[{r.get('category') or 'n/a'}]{Colors.END} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                    emoji = item_emojis.get(r['name'], '💎')  # fallback to diamond
+                    print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
+                          f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
+                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
                 
                 # Display totals
                 print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
@@ -388,13 +350,68 @@ class DisplayManager:
                     print(f"\n📊 {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} worthless{Colors.END}")
             else:
                 print(f"\n💰 {Colors.GRAY}No valuable items found in current inventory{Colors.END}")
-                total_items = len([r for r in rows if r['qty'] > 0])
-                print(f"📦 Total items: {total_items}")
-            
-            self._display_session_footer()
                 
+            self._display_session_footer()
+            
         except Exception as e:
             print(f"❌ [INVENTORY VALUE] error: {e}")
+    
+    def _get_colored_emojis_for_items(self, inventory_items, valuable_items):
+        """
+        Get colored emojis using icon analysis
+        
+        Args:
+            inventory_items: Original inventory items from API (with icon URLs)
+            valuable_items: Filtered valuable items from price analysis
+            
+        Returns:
+            dict: Mapping of item names to colored emojis
+        """
+        try:
+            from icon_cache_manager import get_icon_cache_manager
+            from icon_color_analyzer import get_color_analyzer, get_icon_color_mapper
+            
+            cache_manager = get_icon_cache_manager()
+            color_analyzer = get_color_analyzer()
+            color_mapper = get_icon_color_mapper()
+            
+            # Create mapping of valuable item names
+            valuable_names = {item['name'] for item in valuable_items}
+            
+            # Filter inventory items to only valuable ones
+            valuable_inventory_items = [
+                item for item in inventory_items 
+                if (item.get('typeLine') or item.get('name', '')) in valuable_names
+            ]
+            
+            result = {}
+            for item in valuable_inventory_items:
+                item_name = item.get('typeLine') or item.get('name', 'Unknown')
+                icon_url = item.get('icon')
+                
+                if icon_url:
+                    # Try to get cached icon
+                    cached_icon = cache_manager.get_cached_icon_path(icon_url)
+                    if not cached_icon.exists():
+                        # Download if not cached
+                        cached_icon = cache_manager.download_icon(icon_url)
+                    
+                    if cached_icon and cached_icon.exists():
+                        # Analyze color
+                        dominant_color = color_analyzer.get_dominant_color(cached_icon)
+                        color_category = color_analyzer.categorize_color(dominant_color)
+                        result[item_name] = color_mapper.get_emoji_for_item(item, color_category)
+                    else:
+                        result[item_name] = color_mapper.get_emoji_for_item(item)
+                else:
+                    result[item_name] = color_mapper.get_emoji_for_item(item)
+            
+            return result
+            
+        except Exception as e:
+            print(f"[ICON] Warning: Could not get colored emojis: {e}")
+            # Fallback to simple emojis
+            return {item['name']: '💎' for item in valuable_items}
     
     def display_experimental_waystone_info(self, waystone_info):
         """Display experimental waystone information with prefixes"""
