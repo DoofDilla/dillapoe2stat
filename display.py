@@ -32,15 +32,23 @@ class DisplayManager:
     
     def display_startup_info(self, character_name, session_id, output_mode):
         """Display startup information"""
+        self._display_basic_info(character_name, session_id, output_mode)
+        self._display_hotkey_help()
+        self._display_session_footer()
+    
+    def _display_basic_info(self, character_name, session_id, output_mode):
+        """Display basic tracker information"""
         print(f"🎮 Using character: {Colors.CYAN}{character_name}{Colors.END}")
         print(f"📋 Output mode: {Colors.BOLD}{output_mode.upper()}{Colors.END}")
         print(f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}")
+    
+    def _display_hotkey_help(self):
+        """Display hotkey help information"""
         print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Exp.PRE | "
               f"{Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug")
         print(f"         {Colors.GREEN}F5{Colors.END}=Inventory | {Colors.GREEN}F6{Colors.END}=New Session | "
               f"{Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.GREEN}F8{Colors.END}=Output Mode")
         print(f"         {Colors.RED}Ctrl+Esc{Colors.END}=Quit | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Experimental waystone mode")
-        self._display_session_footer()
     
     def display_map_info(self, map_info):
         """Display current map information"""
@@ -71,59 +79,74 @@ class DisplayManager:
     def display_price_analysis(self, added, removed):
         """Display price analysis for added/removed items"""
         try:
-            added_rows, (add_c, add_e) = valuate_items_raw(added)
-            removed_rows, (rem_c, rem_e) = valuate_items_raw(removed)
-
-            # Filter items with value for normal mode
-            valuable_added = [r for r in added_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
-            valuable_removed = [r for r in removed_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
-
-            if self.output_mode == "normal":
-                self._display_normal_mode_prices(valuable_added, valuable_removed)
-            else:  # comprehensive mode
-                self._display_comprehensive_mode_prices(added_rows, removed_rows)
-
+            # Get price data for all items
+            price_data = self._get_price_data(added, removed)
+            
+            # Display prices based on current mode
+            self._display_prices_by_mode(price_data)
+            
             # Calculate and display net value
-            net_c = (add_c or 0) - (rem_c or 0)
-            net_e = None
-            if add_e is not None and rem_e is not None:
-                net_e = (add_e or 0) - (rem_e or 0)
-
-            return self._display_net_value(net_c, net_e)
+            return self._calculate_and_display_net_value(price_data)
                 
         except Exception as pe:
             print(f"❌ [VALUE] price-check error: {pe}")
             return None
+    
+    def _get_price_data(self, added, removed):
+        """Get and organize price data for items"""
+        added_rows, (add_c, add_e) = valuate_items_raw(added)
+        removed_rows, (rem_c, rem_e) = valuate_items_raw(removed)
+        
+        # Filter valuable items for normal mode
+        valuable_added = [r for r in added_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+        valuable_removed = [r for r in removed_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+        
+        return {
+            'added_rows': added_rows,
+            'removed_rows': removed_rows,
+            'valuable_added': valuable_added,
+            'valuable_removed': valuable_removed,
+            'totals': {'add_c': add_c, 'add_e': add_e, 'rem_c': rem_c, 'rem_e': rem_e}
+        }
+    
+    def _display_prices_by_mode(self, price_data):
+        """Display prices based on current output mode"""
+        if self.output_mode == "normal":
+            self._display_normal_mode_prices(price_data['valuable_added'], price_data['valuable_removed'])
+        else:  # comprehensive mode
+            self._display_comprehensive_mode_prices(price_data['added_rows'], price_data['removed_rows'])
+    
+    def _calculate_and_display_net_value(self, price_data):
+        """Calculate net value and display it"""
+        totals = price_data['totals']
+        net_c = (totals['add_c'] or 0) - (totals['rem_c'] or 0)
+        net_e = None
+        if totals['add_e'] is not None and totals['rem_e'] is not None:
+            net_e = (totals['add_e'] or 0) - (totals['rem_e'] or 0)
+        
+        return self._display_net_value(net_c, net_e)
     
     def _display_normal_mode_prices(self, valuable_added, valuable_removed):
         """Display prices in normal mode (only valuable items)"""
         if valuable_added:
             print(f"\n💰 {Colors.BOLD}Valuable Loot:{Colors.END}")
             for r in valuable_added:
-                ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                print(f"  {Colors.GREEN}+{Colors.END} {Colors.WHITE}{r['name']}{Colors.END} "
-                      f"{Colors.GRAY}x{r['qty']}{Colors.END} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                print(self._format_item_value_line(r, "+", Colors.GREEN))
         
         if valuable_removed:
             print(f"\n💸 {Colors.BOLD}Valuable Items Used:{Colors.END}")
             for r in valuable_removed:
-                ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                print(f"  {Colors.RED}-{Colors.END} {Colors.WHITE}{r['name']}{Colors.END} "
-                      f"{Colors.GRAY}x{r['qty']}{Colors.END} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                print(self._format_item_value_line(r, "-", Colors.RED))
     
     def _display_comprehensive_mode_prices(self, added_rows, removed_rows):
         """Display prices in comprehensive mode (all items)"""
         print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
         for r in added_rows:
-            ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] is not None else ""
-            print(f"  {Colors.GREEN}+{Colors.END} {r['name']} {Colors.GRAY}[{r.get('category') or 'n/a'}]{Colors.END} "
-                  f"x{r['qty']} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+            print(self._format_comprehensive_item_line(r, "+", Colors.GREEN))
 
         print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
         for r in removed_rows:
-            ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] is not None else ""
-            print(f"  {Colors.RED}-{Colors.END} {r['name']} {Colors.GRAY}[{r.get('category') or 'n/a'}]{Colors.END} "
-                  f"x{r['qty']} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+            print(self._format_comprehensive_item_line(r, "-", Colors.RED))
     
     def _display_net_value(self, net_c, net_e):
         """Display net value and return the exalt value"""
@@ -200,42 +223,41 @@ class DisplayManager:
             print(f"📊 Avg/Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END} | "
                   f"⏱️  Avg Time: {Colors.CYAN}{avg_time:.1f}m{Colors.END}")
         
-        self._display_session_footer()
         print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
         self._display_session_footer()
     
     def _display_session_footer(self):
-        """Display a beautiful PoE2-style footer with timestamp using config settings"""
+        """Display a beautiful PoE2-style footer with timestamp using theme system"""
         from datetime import datetime
         from config import Config
         
-        # Get ASCII configuration
-        ascii_config = Config.ASCII_FOOTER
+        # Get current theme configuration
+        theme_config = Config.get_ascii_theme_config()
         
         # Get current timestamp in configured format
-        timestamp = datetime.now().strftime(ascii_config["timestamp_format"])
+        timestamp = datetime.now().strftime(theme_config["timestamp_format"])
         
-        # Get colors from config
-        deco_color = getattr(Colors, ascii_config.get("decoration_color", "CYAN"))
-        middle_color = getattr(Colors, ascii_config.get("middle_color", "CYAN"))
-        timestamp_color = getattr(Colors, ascii_config.get("timestamp_color", "GRAY"))
+        # Get colors from theme
+        deco_color = getattr(Colors, theme_config.get("decoration_color", "CYAN"))
+        middle_color = getattr(Colors, theme_config.get("middle_color", "CYAN"))
+        timestamp_color = getattr(Colors, theme_config.get("timestamp_color", "GRAY"))
         
-        # Apply single color to decorations
-        left_raw = ascii_config["left_decoration"]
-        right_raw = ascii_config["right_decoration"]
+        # Apply colors to decorations
+        left_raw = theme_config["left_decoration"]
+        right_raw = theme_config["right_decoration"]
         
         left_deco = f"{deco_color}{left_raw}{Colors.END}"
         right_deco = f"{deco_color}{right_raw}{Colors.END}"
         
         # Calculate padding for centered timestamp
-        total_width = ascii_config["total_width"]
+        total_width = theme_config["total_width"]
         timestamp_text = f" {timestamp} "
         deco_width = len(left_raw) + len(right_raw)  # Width without color codes
         available_width = total_width - len(timestamp_text) - deco_width
         padding = max(0, available_width // 2)
         
         # Create the beautiful footer line
-        middle_char = ascii_config["middle_char"]
+        middle_char = theme_config["middle_char"]
         middle_line = f"{middle_color}{middle_char * padding}{Colors.END}"
         footer_line = f"{left_deco}{middle_line}{timestamp_color}{timestamp_text}{Colors.END}{middle_line}{right_deco}"
         
@@ -258,7 +280,7 @@ class DisplayManager:
     
     def display_error(self, error_type, error_message):
         """Display error messages"""
-        print(f"❌ [{error_type}] error: {error_message}")
+        print(f"❌ [{error_type}] Error: {error_message}")
     
     def display_current_inventory_value(self, inventory_items):
         """Display value analysis of current inventory"""
@@ -340,3 +362,47 @@ class DisplayManager:
     def display_info_message(self, message):
         """Display general info messages"""
         print(message)
+    
+    def display_ascii_themes(self):
+        """Display available ASCII themes"""
+        from config import Config
+        print(f"\n🎨 {Colors.BOLD}ASCII THEMES{Colors.END}")
+        themes_info = Config.list_ascii_themes()
+        print(themes_info)
+        print(f"\nTo change theme, use: Config.set_ascii_theme('theme_name')")
+        self._display_session_footer()
+    
+    def change_ascii_theme(self, theme_name):
+        """Change the ASCII theme and show preview"""
+        from config import Config
+        
+        if Config.set_ascii_theme(theme_name):
+            print(f"🎨 Theme changed to: {Colors.BOLD}{theme_name}{Colors.END}")
+            preview = Config.preview_ascii_theme(theme_name)
+            print(f"Preview:\n{preview}")
+            self._display_session_footer()
+            return True
+        else:
+            print(f"❌ Theme '{theme_name}' not found")
+            self.display_ascii_themes()
+            return False
+    
+    # Helper methods for reducing code duplication
+    def _format_ex_value(self, ex_value):
+        """Format exalted value display string"""
+        if ex_value and ex_value > 0.01:
+            return f" | {Colors.GOLD}{fmt(ex_value)}ex{Colors.END}"
+        return ""
+    
+    def _format_item_value_line(self, item_data, prefix_symbol, prefix_color):
+        """Format a single item value line with consistent styling"""
+        ex_str = self._format_ex_value(item_data.get('ex_total'))
+        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {Colors.WHITE}{item_data['name']}{Colors.END} "
+                f"{Colors.GRAY}x{item_data['qty']}{Colors.END} => {Colors.GOLD}{fmt(item_data['chaos_total'])}c{Colors.END}{ex_str}")
+    
+    def _format_comprehensive_item_line(self, item_data, prefix_symbol, prefix_color):
+        """Format comprehensive mode item line with category info"""
+        ex_str = self._format_ex_value(item_data.get('ex_total'))
+        category = item_data.get('category') or 'n/a'
+        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {item_data['name']} {Colors.GRAY}[{category}]{Colors.END} "
+                f"x{item_data['qty']} => {Colors.GOLD}{fmt(item_data['chaos_total'])}c{Colors.END}{ex_str}")
