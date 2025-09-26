@@ -290,6 +290,18 @@ class IconColorMapper:
             # === FRAGMENTS ===
             'ancient crisis fragment': '🧩',
             
+            # === WAYSTONES ===
+            'waystone': '🏰',  # Castle for waystones (better padding)
+            
+            # === TABLETS ===
+            'tablet': '📜',  # Scroll for all tablets
+            'precursor tablet': '📜',  # Scroll for precursor tablets
+            
+            # === GEMS (MATERIALS) ===
+            'sapphire': '🔷',  # Blue diamond for sapphire
+            'emerald': '🔶',  # Green diamond for emerald
+            'ruby': '🔴',     # Red circle for ruby (if needed)
+            
             # === GENERIC TYPE FALLBACKS ===
             # These are used if specific item name not found above
             'catalyst': '🔬',  # Default for any catalyst
@@ -298,6 +310,7 @@ class IconColorMapper:
             # 'rune': '🔵',     # Removed for color analysis
             'essence': '✨',   # Default for any essence
             'fragment': '🧩', # Default for any fragment
+            'gem': '💎',      # Default for any gem
         }
         
         # Color-based emoji mappings (used when no specific item/type match found)
