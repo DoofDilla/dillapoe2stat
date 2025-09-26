@@ -255,17 +255,27 @@ class TerminalIconTester:
         return closest_idx
     
     def _display_all_icons_colored_blocks(self, downloaded_images):
-        """Display all icons using colored blocks method"""
-        print(f"\n🎨 ALL ICONS - COLORED BLOCKS METHOD")
+        """Display all icons using colored blocks method in 3 sizes"""
+        print(f"\n🎨 ALL ICONS - COLORED BLOCKS METHOD (3 SIZES)")
         print("=" * 60)
         
-        for name, image_path in downloaded_images.items():
-            print(f"\n🟡 {name}:")
-            self._render_single_icon_colored_blocks(image_path)
+        sizes = [(8, "Small"), (16, "Medium"), (32, "Large")]
+        
+        for size, size_name in sizes:
+            print(f"\n📏 {size_name} ({size}x{size}):")
+            print("-" * 40)
+            
+            # Show all icons in a row for smaller sizes, individual for larger
+            if size <= 16:
+                self._render_icons_in_row(downloaded_images, size)
+            else:
+                for name, image_path in downloaded_images.items():
+                    print(f"\n🟡 {name}:")
+                    self._render_single_icon_colored_blocks(image_path, size)
     
     def _display_all_icons_braille(self, downloaded_images):
         """Display all icons using braille art method"""
-        print(f"\n⠿ ALL ICONS - BRAILLE ART METHOD")
+        print(f"\n⠿ ALL ICONS - BRAILLE ART METHOD (FIXED ASPECT RATIO)")
         print("=" * 60)
         
         for name, image_path in downloaded_images.items():
@@ -281,16 +291,16 @@ class TerminalIconTester:
             print(f"\n🎭 {name}:")
             self._render_single_icon_ascii(image_path)
     
-    def _render_single_icon_colored_blocks(self, image_path):
-        """Render a single icon using colored blocks (compact version)"""
+    def _render_single_icon_colored_blocks(self, image_path, size=16):
+        """Render a single icon using colored blocks"""
         try:
             with Image.open(image_path) as img:
                 if img.mode != 'RGBA':
                     img = img.convert('RGBA')
                 
-                # Smaller size for overview
-                target_width = 16
-                target_height = 16
+                # Use specified size
+                target_width = size
+                target_height = size
                 img = img.resize((target_width, target_height))
                 
                 # Process image in pairs of rows
@@ -336,7 +346,11 @@ class TerminalIconTester:
                     background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
                     img = background
                 
-                img = img.resize((24, 12))
+                # Braille chars are 2x4 pixels, so we need 2:1 width:height ratio
+                # Each braille char = 2 pixels wide, 4 pixels tall
+                target_width = 32
+                target_height = 16  # 2:1 ratio for proper proportions
+                img = img.resize((target_width, target_height))
                 img = img.convert('L')
                 
                 for y in range(0, img.height, 4):
@@ -380,6 +394,77 @@ class TerminalIconTester:
                     print(line)
         except Exception as e:
             print(f"❌ Error rendering {image_path}: {e}")
+    
+    def _render_icons_in_row(self, downloaded_images, size):
+        """Render multiple small icons side by side"""
+        try:
+            # Prepare all icons
+            icon_data = {}
+            names = list(downloaded_images.keys())
+            
+            for name, image_path in downloaded_images.items():
+                try:
+                    with Image.open(image_path) as img:
+                        if img.mode != 'RGBA':
+                            img = img.convert('RGBA')
+                        
+                        img = img.resize((size, size))
+                        icon_data[name] = img.copy()
+                except Exception as e:
+                    continue
+            
+            if not icon_data:
+                return
+            
+            # Print names header (shortened)
+            header = ""
+            for name in names:
+                if name in icon_data:
+                    short_name = name.replace(" Orb", "")[:6]
+                    header += f"{short_name:<{size+2}}"
+            print(header)
+            
+            # Render all icons line by line
+            for y in range(0, size, 2):
+                line = ""
+                
+                for name in names:
+                    if name not in icon_data:
+                        continue
+                    
+                    img = icon_data[name]
+                    icon_line = ""
+                    
+                    for x in range(size):
+                        # Get pixels and handle transparency (same logic as before)
+                        pixel1 = img.getpixel((x, y))
+                        r1, g1, b1, a1 = pixel1 if len(pixel1) == 4 else (*pixel1, 255)
+                        
+                        if y + 1 < size:
+                            pixel2 = img.getpixel((x, y + 1))
+                            r2, g2, b2, a2 = pixel2 if len(pixel2) == 4 else (*pixel2, 255)
+                        else:
+                            r2, g2, b2, a2 = r1, g1, b1, a1
+                        
+                        if a1 < 50 and a2 < 50:
+                            icon_line += " "
+                        elif a1 < 50:
+                            icon_line += f"\033[38;2;{r2};{g2};{b2}m▄\033[0m"
+                        elif a2 < 50:
+                            icon_line += f"\033[38;2;{r1};{g1};{b1}m▀\033[0m"
+                        else:
+                            icon_line += f"\033[38;2;{r1};{g1};{b1}m\033[48;2;{r2};{g2};{b2}m▀\033[0m"
+                    
+                    line += icon_line + "  "
+                
+                print(line)
+                
+        except Exception as e:
+            print(f"❌ Error rendering row: {e}")
+            # Fallback to individual rendering
+            for name, image_path in downloaded_images.items():
+                print(f"\n🟡 {name}:")
+                self._render_single_icon_colored_blocks(image_path, size)
     
     def test_method_2_kitty(self, image_path):
         """Test Method 2: Kitty Graphics Protocol"""
@@ -662,6 +747,98 @@ class TerminalIconTester:
             print("  🎭 Use ASCII art - universal compatibility!")
         else:
             print("  😅 Stick with emojis - they're the most reliable!")
+
+
+def main():
+    """Main function"""
+    print("🎨 Welcome to the Terminal Icon Display POC!")
+    print("This will test different methods to show actual images in your terminal.\n")
+    
+    tester = TerminalIconTester()
+    
+    try:
+        tester.run_all_tests()
+    except KeyboardInterrupt:
+        print("\n\n👋 Tests interrupted by user")
+    except Exception as e:
+        print(f"\n❌ Test suite crashed: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    print(f"\n📁 Test files saved in: {tester.test_dir.absolute()}")
+    print("🧹 You can delete this folder when done testing")
+
+
+    def _render_icons_in_row(self, downloaded_images, size):
+        """Render multiple small icons side by side"""
+        try:
+            # Prepare all icons
+            icon_data = {}
+            names = list(downloaded_images.keys())
+            
+            for name, image_path in downloaded_images.items():
+                try:
+                    with Image.open(image_path) as img:
+                        if img.mode != 'RGBA':
+                            img = img.convert('RGBA')
+                        
+                        img = img.resize((size, size))
+                        icon_data[name] = img.copy()
+                except Exception as e:
+                    continue
+            
+            if not icon_data:
+                return
+            
+            # Print names header (shortened)
+            header = ""
+            for name in names:
+                if name in icon_data:
+                    short_name = name.replace(" Orb", "")[:6]
+                    header += f"{short_name:<{size+2}}"
+            print(header)
+            
+            # Render all icons line by line
+            for y in range(0, size, 2):
+                line = ""
+                
+                for name in names:
+                    if name not in icon_data:
+                        continue
+                    
+                    img = icon_data[name]
+                    icon_line = ""
+                    
+                    for x in range(size):
+                        # Get pixels and handle transparency (same logic as before)
+                        pixel1 = img.getpixel((x, y))
+                        r1, g1, b1, a1 = pixel1 if len(pixel1) == 4 else (*pixel1, 255)
+                        
+                        if y + 1 < size:
+                            pixel2 = img.getpixel((x, y + 1))
+                            r2, g2, b2, a2 = pixel2 if len(pixel2) == 4 else (*pixel2, 255)
+                        else:
+                            r2, g2, b2, a2 = r1, g1, b1, a1
+                        
+                        if a1 < 50 and a2 < 50:
+                            icon_line += " "
+                        elif a1 < 50:
+                            icon_line += f"\033[38;2;{r2};{g2};{b2}m▄\033[0m"
+                        elif a2 < 50:
+                            icon_line += f"\033[38;2;{r1};{g1};{b1}m▀\033[0m"
+                        else:
+                            icon_line += f"\033[38;2;{r1};{g1};{b1}m\033[48;2;{r2};{g2};{b2}m▀\033[0m"
+                    
+                    line += icon_line + "  "
+                
+                print(line)
+                
+        except Exception as e:
+            print(f"❌ Error rendering row: {e}")
+            # Fallback to individual rendering
+            for name, image_path in downloaded_images.items():
+                print(f"\n🟡 {name}:")
+                self._render_single_icon_colored_blocks(image_path, size)
 
 
 def main():
