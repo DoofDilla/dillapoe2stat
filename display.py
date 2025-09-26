@@ -26,6 +26,12 @@ class DisplayManager:
     
     def __init__(self, output_mode="normal"):
         self.output_mode = output_mode
+        # Import config for table settings
+        from config import Config
+        self.config = Config()
+        # Import config for table settings
+        from config import Config
+        self.config = Config()
     
     def set_output_mode(self, mode):
         """Set output mode: 'normal' or 'comprehensive'"""
@@ -530,7 +536,7 @@ class DisplayManager:
     
     def _display_valuable_items_list(self, header, items_data, inventory_items=None):
         """
-        Unified display function for valuable items (used by both POST-map and Current Inventory)
+        Unified display function for valuable items as formatted table
         
         Args:
             header: Display header (e.g., "💰 Valuable Loot:" or "💰 Valuable Items:")
@@ -545,13 +551,48 @@ class DisplayManager:
         # Get emojis using unified analysis
         item_emojis = self._get_smart_emojis_for_items(items_data, inventory_items)
         
-        # Display each item with consistent formatting
+        # Calculate column widths based on data (without ANSI color codes)
+        max_name_len = max(len(f"{item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))} {r['name']}") for r in items_data)
+        name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
+        
+        # Table header
+        header_line = (
+            f"{'Item Name':<{name_width}} "
+            f"{'Qty':>{self.config.TABLE_QTY_WIDTH}} "
+            f"{'Category':<{self.config.TABLE_CATEGORY_WIDTH}} "
+            f"{'Chaos':>{self.config.TABLE_CHAOS_WIDTH}} "
+            f"{'Exalted':>{self.config.TABLE_EXALTED_WIDTH}}"
+        )
+        print(header_line)
+        
+        # Separator line
+        separator_width = len(header_line)
+        print(self.config.TABLE_SEPARATOR_CHAR * separator_width)
+        
+        # Table rows
         for r in items_data:
             emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-            ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-            print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
-                  f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
-                  f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+            
+            # Calculate visible lengths (without ANSI codes) for proper padding
+            item_name_visible = f"{emoji} {r['name']}"
+            item_name_colored = f"{emoji} {Colors.WHITE}{r['name']}{Colors.END}"
+            
+            category = (r.get('category') or 'n/a')[:self.config.TABLE_CATEGORY_WIDTH]
+            chaos_val = f"{fmt(r['chaos_total'])}c"
+            ex_val = f"{fmt(r['ex_total'])}ex" if r['ex_total'] and r['ex_total'] > 0.01 else "-"
+            
+            # Calculate padding for colored item name
+            name_padding = name_width - len(item_name_visible)
+            
+            # Format row with proper padding
+            row = (
+                f"{item_name_colored}{' ' * name_padding} "
+                f"{Colors.CYAN}{r['qty']:>{self.config.TABLE_QTY_WIDTH}}{Colors.END} "
+                f"{Colors.GRAY}{category:<{self.config.TABLE_CATEGORY_WIDTH}}{Colors.END} "
+                f"{Colors.GOLD}{chaos_val:>{self.config.TABLE_CHAOS_WIDTH}}{Colors.END} "
+                f"{Colors.GOLD}{ex_val:>{self.config.TABLE_EXALTED_WIDTH}}{Colors.END}"
+            )
+            print(row)
     
 
     

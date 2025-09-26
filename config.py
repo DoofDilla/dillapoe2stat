@@ -87,6 +87,14 @@ class Config:
     # Notification Settings
     NOTIFICATION_ENABLED = True
     
+    # Table display settings
+    TABLE_SEPARATOR_CHAR = '─'
+    TABLE_MIN_NAME_WIDTH = 35
+    TABLE_QTY_WIDTH = 4
+    TABLE_CATEGORY_WIDTH = 12
+    TABLE_CHAOS_WIDTH = 10
+    TABLE_EXALTED_WIDTH = 12
+    
     @classmethod
     def get_script_dir(cls):
         """Get the directory where the script is located"""
