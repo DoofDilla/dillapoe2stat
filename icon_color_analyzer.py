@@ -243,7 +243,7 @@ class IconColorMapper:
             'chaos orb': '🟡',
             'exalted orb': '🟠', 
             'greater exalted orb': '🟠',
-            'divine orb': '🟨',
+            'divine orb': '⭐',
             'regal orb': '🟤',
             'greater regal orb': '🟤',
             'perfect orb of augmentation': '🔵',

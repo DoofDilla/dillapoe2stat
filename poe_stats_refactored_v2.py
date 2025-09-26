@@ -15,7 +15,6 @@ from hotkey_manager import HotkeyManager
 from inventory_debug import InventoryDebugger
 from waystone_analyzer import WaystoneAnalyzer
 from notification_manager import NotificationManager
-from animation_manager import AnimationManager
 from utils import format_time, get_current_timestamp
 
 # Import existing modules
@@ -45,7 +44,6 @@ class PoEStatsTracker:
         )
         self.waystone_analyzer = WaystoneAnalyzer(self.config, self.display, self.debugger)
         self.notification_manager = NotificationManager(self.config)
-        self.animation_manager = AnimationManager()
         
         # State variables
         self.token = None
@@ -172,14 +170,9 @@ class PoEStatsTracker:
             # Take inventory snapshot for waystone analysis only
             current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
             
-            # Find and parse waystone with animation
-            with self.animation_manager.context_spinner(
-                "🧪 Analyzing waystone modifiers", 
-                style='dots', 
-                delay=0.15
-            ):
-                waystone = self.waystone_analyzer.find_waystone_in_inventory(current_inventory)
-                waystone_info = self.waystone_analyzer.parse_waystone_info(waystone)
+            # Find and parse waystone
+            waystone = self.waystone_analyzer.find_waystone_in_inventory(current_inventory)
+            waystone_info = self.waystone_analyzer.parse_waystone_info(waystone)
             
             if waystone_info:
                 print("🧪 EXPERIMENTAL WAYSTONE ANALYSIS")
@@ -245,7 +238,6 @@ class PoEStatsTracker:
             
             # Display changes and price analysis
             self.display.display_inventory_changes(analysis['added'], analysis['removed'])
-            
             # Pass inventory data for better emoji analysis
             map_value = self.display.display_price_analysis(analysis['added'], analysis['removed'], 
                                                            post_inventory=post_inventory, pre_inventory=self.pre_inventory)
