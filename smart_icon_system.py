@@ -54,12 +54,12 @@ class SmartIconSystem:
         icon_url = item_data.get('icon')
         if not icon_url:
             # No icon URL, use type-based fallback
-            return self.color_mapper.get_emoji_for_item(item_data)
+            return self.color_mapper.get_smart_unicode_for_item(item_data, self.color_analyzer, None)
         
         # Check if we have cached color analysis
         if icon_url in self.color_cache:
             color_category = self.color_cache[icon_url]
-            return self.color_mapper.get_emoji_for_item(item_data, color_category)
+            return self.color_mapper.get_smart_unicode_for_item(item_data, self.color_analyzer, color_category)
         
         # Try to get cached icon file
         cached_icon = self.cache_manager.get_cached_icon_path(icon_url)
@@ -78,10 +78,10 @@ class SmartIconSystem:
             self.color_cache[icon_url] = color_category
             self._save_color_cache()
             
-            return self.color_mapper.get_emoji_for_item(item_data, color_category)
+            return self.color_mapper.get_smart_unicode_for_item(item_data, self.color_analyzer, color_category)
         
         # Fallback to type-based emoji
-        return self.color_mapper.get_emoji_for_item(item_data)
+        return self.color_mapper.get_smart_unicode_for_item(item_data, self.color_analyzer, None)
     
     def batch_analyze_items(self, items_list, max_downloads=20):
         """
@@ -105,13 +105,13 @@ class SmartIconSystem:
             
             if not icon_url:
                 # No icon, use type-based
-                results[item_name] = self.color_mapper.get_emoji_for_item(item)
+                results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, None)
                 continue
             
             if icon_url in self.color_cache:
                 # Already analyzed
                 color_category = self.color_cache[icon_url]
-                results[item_name] = self.color_mapper.get_emoji_for_item(item, color_category)
+                results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, color_category)
                 continue
             
             cached_path = self.cache_manager.get_cached_icon_path(icon_url)
@@ -120,7 +120,7 @@ class SmartIconSystem:
                 dominant_color = self.color_analyzer.get_dominant_color(cached_path)
                 color_category = self.color_analyzer.categorize_color(dominant_color)
                 self.color_cache[icon_url] = color_category
-                results[item_name] = self.color_mapper.get_emoji_for_item(item, color_category)
+                results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, color_category)
                 continue
             
             # Need to download
@@ -128,7 +128,7 @@ class SmartIconSystem:
                 urls_to_download.append((icon_url, item))
             else:
                 # Use fallback for items beyond download limit
-                results[item_name] = self.color_mapper.get_emoji_for_item(item)
+                results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, None)
         
         # Batch download icons
         if urls_to_download:
@@ -151,9 +151,9 @@ class SmartIconSystem:
                     dominant_color = self.color_analyzer.get_dominant_color(cached_path)
                     color_category = self.color_analyzer.categorize_color(dominant_color)
                     self.color_cache[icon_url] = color_category
-                    results[item_name] = self.color_mapper.get_emoji_for_item(item, color_category)
+                    results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, color_category)
                 else:
-                    results[item_name] = self.color_mapper.get_emoji_for_item(item)
+                    results[item_name] = self.color_mapper.get_smart_unicode_for_item(item, self.color_analyzer, None)
         
         # Save color cache
         self._save_color_cache()
