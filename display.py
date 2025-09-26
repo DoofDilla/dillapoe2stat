@@ -131,23 +131,35 @@ class DisplayManager:
         """Display prices in normal mode (only valuable items)"""
         if valuable_added:
             print(f"\n💰 {Colors.BOLD}Valuable Loot:{Colors.END}")
+            # Get smart emojis for added items
+            item_emojis = self._get_smart_emojis_for_items(valuable_added)
             for r in valuable_added:
-                print(self._format_item_value_line(r, "+", Colors.GREEN))
+                emoji = item_emojis.get(r['name'])
+                print(self._format_item_value_line(r, "+", Colors.GREEN, emoji))
         
         if valuable_removed:
             print(f"\n💸 {Colors.BOLD}Valuable Items Used:{Colors.END}")
+            # Get smart emojis for removed items  
+            item_emojis = self._get_smart_emojis_for_items(valuable_removed)
             for r in valuable_removed:
-                print(self._format_item_value_line(r, "-", Colors.RED))
+                emoji = item_emojis.get(r['name'])
+                print(self._format_item_value_line(r, "-", Colors.RED, emoji))
     
     def _display_comprehensive_mode_prices(self, added_rows, removed_rows):
         """Display prices in comprehensive mode (all items)"""
         print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
+        # Get smart emojis for added items
+        added_emojis = self._get_smart_emojis_for_items(added_rows)
         for r in added_rows:
-            print(self._format_comprehensive_item_line(r, "+", Colors.GREEN))
+            emoji = added_emojis.get(r['name'])
+            print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
 
         print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
+        # Get smart emojis for removed items
+        removed_emojis = self._get_smart_emojis_for_items(removed_rows)
         for r in removed_rows:
-            print(self._format_comprehensive_item_line(r, "-", Colors.RED))
+            emoji = removed_emojis.get(r['name'])
+            print(self._format_comprehensive_item_line(r, "-", Colors.RED, emoji))
     
     def _display_net_value(self, net_c, net_e):
         """Display net value and return the exalt value"""
@@ -299,7 +311,7 @@ class DisplayManager:
         print(f"❌ [{error_type}] Error: {error_message}")
     
     def display_current_inventory_value(self, inventory_items):
-        """Display value analysis of current inventory"""
+        """Display value analysis of current inventory with smart icons"""
         try:
             from price_check_poe2 import valuate_items_raw
             rows, (total_c, total_e) = valuate_items_raw(inventory_items)
@@ -311,9 +323,14 @@ class DisplayManager:
             
             if valuable_items:
                 print(f"\n💰 {Colors.BOLD}Valuable Items:{Colors.END}")
+                
+                # Get smart emojis for valuable items - use original inventory items for icon analysis
+                item_emojis = self._get_smart_emojis_for_current_inventory(inventory_items, valuable_items)
+                
                 for r in valuable_items:
                     ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                    print(f"  💎 {Colors.WHITE}{r['name']}{Colors.END} "
+                    emoji = item_emojis.get(r['name'], '💎')  # fallback to diamond
+                    print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
                           f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
                           f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
                 
@@ -379,6 +396,53 @@ class DisplayManager:
         """Display general info messages"""
         print(message)
     
+    def display_icon_system_stats(self):
+        """Display statistics about the smart icon system"""
+        try:
+            from smart_icon_system import get_smart_icon_system
+            icon_system = get_smart_icon_system()
+            stats = icon_system.get_system_stats()
+            
+            print(f"\n🎨 {Colors.BOLD}SMART ICON SYSTEM STATS{Colors.END}")
+            print(f"📁 Cached Icons: {Colors.GREEN}{stats['cached_icons']}{Colors.END}")
+            print(f"💾 Cache Size: {Colors.CYAN}{stats['cache_size_mb']:.1f} MB{Colors.END}")
+            print(f"🎨 Analyzed Colors: {Colors.YELLOW}{stats['analyzed_colors']}{Colors.END}")
+            print(f"📂 Cache Directory: {Colors.GRAY}{stats.get('cache_dir', 'N/A')}{Colors.END}")
+            self._display_session_footer()
+            
+        except Exception as e:
+            print(f"❌ Could not get icon system stats: {e}")
+    
+    def test_smart_icons(self, sample_items=None):
+        """Test the smart icon system with sample items"""
+        if not sample_items:
+            # Create some sample items for testing
+            sample_items = [
+                {'typeLine': 'Chaos Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyRerollRare.png'},
+                {'typeLine': 'Exalted Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyAddModToRare.png'},
+                {'typeLine': 'Divine Orb', 'icon': 'https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyModValues.png'},
+                {'typeLine': 'Iron Sword', 'icon': None},  # Test fallback
+                {'typeLine': 'Test Item', 'icon': 'invalid_url'}  # Test error handling
+            ]
+        
+        try:
+            from smart_icon_system import get_smart_icon_system
+            icon_system = get_smart_icon_system()
+            
+            print(f"\n🧪 {Colors.BOLD}TESTING SMART ICON SYSTEM{Colors.END}")
+            
+            for item in sample_items:
+                emoji = icon_system.get_item_emoji(item, enable_downloads=True)
+                icon_status = "📡" if item.get('icon') else "🔄"
+                print(f"  {icon_status} {emoji} {Colors.WHITE}{item['typeLine']}{Colors.END}")
+            
+            self._display_session_footer()
+            
+        except Exception as e:
+            print(f"❌ Smart icon test failed: {e}")
+            import traceback
+            traceback.print_exc()
+    
     def display_ascii_themes(self):
         """Display available ASCII themes"""
         from config import Config
@@ -403,6 +467,83 @@ class DisplayManager:
             self.display_ascii_themes()
             return False
     
+    def _get_smart_emojis_for_items(self, items_data):
+        """
+        Get smart emojis for a list of items using the icon system
+        
+        Args:
+            items_data: List of item data dicts (from price analysis)
+            
+        Returns:
+            dict: Mapping of item names to emojis
+        """
+        try:
+            # Try to get the smart icon system
+            from smart_icon_system import get_smart_icon_system
+            icon_system = get_smart_icon_system()
+            
+            # Convert price analysis items back to API format for icon analysis
+            api_items = []
+            for item in items_data:
+                # Create a mock API item dict
+                api_item = {
+                    'typeLine': item['name'],
+                    'name': item['name'],
+                    # Add more fields if available from original data
+                }
+                api_items.append(api_item)
+            
+            # Get emojis (limit downloads to avoid delays)
+            return icon_system.batch_analyze_items(api_items, max_downloads=5)
+            
+        except Exception as e:
+            from config import Config
+            if Config.DEBUG_ENABLED:
+                print(f"[ICON] Warning: Could not get smart emojis: {e}")
+            # Fallback to simple emojis
+            return {item['name']: '⚪' for item in items_data}
+    
+    def _get_smart_emojis_for_current_inventory(self, inventory_items, valuable_items):
+        """
+        Get smart emojis for current inventory items (has access to original API data)
+        
+        Args:
+            inventory_items: Original inventory items from API (with icon URLs)
+            valuable_items: Filtered valuable items from price analysis
+            
+        Returns:
+            dict: Mapping of item names to emojis
+        """
+        try:
+            from smart_icon_system import get_smart_icon_system
+            icon_system = get_smart_icon_system()
+            
+            # Create mapping of valuable item names
+            valuable_names = {item['name'] for item in valuable_items}
+            
+            # Filter inventory items to only valuable ones
+            valuable_inventory_items = [
+                item for item in inventory_items 
+                if (item.get('typeLine') or item.get('name', '')) in valuable_names
+            ]
+            
+            # Only show debug message in debug mode
+            from config import Config
+            if Config.DEBUG_ENABLED:
+                print(f"[ICON] Analyzing {len(valuable_inventory_items)} valuable items...")
+            
+            # Get emojis using original API data (has icon URLs)
+            result = icon_system.batch_analyze_items(valuable_inventory_items, max_downloads=10)
+            
+            return result
+            
+        except Exception as e:
+            from config import Config
+            if Config.DEBUG_ENABLED:
+                print(f"[ICON] Warning: Could not get smart emojis for inventory: {e}")
+            # Fallback to simple emojis
+            return {item['name']: '💎' for item in valuable_items}
+    
     # Helper methods for reducing code duplication
     def _format_ex_value(self, ex_value):
         """Format exalted value display string"""
@@ -410,15 +551,17 @@ class DisplayManager:
             return f" | {Colors.GOLD}{fmt(ex_value)}ex{Colors.END}"
         return ""
     
-    def _format_item_value_line(self, item_data, prefix_symbol, prefix_color):
+    def _format_item_value_line(self, item_data, prefix_symbol, prefix_color, item_emoji=None):
         """Format a single item value line with consistent styling"""
         ex_str = self._format_ex_value(item_data.get('ex_total'))
-        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {Colors.WHITE}{item_data['name']}{Colors.END} "
+        emoji_str = f"{item_emoji} " if item_emoji else ""
+        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {emoji_str}{Colors.WHITE}{item_data['name']}{Colors.END} "
                 f"{Colors.GRAY}x{item_data['qty']}{Colors.END} => {Colors.GOLD}{fmt(item_data['chaos_total'])}c{Colors.END}{ex_str}")
     
-    def _format_comprehensive_item_line(self, item_data, prefix_symbol, prefix_color):
+    def _format_comprehensive_item_line(self, item_data, prefix_symbol, prefix_color, item_emoji=None):
         """Format comprehensive mode item line with category info"""
         ex_str = self._format_ex_value(item_data.get('ex_total'))
         category = item_data.get('category') or 'n/a'
-        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {item_data['name']} {Colors.GRAY}[{category}]{Colors.END} "
+        emoji_str = f"{item_emoji} " if item_emoji else ""
+        return (f"  {prefix_color}{prefix_symbol}{Colors.END} {emoji_str}{item_data['name']} {Colors.GRAY}[{category}]{Colors.END} "
                 f"x{item_data['qty']} => {Colors.GOLD}{fmt(item_data['chaos_total'])}c{Colors.END}{ex_str}")
