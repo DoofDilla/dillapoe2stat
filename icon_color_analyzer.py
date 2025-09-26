@@ -312,7 +312,7 @@ class IconColorMapper:
             'square': {'brown': '🟫', 'yellow': '🟨', 'white': '⬜', 'blue': '🟦', 'black': '⬛', 'gold': '🟨', 'orange': '🟧', 'gray': '⬛', 'silver': '⬜', 'default': '🟨'},
             
             # Triangular shapes (like fragments)
-            'triangle': {'red': '🔺', 'blue': '🔷', 'orange': '🔸', 'white': '△', 'black': '▲', 'brown': '🔸', 'gold': '🔸', 'gray': '▲', 'silver': '△', 'default': '🔸'},
+            'triangle': {'red': '▲', 'blue': '▲', 'orange': '▲', 'white': '△', 'black': '▲', 'brown': '▲', 'gold': '▲', 'gray': '▲', 'silver': '△', 'default': '▲'},
             
             # Star shapes (like essences)
             'star': {'gold': '⭐', 'yellow': '✨', 'white': '☆', 'blue': '💫', 'black': '✦', 'brown': '✧', 'gray': '☆', 'silver': '☆', 'default': '⭐'}

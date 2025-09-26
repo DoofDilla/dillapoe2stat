@@ -31,6 +31,43 @@ class DisplayManager:
         """Set output mode: 'normal' or 'comprehensive'"""
         self.output_mode = mode
     
+    def get_unicode_display_width(self, char):
+        """Get actual terminal display width of a single Unicode character"""
+        code = ord(char)
+        
+        # Emoji ranges (typically 2 columns wide)
+        if (0x1F600 <= code <= 0x1F64F or  # Emoticons
+            0x1F300 <= code <= 0x1F5FF or  # Misc Symbols
+            0x1F680 <= code <= 0x1F6FF or  # Transport
+            0x1F1E0 <= code <= 0x1F1FF or  # Flags
+            0x2600 <= code <= 0x26FF or    # Misc symbols
+            0x2700 <= code <= 0x27BF):     # Dingbats
+            return 2
+            
+        # Special Unicode symbols (1 column wide)
+        elif (0x2000 <= code <= 0x2BFF or  # General punctuation, symbols
+              0x25A0 <= code <= 0x25FF or  # Geometric shapes (⬛, ▲, ◇, etc.)
+              0x2600 <= code <= 0x26FF):   # Misc symbols
+            return 1
+            
+        # ASCII and most other characters
+        else:
+            return 1
+    
+    def get_text_display_width(self, text):
+        """Calculate actual terminal display width of text"""
+        return sum(self.get_unicode_display_width(char) for char in text)
+    
+    def pad_to_display_width(self, text, target_width):
+        """Pad text to exact display width"""
+        current_width = self.get_text_display_width(text)
+        if current_width < target_width:
+            return text + ' ' * (target_width - current_width)
+        elif current_width > target_width:
+            # Truncate if too long
+            return text[:target_width-3] + "..."
+        return text
+    
     def display_startup_info(self, character_name, session_id, output_mode):
         """Display startup information"""
         self._display_basic_info(character_name, session_id, output_mode)
@@ -330,8 +367,15 @@ class DisplayManager:
                 for r in valuable_items:
                     ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
                     emoji = item_emojis.get(r['name'], '💎')  # fallback to diamond
-                    print(f"  {emoji} {Colors.WHITE}{r['name']}{Colors.END} "
-                          f"{Colors.GRAY}x{r['qty']} [{r.get('category') or 'n/a'}]{Colors.END} "
+                    
+                    # Perfect column alignment using real Unicode widths
+                    icon_col = self.pad_to_display_width(emoji, 3)       # 3 chars for icon
+                    name_col = self.pad_to_display_width(r['name'], 25)  # 25 chars for name
+                    qty_text = f"x{r['qty']}"
+                    qty_col = self.pad_to_display_width(qty_text, 4)     # 4 chars for quantity
+                    
+                    print(f"  {icon_col} {Colors.WHITE}{name_col}{Colors.END} "
+                          f"{Colors.GRAY}{qty_col} [{r.get('category') or 'n/a'}]{Colors.END} "
                           f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
                 
                 # Display totals
