@@ -235,3 +235,14 @@
 {"event_type": "session_start", "session_id": "394d558b-df67-4c4d-89e6-66ec12ea3a63", "ts": "2025-09-27T01:07:38", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "394d558b-df67-4c4d-89e6-66ec12ea3a63", "ts": "2025-09-27T01:07:48", "character": "Mettmanwalking", "session_runtime": 10.54, "total_value": 0.0, "total_maps": 0}
 {"event_type": "session_start", "session_id": "7382612b-5598-4914-8f28-14b7d5598ef9", "ts": "2025-09-27T01:08:37", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "7382612b-5598-4914-8f28-14b7d5598ef9", "ts": "2025-09-27T01:10:11", "character": "Mettmanwalking", "session_runtime": 94.85, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "8a34e12c-d083-4c74-a35f-bb75f16df674", "ts": "2025-09-27T01:11:23", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "8a34e12c-d083-4c74-a35f-bb75f16df674", "ts": "2025-09-27T01:12:52", "character": "Mettmanwalking", "session_runtime": 88.78, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "b9f20c37-91b6-48ba-909e-119beb8cf09c", "ts": "2025-09-27T01:12:56", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "b9f20c37-91b6-48ba-909e-119beb8cf09c", "ts": "2025-09-27T01:13:19", "character": "Mettmanwalking", "session_runtime": 23.2, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "4f32ee0d-d419-4b45-b8e9-92f6512b40fe", "ts": "2025-09-27T01:13:23", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "4f32ee0d-d419-4b45-b8e9-92f6512b40fe", "ts": "2025-09-27T01:13:42", "character": "Mettmanwalking", "session_runtime": 19.04, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "cf6ea590-e6d4-48db-a79b-16aa2949fd56", "ts": "2025-09-27T01:14:38", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "cf6ea590-e6d4-48db-a79b-16aa2949fd56", "ts": "2025-09-27T01:15:10", "character": "Mettmanwalking", "session_runtime": 31.81, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "e15bdf47-31dc-410e-8933-579f41d71bab", "ts": "2025-09-27T01:16:29", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "e15bdf47-31dc-410e-8933-579f41d71bab", "ts": "2025-09-27T01:17:19", "character": "Mettmanwalking", "session_runtime": 49.63, "total_value": 0.0, "total_maps": 0}

@@ -280,7 +280,7 @@ class IconColorMapper:
             'perfect essence of the infinite': '✨',
             
             # === DELIRIUM ===
-            'diluted liquid guilt': '⚫',
+            # 'diluted liquid guilt': '⚫',  # Removed for color analysis
             'diluted liquid greed': '⚫',
             'liquid despair': '🔵',
             
@@ -295,7 +295,7 @@ class IconColorMapper:
             'catalyst': '🔬',  # Default for any catalyst
             'splinter': '🌟',  # Default for any splinter (glowing star)
             'orb': '🟡',      # Default for any orb
-            'rune': '🔵',     # Default for any rune
+            # 'rune': '🔵',     # Removed for color analysis
             'essence': '✨',   # Default for any essence
             'fragment': '🧩', # Default for any fragment
         }
@@ -344,8 +344,8 @@ class IconColorMapper:
             type_line = (item_data.get('typeLine') or '').lower()
             icon_url = item_data.get('icon', '')
             
-            # Simple currency check
-            currency_keywords = ['orb', 'catalyst', 'splinter', 'essence', 'rune', 'fragment', 'currency']
+            # Simple currency check - only real currency items
+            currency_keywords = ['orb', 'currency']
             is_currency = any(keyword in type_line for keyword in currency_keywords) or 'currency' in icon_url.lower()
             
             if not is_currency:
