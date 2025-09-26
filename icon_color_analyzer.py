@@ -104,53 +104,6 @@ class ColorAnalyzer:
         h, l, s = colorsys.rgb_to_hls(r, g, b)
         return (int(h*360), int(s*100), int(l*100))
     
-    def detect_item_shape(self, item_data):
-        """
-        Detect item shape based on name/type (no image analysis needed!)
-        
-        Args:
-            item_data: Item data dict from API
-            
-        Returns:
-            str: Shape category
-        """
-        type_line = (item_data.get('typeLine') or '').lower()
-        base_type = (item_data.get('baseType') or '').lower()
-        
-        # We KNOW what PoE items look like - no analysis needed!
-        if 'chaos' in type_line:
-            return 'hexagon'  # Chaos Orb is hexagonal
-        elif 'exalted' in type_line:
-            return 'diamond'  # Exalted Orb is diamond-shaped
-        elif 'divine' in type_line:
-            return 'ornate'   # Divine Orb is ornate/star-like
-        elif 'mirror' in type_line:
-            return 'circle'   # Mirror is circular
-        elif any(weapon in type_line for weapon in ['sword', 'axe', 'mace', 'bow', 'staff', 'wand', 'dagger', 'claw']):
-            return 'weapon'
-        elif any(armor in type_line for armor in ['helmet', 'chest', 'gloves', 'boots']):
-            return 'shield'
-        elif 'shield' in type_line:
-            return 'shield'
-        elif any(gem in type_line for gem in ['gem', 'skill']):
-            return 'diamond'  # Gems are diamond-shaped
-        elif 'essence' in type_line:
-            return 'star'     # Essences are star-like
-        elif 'fragment' in type_line or 'reliquary key' in type_line:
-            return 'triangle' # Fragments and keys are triangular
-        elif 'scroll of wisdom' in type_line:
-            return 'triangle' # Scrolls are triangular
-        elif 'tablet' in type_line:
-            return 'square'   # Tablets are square-ish  
-        elif 'omen' in type_line:
-            return 'diamond'  # Omens are diamond-shaped
-        elif 'waystone' in type_line or 'map' in type_line:
-            return 'square'   # Maps are square-ish
-        elif 'orb' in type_line:
-            return 'circle'   # Default orbs are circular
-        else:
-            return 'circle'   # Default fallback
-    
     def categorize_color(self, rgb_color):
         """
         Categorize an RGB color into a general color category
@@ -274,85 +227,10 @@ class IconColorMapper:
             'cyan': '🔵',
             'unknown': '⚪'
         }
-        
-        # Special item type overrides
-        self.item_type_emojis = {
-            'currency': {
-                'chaos': '🟡',
-                'exalted': '🟠', 
-                'divine': '🟨',
-                'orb': '⚪'
-            },
-            'weapon': '⚔️',
-            'armor': '🛡️',
-            'accessory': '💍',
-            'gem': '💎',
-            'flask': '🧪',
-            'map': '🗺️',
-            'fragment': '🧩',
-            'essence': '✨',
-            'catalyst': '⚡'
-        }
-        
-        # Smart Unicode Map - VERSCHIEDENE FORMEN + ECHTE FARBEN!
-        self.smart_unicode_map = {
-            # Circular shapes (like most orbs)
-            'circle': {'gold': '🟡', 'orange': '🟠', 'red': '🔴', 'blue': '🔵', 'green': '🟢', 'white': '⚪', 'black': '⚫', 'brown': '🟤', 'gray': '⚫', 'silver': '⚪', 'default': '🟡'},
-            
-            # Hexagonal shapes (like Chaos Orb) - ECHTE HEXAGONS!
-            'hexagon': {'gold': '🟨', 'yellow': '🟨', 'orange': '🟧', 'white': '⬜', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '⬜', 'default': '🟨'},
-            
-            # Diamond/Crystal shapes (like Exalted Orb) - ECHTE DIAMONDS!
-            'diamond': {'gold': '�', 'orange': '�', 'white': '⬜', 'blue': '�', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '⬜', 'default': '�'},
-            
-            # Complex/Ornate shapes (like Divine Orb) - Stars für ornate!
-            'ornate': {'gold': '⭐', 'yellow': '🌟', 'white': '✨', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '✨', 'default': '⭐'},
-            
-            # Square/Rectangular shapes (like maps)
-            'square': {'brown': '🟫', 'yellow': '🟨', 'white': '⬜', 'blue': '🟦', 'black': '⬛', 'gold': '🟨', 'orange': '🟧', 'gray': '⬛', 'silver': '⬜', 'default': '⬛'},
-            
-            # Triangular shapes (like fragments) - ECHTE TRIANGLES!
-            'triangle': {'red': '🔺', 'blue': '🔷', 'orange': '🔸', 'white': '⬜', 'black': '⬛', 'brown': '🟫', 'gold': '🟨', 'gray': '⬛', 'silver': '⬜', 'default': '🔸'},
-            
-            # Star shapes (like essences) - ECHTE STARS!
-            'star': {'gold': '⭐', 'yellow': '🌟', 'white': '✨', 'blue': '�', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '✨', 'default': '⭐'}
-        }
     
     def get_emoji_for_color(self, color_category):
         """Get emoji for a color category"""
         return self.color_emoji_map.get(color_category, '⚪')
-    
-    def get_smart_unicode_for_item(self, item_data, color_analyzer, color_category=None):
-        """ENTFERNT - Zurück zum einfachen System"""
-        # Einfach die alte get_emoji_for_item Methode verwenden
-        return self.get_emoji_for_item(item_data, color_category)
-    
-    def _guess_color_from_name(self, item_data):
-        """Guess color from item name (for items without cached color analysis)"""
-        type_line = (item_data.get('typeLine') or '').lower()
-        
-        if 'chaos' in type_line:
-            return 'gold'
-        elif 'exalted' in type_line:
-            return 'orange'
-        elif 'divine' in type_line:
-            return 'gold'
-        elif 'mirror' in type_line:
-            return 'silver'
-        elif any(word in type_line for word in ['rusty', 'copper', 'bronze']):
-            return 'brown'
-        elif any(word in type_line for word in ['iron', 'steel']):
-            return 'silver'
-        elif any(word in type_line for word in ['gold', 'golden']):
-            return 'gold'
-        elif any(word in type_line for word in ['blue', 'sapphire', 'azure']):
-            return 'blue'  
-        elif any(word in type_line for word in ['red', 'ruby', 'crimson']):
-            return 'red'
-        elif any(word in type_line for word in ['green', 'emerald']):
-            return 'green'
-        else:
-            return 'gold'  # Default PoE color
     
     def get_emoji_for_item(self, item_data, dominant_color_category=None):
         """
