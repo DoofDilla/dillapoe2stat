@@ -366,17 +366,13 @@ class DisplayManager:
                 
                 for r in valuable_items:
                     ex_str = f" | {Colors.GOLD}{fmt(r['ex_total'])}ex{Colors.END}" if r['ex_total'] and r['ex_total'] > 0.01 else ""
-                    emoji = item_emojis.get(r['name'], '💎')  # fallback to diamond
+                    emoji = item_emojis.get(r['name'], '◆')  # fallback to diamond
                     
-                    # Perfect column alignment using real Unicode widths
-                    icon_col = self.pad_to_display_width(emoji, 3)       # 3 chars for icon
-                    name_col = self.pad_to_display_width(r['name'], 25)  # 25 chars for name
-                    qty_text = f"x{r['qty']}"
-                    qty_col = self.pad_to_display_width(qty_text, 4)     # 4 chars for quantity
+                    # Simple table formatting with fixed column widths
+                    name_padded = f"{r['name']:<26}"  # 26 chars for name
+                    qty_padded = f"x{r['qty']:<4}"    # 5 chars for quantity 
                     
-                    print(f"  {icon_col} {Colors.WHITE}{name_col}{Colors.END} "
-                          f"{Colors.GRAY}{qty_col} [{r.get('category') or 'n/a'}]{Colors.END} "
-                          f"=> {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
+                    print(f"  {emoji} {Colors.WHITE}{name_padded}{Colors.END}{Colors.GRAY}{qty_padded}[{r.get('category') or 'n/a'}]{Colors.END} => {Colors.GOLD}{fmt(r['chaos_total'])}c{Colors.END}{ex_str}")
                 
                 # Display totals
                 print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
