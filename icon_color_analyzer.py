@@ -294,28 +294,28 @@ class IconColorMapper:
             'catalyst': '⚡'
         }
         
-        # Smart Unicode Map - Beautiful characters based on shape + color
+        # Smart Unicode Map - VERSCHIEDENE FORMEN + ECHTE FARBEN!
         self.smart_unicode_map = {
             # Circular shapes (like most orbs)
             'circle': {'gold': '🟡', 'orange': '🟠', 'red': '🔴', 'blue': '🔵', 'green': '🟢', 'white': '⚪', 'black': '⚫', 'brown': '🟤', 'gray': '⚫', 'silver': '⚪', 'default': '🟡'},
             
-            # Hexagonal shapes (like Chaos Orb)
-            'hexagon': {'gold': '⬢', 'yellow': '⬢', 'orange': '⬡', 'white': '⬡', 'black': '⬢', 'brown': '⬢', 'gray': '⬡', 'silver': '⬡', 'default': '⬢'},
+            # Hexagonal shapes (like Chaos Orb) - ECHTE HEXAGONS!
+            'hexagon': {'gold': '🟨', 'yellow': '🟨', 'orange': '🟧', 'white': '⬜', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '⬜', 'default': '🟨'},
             
-            # Diamond/Crystal shapes (like Exalted Orb)  
-            'diamond': {'gold': '◈', 'orange': '◇', 'white': '◇', 'blue': '◆', 'black': '◆', 'brown': '◈', 'gray': '◇', 'silver': '◇', 'default': '◈'},
+            # Diamond/Crystal shapes (like Exalted Orb) - ECHTE DIAMONDS!
+            'diamond': {'gold': '�', 'orange': '�', 'white': '⬜', 'blue': '�', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '⬜', 'default': '�'},
             
-            # Complex/Ornate shapes (like Divine Orb)
-            'ornate': {'gold': '✦', 'yellow': '✧', 'white': '✩', 'black': '✦', 'brown': '✧', 'gray': '✩', 'silver': '✩', 'default': '✦'},
+            # Complex/Ornate shapes (like Divine Orb) - Stars für ornate!
+            'ornate': {'gold': '⭐', 'yellow': '🌟', 'white': '✨', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '✨', 'default': '⭐'},
             
             # Square/Rectangular shapes (like maps)
-            'square': {'brown': '🟫', 'yellow': '🟨', 'white': '⬜', 'blue': '🟦', 'black': '⬛', 'gold': '🟨', 'orange': '🟧', 'gray': '⬛', 'silver': '⬜', 'default': '🟨'},
+            'square': {'brown': '🟫', 'yellow': '🟨', 'white': '⬜', 'blue': '🟦', 'black': '⬛', 'gold': '🟨', 'orange': '🟧', 'gray': '⬛', 'silver': '⬜', 'default': '⬛'},
             
-            # Triangular shapes (like fragments)
-            'triangle': {'red': '▲', 'blue': '▲', 'orange': '▲', 'white': '△', 'black': '▲', 'brown': '▲', 'gold': '▲', 'gray': '▲', 'silver': '△', 'default': '▲'},
+            # Triangular shapes (like fragments) - ECHTE TRIANGLES!
+            'triangle': {'red': '🔺', 'blue': '🔷', 'orange': '🔸', 'white': '⬜', 'black': '⬛', 'brown': '🟫', 'gold': '🟨', 'gray': '⬛', 'silver': '⬜', 'default': '🔸'},
             
-            # Star shapes (like essences)
-            'star': {'gold': '⭐', 'yellow': '✨', 'white': '☆', 'blue': '💫', 'black': '✦', 'brown': '✧', 'gray': '☆', 'silver': '☆', 'default': '⭐'}
+            # Star shapes (like essences) - ECHTE STARS!
+            'star': {'gold': '⭐', 'yellow': '🌟', 'white': '✨', 'blue': '�', 'black': '⬛', 'brown': '🟫', 'gray': '⬛', 'silver': '✨', 'default': '⭐'}
         }
     
     def get_emoji_for_color(self, color_category):
@@ -323,33 +323,9 @@ class IconColorMapper:
         return self.color_emoji_map.get(color_category, '⚪')
     
     def get_smart_unicode_for_item(self, item_data, color_analyzer, color_category=None):
-        """
-        Get smart Unicode character based on shape + color analysis
-        
-        Args:
-            item_data: Item data dict from API
-            color_analyzer: ColorAnalyzer instance for shape detection
-            color_category: Optional pre-analyzed color category
-            
-        Returns:
-            str: Perfect Unicode character for this item
-        """
-        # Get shape from item type (no image analysis needed!)
-        shape = color_analyzer.detect_item_shape(item_data)
-        
-        # Use provided color category (analyzed from real icon!) or fallback
-        dominant_color = color_category or self._guess_color_from_name(item_data)
-        
-        # Get perfect Unicode character from smart map
-        if shape in self.smart_unicode_map:
-            shape_map = self.smart_unicode_map[shape]
-            if dominant_color and dominant_color in shape_map:
-                return shape_map[dominant_color]
-            elif 'default' in shape_map:
-                return shape_map['default']
-        
-        # Fallback to color-only emoji
-        return self.get_emoji_for_color(dominant_color) if dominant_color else '⚪'
+        """ENTFERNT - Zurück zum einfachen System"""
+        # Einfach die alte get_emoji_for_item Methode verwenden
+        return self.get_emoji_for_item(item_data, color_category)
     
     def _guess_color_from_name(self, item_data):
         """Guess color from item name (for items without cached color analysis)"""
