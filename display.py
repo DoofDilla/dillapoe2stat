@@ -323,7 +323,7 @@ class DisplayManager:
             from price_check_poe2 import valuate_items_raw
             rows, (total_c, total_e) = valuate_items_raw(inventory_items)
             
-            print(f"\n💼 {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
+            print(f"\n� {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
             
             # Filter valuable items for display
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
@@ -568,8 +568,17 @@ class DisplayManager:
             
         print(f"\n{Colors.BOLD}{header}{Colors.END}")
         
-        # Get emojis using unified analysis
-        item_emojis = self._get_smart_emojis_for_items(items_data, inventory_items)
+        # Show animation during emoji analysis (the slow part)
+        from animation_manager import AnimationManager
+        animation_manager = AnimationManager()
+        
+        with animation_manager.context_spinner(
+            f"📊 Building table for {len(items_data)} items", 
+            style='dots', 
+            delay=0.15
+        ):
+            # Get emojis using unified analysis
+            item_emojis = self._get_smart_emojis_for_items(items_data, inventory_items)
         
         # Calculate column widths based on data (without ANSI color codes)
         max_name_len = max(len(f"{item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))} {r['name']}") for r in items_data)
