@@ -641,7 +641,11 @@ class DisplayManager:
             
             # Calculate visible lengths (without ANSI codes) for proper padding
             item_name_visible = f"{emoji} {r['name']}"
-            item_name_colored = f"{emoji} {Colors.WHITE}{r['name']}{Colors.END}"
+            
+            # Use gray color for items without value
+            is_worthless = (r.get('chaos_total', 0) <= 0.01 and r.get('ex_total', 0) <= 0.01)
+            name_color = Colors.GRAY if is_worthless else Colors.WHITE
+            item_name_colored = f"{emoji} {name_color}{r['name']}{Colors.END}"
             
             category = (r.get('category') or 'n/a')[:self.config.TABLE_CATEGORY_WIDTH]
             
