@@ -261,8 +261,8 @@ class IconColorMapper:
             'sibilant catalyst': '🔬',
             
             # === SPLINTERS ===
-            'breach splinter': '◆',  # Black diamond for splinters
-            'simulacrum splinter': '◆',  # Black diamond for splinters
+            'breach splinter': '🌟',  # Glowing star for splinters
+            'simulacrum splinter': '🌟',  # Glowing star for splinters
             
             # === RUNES ===
             'greater desert rune': '🔵',
@@ -293,7 +293,7 @@ class IconColorMapper:
             # === GENERIC TYPE FALLBACKS ===
             # These are used if specific item name not found above
             'catalyst': '🔬',  # Default for any catalyst
-            'splinter': '◆',  # Default for any splinter (black diamond)
+            'splinter': '🌟',  # Default for any splinter (glowing star)
             'orb': '🟡',      # Default for any orb
             'rune': '🔵',     # Default for any rune
             'essence': '✨',   # Default for any essence
