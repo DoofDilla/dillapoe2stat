@@ -95,6 +95,30 @@
       "decoration_color": "GOLD",
       "middle_color": "YELLOW",
       "timestamp_color": "CYAN"
+    },
+    "celestial": {
+      "name": "Celestial Magic",
+      "description": "Beautiful celestial design in PoE2 colors (dark gray and brown)",
+      "left_decoration": "*'..°── .+────o(*)(*)o────+.── °..'*",
+      "right_decoration": "*'..°── .+────o(*)(*)o────+.── °..'*",
+      "middle_char": "─",
+      "total_width": 90,
+      "timestamp_format": "%H:%M:%S + %d.%m.%Y",
+      "decoration_color": "BROWN",
+      "middle_color": "WHITE",
+      "timestamp_color": "GRAY"
+    },
+    "celestial_unicode": {
+      "name": "Celestial Magic (Unicode)",
+      "description": "Original beautiful celestial design with special Unicode characters",
+      "left_decoration": "✧˖°── .✦────☼༺☆༻☾────✦.── °˖✧",
+      "right_decoration": "✧˖°── .✦────☼༺☆༻☾────✦.── °˖✧",
+      "middle_char": "─",
+      "total_width": 90,
+      "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+      "decoration_color": "GOLD",
+      "middle_color": "CYAN",
+      "timestamp_color": "MAGENTA"
     }
   }
 }
