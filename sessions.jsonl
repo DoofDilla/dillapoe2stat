@@ -92,3 +92,31 @@
 {"event_type": "session_end", "session_id": "5943b719-a09f-4b04-8048-b7e81b7a74b0", "ts": "2025-09-26T12:48:00", "character": "Mettmanwalking", "session_runtime": 21.12, "total_value": 0.0, "total_maps": 0}
 {"event_type": "session_start", "session_id": "f81683db-2d52-4f19-b789-1ba8adef6ffd", "ts": "2025-09-26T12:50:05", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "f81683db-2d52-4f19-b789-1ba8adef6ffd", "ts": "2025-09-26T12:52:42", "character": "Mettmanwalking", "session_runtime": 157.34, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "b539df23-27fe-4b76-bdc1-0b4b0f01e105", "ts": "2025-09-26T13:40:47", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "b539df23-27fe-4b76-bdc1-0b4b0f01e105", "ts": "2025-09-26T13:40:57", "character": "Mettmanwalking", "session_runtime": 10.55, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "37625637-cf36-4ea6-a3dd-a9d996d61f52", "ts": "2025-09-26T13:45:08", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "37625637-cf36-4ea6-a3dd-a9d996d61f52", "ts": "2025-09-26T13:45:17", "character": "Mettmanwalking", "session_runtime": 8.85, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "f126234b-3b88-4402-9df2-76d32634d820", "ts": "2025-09-26T13:47:48", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "f126234b-3b88-4402-9df2-76d32634d820", "ts": "2025-09-26T13:47:57", "character": "Mettmanwalking", "session_runtime": 8.91, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "fcf2b962-6087-40c6-a445-18f43f360e48", "ts": "2025-09-26T13:49:44", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "fcf2b962-6087-40c6-a445-18f43f360e48", "ts": "2025-09-26T13:49:54", "character": "Mettmanwalking", "session_runtime": 10.4, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "0efdd105-9ee2-41a1-a56b-dac548f1c18f", "ts": "2025-09-26T13:50:37", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "0efdd105-9ee2-41a1-a56b-dac548f1c18f", "ts": "2025-09-26T13:50:49", "character": "Mettmanwalking", "session_runtime": 12.05, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "69c50657-31a7-42e9-b992-6f91dc4dccc4", "ts": "2025-09-26T13:51:12", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "69c50657-31a7-42e9-b992-6f91dc4dccc4", "ts": "2025-09-26T13:51:21", "character": "Mettmanwalking", "session_runtime": 8.99, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "2572bf6f-d15d-496b-bc9d-f2e30e3ce7ae", "ts": "2025-09-26T13:51:44", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "2572bf6f-d15d-496b-bc9d-f2e30e3ce7ae", "ts": "2025-09-26T13:52:07", "character": "Mettmanwalking", "session_runtime": 23.18, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "1a4b5381-ed10-412b-8b48-3af6a0cf69a6", "ts": "2025-09-26T13:52:32", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "1a4b5381-ed10-412b-8b48-3af6a0cf69a6", "ts": "2025-09-26T13:52:49", "character": "Mettmanwalking", "session_runtime": 17.06, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "fa8b217d-27d1-4fed-a2c8-44242aa3b0b6", "ts": "2025-09-26T13:54:29", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "fa8b217d-27d1-4fed-a2c8-44242aa3b0b6", "ts": "2025-09-26T13:54:37", "character": "Mettmanwalking", "session_runtime": 7.74, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "9d05906f-e242-4fa3-8288-61459d081023", "ts": "2025-09-26T13:54:56", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "9d05906f-e242-4fa3-8288-61459d081023", "ts": "2025-09-26T13:55:08", "character": "Mettmanwalking", "session_runtime": 12.03, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "b8859810-601c-4f07-bbc5-16e29e38cda1", "ts": "2025-09-26T13:56:20", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "b8859810-601c-4f07-bbc5-16e29e38cda1", "ts": "2025-09-26T13:56:32", "character": "Mettmanwalking", "session_runtime": 11.81, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "7bbb0047-af9c-4c47-92e1-f6a280cc345e", "ts": "2025-09-26T13:59:30", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "7bbb0047-af9c-4c47-92e1-f6a280cc345e", "ts": "2025-09-26T13:59:36", "character": "Mettmanwalking", "session_runtime": 6.71, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "4334fe45-5d44-4c4b-9564-44c1f598336b", "ts": "2025-09-26T14:03:00", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "4334fe45-5d44-4c4b-9564-44c1f598336b", "ts": "2025-09-26T14:03:07", "character": "Mettmanwalking", "session_runtime": 7.02, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "1b1fac04-c65a-4057-bfd6-c32510fad3ed", "ts": "2025-09-26T14:03:44", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "1b1fac04-c65a-4057-bfd6-c32510fad3ed", "ts": "2025-09-26T14:03:57", "character": "Mettmanwalking", "session_runtime": 12.83, "total_value": 0.0, "total_maps": 0}

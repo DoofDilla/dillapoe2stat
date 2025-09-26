@@ -538,9 +538,12 @@ class DisplayManager:
             return result
             
         except Exception as e:
+            import traceback
             from config import Config
             if Config.DEBUG_ENABLED:
                 print(f"[ICON] Warning: Could not get smart emojis for inventory: {e}")
+                print(f"[ICON] Full traceback:")
+                traceback.print_exc()
             # Fallback to simple emojis
             return {item['name']: '💎' for item in valuable_items}
     
