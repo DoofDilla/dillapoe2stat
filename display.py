@@ -425,7 +425,7 @@ class DisplayManager:
         emoji_map = {
             'currency': '🟡',  # Gold for currency
             'delirium': '⚫',   # Black for delirium
-            'catalysts': '⚡',  # Lightning for catalysts
+            'catalysts': '🔬',  # Microscope for catalysts (science/chemistry)
             'runes': '🔵',     # Blue for runes
             'ritual': '🟠',    # Orange for ritual
             'fragments': '🔴', # Red for fragments
@@ -462,7 +462,7 @@ class DisplayManager:
         if 'orb' in category_lower:
             return '🟡'  # Gold for orbs
         elif 'catalyst' in category_lower:
-            return '⚡'  # Lightning for catalysts
+            return '🔬'  # Microscope for catalysts
         elif 'splinter' in category_lower:
             return '🔴'  # Red for splinters
         elif 'liquid' in category_lower:

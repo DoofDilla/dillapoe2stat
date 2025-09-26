@@ -1,6 +1,19 @@
 """
 Color Analysis System for PoE Icons
 Analyzes dominant colors from item icons and maps them to emojis
+
+==== HOW TO ADD/EDIT ITEM EMOJIS ====
+
+To customize emojis for specific items:
+1. Find the IconColorMapper class (around line 209)
+2. Edit the self.item_emoji_map dictionary
+3. Add/modify entries like: 'item name': 'emoji'
+
+Examples:
+- Specific items: 'chaos orb': '🟡'
+- Generic types: 'catalyst': '🔬'
+
+Priority order: Specific item names > Generic types > Equipment categories > Color analysis
 """
 
 import os
@@ -57,12 +70,24 @@ class ColorAnalyzer:
                 # Sort by frequency and get most common
                 colors.sort(key=lambda x: x[0], reverse=True)
                 
-                # Skip very dark/black colors that might be background
+                # Skip background colors (very dark or very bright)
                 for count, color in colors:
                     r, g, b = color
-                    # Skip if too dark (likely background/shadow)
-                    if r + g + b > 50:  # Brightness threshold
-                        return color
+                    brightness = r + g + b
+                    
+                    # Skip if too dark (likely shadow/background)
+                    if brightness < 50:
+                        continue
+                        
+                    # Skip if too bright/white (likely transparent background)
+                    if brightness > 600:  # Very bright whites
+                        continue
+                        
+                    # Skip if very close to white/gray
+                    if r > 200 and g > 200 and b > 200:
+                        continue
+                        
+                    return color
                 
                 # Fallback to most common color
                 return colors[0][1] if colors else None
@@ -210,7 +235,73 @@ class IconColorMapper:
     """Maps analyzed colors to appropriate emojis"""
     
     def __init__(self):
-        # Emoji mappings based on color categories and item types
+        # ===== EDITABLE ITEM-EMOJI MAPPING TABLE =====
+        # Priority: Specific items > Item types > Color analysis
+        # To add new items: Add entry to item_emoji_map below
+        self.item_emoji_map = {
+            # === CURRENCY ITEMS ===
+            'chaos orb': '🟡',
+            'exalted orb': '🟠', 
+            'greater exalted orb': '🟠',
+            'divine orb': '🟨',
+            'regal orb': '🟤',
+            'greater regal orb': '🟤',
+            'perfect orb of augmentation': '🔵',
+            'orb of annulment': '⚪',
+            'vaal orb': '🟠',
+            'gemcutter\'s prism': '💎',
+            'glassblower\'s bauble': '⚪',
+            'armourer\'s scrap': '⚫',
+            'scroll of wisdom': '🟤',
+            
+            # === CATALYSTS ===
+            'chayula\'s catalyst': '🔬',
+            'esh\'s catalyst': '🔬',
+            'tul\'s catalyst': '🔬',
+            'sibilant catalyst': '🔬',
+            
+            # === SPLINTERS ===
+            'breach splinter': '◆',  # Black diamond for splinters
+            'simulacrum splinter': '◆',  # Black diamond for splinters
+            
+            # === RUNES ===
+            'greater desert rune': '🔵',
+            'greater storm rune': '🔵',
+            'greater vision rune': '🔵',
+            'greater rebirth rune': '🔵',
+            'farrul\'s rune of the hunt': '🟣',  # Special purple for unique runes
+            'perfect desert rune': '🟨',
+            'perfect vision rune': '🟨',
+            
+            # === ESSENCES ===
+            'greater essence of opulence': '✨',
+            'greater essence of alacrity': '✨',
+            'perfect essence of command': '✨',
+            'perfect essence of the infinite': '✨',
+            
+            # === DELIRIUM ===
+            'diluted liquid guilt': '⚫',
+            'diluted liquid greed': '⚫',
+            'liquid despair': '🔵',
+            
+            # === RITUAL ===
+            # 'omen of amelioration': '⬜',  # Entfernt für Farbanalyse
+            
+            # === FRAGMENTS ===
+            'ancient crisis fragment': '🧩',
+            
+            # === GENERIC TYPE FALLBACKS ===
+            # These are used if specific item name not found above
+            'catalyst': '🔬',  # Default for any catalyst
+            'splinter': '◆',  # Default for any splinter (black diamond)
+            'orb': '🟡',      # Default for any orb
+            'rune': '🔵',     # Default for any rune
+            'essence': '✨',   # Default for any essence
+            'fragment': '🧩', # Default for any fragment
+        }
+        
+        # Color-based emoji mappings (used when no specific item/type match found)
+        # Currency items get circles, non-currency get squares
         self.color_emoji_map = {
             'red': '🔴',
             'green': '🟢', 
@@ -227,14 +318,53 @@ class IconColorMapper:
             'cyan': '🔵',
             'unknown': '⚪'
         }
+        
+        # Square variants for non-currency items
+        self.color_square_map = {
+            'red': '🟥',
+            'green': '🟩', 
+            'blue': '🟦',
+            'yellow': '🟨',
+            'orange': '🟧',
+            'purple': '🟦',  # Use blue square for purple
+            'brown': '🟤',  # Use brown circle as fallback
+            'gold': '🟨',
+            'silver': '⬜',
+            'white': '⬜',
+            'black': '⬛',
+            'gray': '⬛',
+            'cyan': '🟦',
+            'unknown': '⬜'
+        }
     
-    def get_emoji_for_color(self, color_category):
-        """Get emoji for a color category"""
+    def get_emoji_for_color(self, color_category, item_data=None):
+        """Get emoji for a color category - circles for currency, squares for others"""
+        # Check if it's a currency item
+        if item_data:
+            type_line = (item_data.get('typeLine') or '').lower()
+            icon_url = item_data.get('icon', '')
+            
+            # Simple currency check
+            currency_keywords = ['orb', 'catalyst', 'splinter', 'essence', 'rune', 'fragment', 'currency']
+            is_currency = any(keyword in type_line for keyword in currency_keywords) or 'currency' in icon_url.lower()
+            
+            if not is_currency:
+                # Use squares for non-currency
+                return self.color_square_map.get(color_category, '⬜')
+        
+        # Use circles for currency (default)
         return self.color_emoji_map.get(color_category, '⚪')
     
     def get_emoji_for_item(self, item_data, dominant_color_category=None):
         """
-        Get the best emoji for an item based on type and color
+        Get the best emoji for an item using the editable mapping table
+        
+        Priority order:
+        1. Specific item name match (e.g., 'chaos orb')
+        2. Generic type match (e.g., 'catalyst', 'orb')
+        3. Equipment category (weapons, armor, accessories)
+        4. Color analysis
+        5. Default fallback
         
         Args:
             item_data: Item data dict from API
@@ -243,23 +373,21 @@ class IconColorMapper:
         Returns:
             str: Best emoji for the item
         """
-        # Get item type info
+        # Get item info
         type_line = (item_data.get('typeLine') or '').lower()
         base_type = (item_data.get('baseType') or '').lower()
         icon_url = item_data.get('icon', '')
         
-        # Special handling for currency
-        if 'orb' in type_line or 'currency' in icon_url:
-            if 'chaos' in type_line:
-                return '🟡'  # Gold/yellow for chaos orbs
-            elif 'exalted' in type_line:
-                return '🟠'  # Orange for exalted orbs
-            elif 'divine' in type_line:
-                return '🟨'  # Bright yellow for divine orbs
-            else:
-                return self.get_emoji_for_color(dominant_color_category) if dominant_color_category else '⚪'
+        # 1. Try exact item name match first
+        if type_line in self.item_emoji_map:
+            return self.item_emoji_map[type_line]
         
-        # Special handling for other item types
+        # 2. Try generic type matches
+        for item_type, emoji in self.item_emoji_map.items():
+            if item_type in type_line:
+                return emoji
+        
+        # 3. Equipment category fallbacks (not in mapping table)
         if any(weapon in type_line for weapon in ['sword', 'axe', 'mace', 'bow', 'staff', 'wand', 'dagger', 'claw']):
             return '⚔️'
         elif any(armor in type_line for armor in ['helmet', 'chest', 'gloves', 'boots', 'shield']):
@@ -272,18 +400,12 @@ class IconColorMapper:
             return '🧪'
         elif 'map' in type_line or 'waystone' in type_line:
             return '🗺️'
-        elif 'fragment' in type_line:
-            return '🧩'
-        elif 'essence' in type_line:
-            return '✨'
-        elif 'catalyst' in type_line:
-            return '⚡'
         
-        # Fallback to color-based emoji
+        # 4. Color-based fallback
         if dominant_color_category:
-            return self.get_emoji_for_color(dominant_color_category)
+            return self.get_emoji_for_color(dominant_color_category, item_data)
         
-        # Ultimate fallback
+        # 5. Ultimate fallback
         return '⚪'
 
 
