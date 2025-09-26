@@ -325,12 +325,25 @@ class DisplayManager:
             
             print(f"\n� {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
             
-            # Filter valuable items for display
+            # Filter and prepare items for display
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
             
-            if valuable_items:
-                # Display valuable items with unified emoji analysis (includes header)
-                self._display_valuable_items_list("💰 Valuable Items:", valuable_items, inventory_items)
+            if self.config.SHOW_ALL_ITEMS:
+                # Show all items with separator
+                worthless_items = [r for r in rows if (r['chaos_total'] or 0) <= 0.01 and (r['ex_total'] or 0) <= 0.01]
+                
+                if valuable_items or worthless_items:
+                    # Combine lists with separator marker
+                    all_items = valuable_items.copy()
+                    if valuable_items and worthless_items:
+                        all_items.append({"SEPARATOR": True})  # Special separator marker
+                    all_items.extend(worthless_items)
+                    
+                    self._display_valuable_items_list("💰 Valuable Items:", all_items, inventory_items)
+            else:
+                # Legacy: Show only valuable items
+                if valuable_items:
+                    self._display_valuable_items_list("💰 Valuable Items:", valuable_items, inventory_items)
                 
                 # Display totals
                 print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
@@ -338,14 +351,25 @@ class DisplayManager:
                 if total_e is not None and total_e > 0.01:
                     print(f"💰 Exalted: {Colors.GOLD}{fmt(total_e)}ex{Colors.END}")
                 
-                # Show percentage of valuable vs total items
-                valuable_count = len(valuable_items)
-                total_count = len([r for r in rows if r['qty'] > 0])
-                if total_count > valuable_count:
-                    worthless_count = total_count - valuable_count
-                    print(f"\n📊 {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} worthless{Colors.END}")
-            else:
-                print(f"\n💰 {Colors.GRAY}No valuable items found in current inventory{Colors.END}")
+                else:
+                    print(f"\n💰 {Colors.GRAY}No valuable items found in current inventory{Colors.END}")
+            
+            # Always show totals
+            if valuable_items or (self.config.SHOW_ALL_ITEMS and worthless_items):
+                # Display totals
+                print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
+                print(f"💰 Chaos: {Colors.GOLD}{fmt(total_c)}c{Colors.END}")
+                if total_e is not None and total_e > 0.01:
+                    print(f"💰 Exalted: {Colors.GOLD}{fmt(total_e)}ex{Colors.END}")
+                
+                # Show item statistics
+                if self.config.SHOW_ALL_ITEMS:
+                    worthless_items = [r for r in rows if (r['chaos_total'] or 0) <= 0.01 and (r['ex_total'] or 0) <= 0.01]
+                    valuable_count = len(valuable_items) 
+                    worthless_count = len(worthless_items)
+                    total_count = valuable_count + worthless_count
+                    if total_count > 0:
+                        print(f"\n� {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} without value{Colors.END}")
                 
             self._display_session_footer()
             
@@ -572,17 +596,25 @@ class DisplayManager:
         from animation_manager import AnimationManager
         animation_manager = AnimationManager()
         
+        # Count real items (without separators)
+        real_item_count = len([r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))])
+        
         with animation_manager.context_spinner(
-            f"📊 Building table for {len(items_data)} items", 
+            f"📊 Building table for {real_item_count} items", 
             style='dots', 
             delay=0.15
         ):
-            # Get emojis using unified analysis
-            item_emojis = self._get_smart_emojis_for_items(items_data, inventory_items)
+            # Get emojis using unified analysis (filter out separators)
+            real_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
+            item_emojis = self._get_smart_emojis_for_items(real_items, inventory_items)
         
-        # Calculate column widths based on data (without ANSI color codes)
-        max_name_len = max(len(f"{item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))} {r['name']}") for r in items_data)
-        name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
+        # Calculate column widths based on data (without ANSI color codes, ignore separators)
+        real_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
+        if real_items:
+            max_name_len = max(len(f"{item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))} {r['name']}") for r in real_items)
+            name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
+        else:
+            name_width = self.config.TABLE_MIN_NAME_WIDTH
         
         # Table header
         header_line = (
@@ -600,6 +632,11 @@ class DisplayManager:
         
         # Table rows
         for r in items_data:
+            # Check for separator marker
+            if isinstance(r, dict) and r.get("SEPARATOR"):
+                print()  # Empty line separator
+                continue
+                
             emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
             
             # Calculate visible lengths (without ANSI codes) for proper padding

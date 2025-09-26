@@ -87,6 +87,9 @@ class Config:
     # Notification Settings
     NOTIFICATION_ENABLED = True
     
+    # Display Settings
+    SHOW_ALL_ITEMS = True  # Show items without value (with '-' for price)
+    
     # Table display settings
     TABLE_SEPARATOR_CHAR = '─'
     TABLE_MIN_NAME_WIDTH = 35
