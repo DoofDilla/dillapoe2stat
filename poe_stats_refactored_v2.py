@@ -238,7 +238,9 @@ class PoEStatsTracker:
             
             # Display changes and price analysis
             self.display.display_inventory_changes(analysis['added'], analysis['removed'])
-            map_value = self.display.display_price_analysis(analysis['added'], analysis['removed'])
+            # Pass inventory data for better emoji analysis
+            map_value = self.display.display_price_analysis(analysis['added'], analysis['removed'], 
+                                                           post_inventory=post_inventory, pre_inventory=self.pre_inventory)
             
             self.display.display_completion_separator()
             
