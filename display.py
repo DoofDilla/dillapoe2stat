@@ -16,6 +16,7 @@ class Colors:
     MAGENTA = '\033[95m'
     WHITE = '\033[97m'
     GRAY = '\033[90m'
+    YELLOW = '\033[93m'  # Same as GOLD for compatibility
     BOLD = '\033[1m'
     END = '\033[0m'
 
@@ -231,37 +232,52 @@ class DisplayManager:
         from datetime import datetime
         from config import Config
         
-        # Get current theme configuration
-        theme_config = Config.get_ascii_theme_config()
-        
-        # Get current timestamp in configured format
-        timestamp = datetime.now().strftime(theme_config["timestamp_format"])
-        
-        # Get colors from theme
-        deco_color = getattr(Colors, theme_config.get("decoration_color", "CYAN"))
-        middle_color = getattr(Colors, theme_config.get("middle_color", "CYAN"))
-        timestamp_color = getattr(Colors, theme_config.get("timestamp_color", "GRAY"))
-        
-        # Apply colors to decorations
-        left_raw = theme_config["left_decoration"]
-        right_raw = theme_config["right_decoration"]
-        
-        left_deco = f"{deco_color}{left_raw}{Colors.END}"
-        right_deco = f"{deco_color}{right_raw}{Colors.END}"
-        
-        # Calculate padding for centered timestamp
-        total_width = theme_config["total_width"]
-        timestamp_text = f" {timestamp} "
-        deco_width = len(left_raw) + len(right_raw)  # Width without color codes
-        available_width = total_width - len(timestamp_text) - deco_width
-        padding = max(0, available_width // 2)
-        
-        # Create the beautiful footer line
-        middle_char = theme_config["middle_char"]
-        middle_line = f"{middle_color}{middle_char * padding}{Colors.END}"
-        footer_line = f"{left_deco}{middle_line}{timestamp_color}{timestamp_text}{Colors.END}{middle_line}{right_deco}"
-        
-        print(f"\n{footer_line}\n")
+        try:
+            # Get current theme configuration
+            theme_config = Config.get_ascii_theme_config()
+            
+            # Get current timestamp in configured format (with Unicode fallback)
+            try:
+                timestamp = datetime.now().strftime(theme_config["timestamp_format"])
+            except UnicodeEncodeError:
+                # Fallback to safe ASCII timestamp if Unicode fails
+                timestamp = datetime.now().strftime("%H:%M:%S • %d.%m.%Y")
+                print(f"Warning: Theme timestamp format contains unsupported characters, using fallback")
+            
+            # Get colors from theme (with fallbacks for unknown colors)
+            deco_color = getattr(Colors, theme_config.get("decoration_color", "CYAN"), Colors.CYAN)
+            middle_color = getattr(Colors, theme_config.get("middle_color", "CYAN"), Colors.CYAN)
+            timestamp_color = getattr(Colors, theme_config.get("timestamp_color", "GRAY"), Colors.GRAY)
+            
+            # Apply colors to decorations (with Unicode fallback)
+            left_raw = theme_config["left_decoration"]
+            right_raw = theme_config["right_decoration"]
+            
+            left_deco = f"{deco_color}{left_raw}{Colors.END}"
+            right_deco = f"{deco_color}{right_raw}{Colors.END}"
+            
+            # Calculate padding for centered timestamp
+            total_width = theme_config["total_width"]
+            timestamp_text = f" {timestamp} "
+            deco_width = len(left_raw) + len(right_raw)  # Width without color codes
+            available_width = total_width - len(timestamp_text) - deco_width
+            padding = max(0, available_width // 2)
+            
+            # Create the beautiful footer line
+            middle_char = theme_config["middle_char"]
+            middle_line = f"{middle_color}{middle_char * padding}{Colors.END}"
+            footer_line = f"{left_deco}{middle_line}{timestamp_color}{timestamp_text}{Colors.END}{middle_line}{right_deco}"
+            
+            print(f"\n{footer_line}\n")
+            
+        except UnicodeEncodeError as e:
+            # Ultimate fallback to simple ASCII footer
+            print(f"\n{Colors.GRAY}--- {datetime.now().strftime('%H:%M:%S')} ---{Colors.END}\n")
+            print(f"Warning: Theme contains unsupported Unicode characters: {e}")
+        except Exception as e:
+            # Fallback for any other theme-related errors
+            print(f"\n{Colors.GRAY}--- {datetime.now().strftime('%H:%M:%S')} ---{Colors.END}\n")
+            print(f"Warning: Theme error: {e}")
     
     def display_session_completion(self, maps_completed, total_value):
         """Display session completion summary"""

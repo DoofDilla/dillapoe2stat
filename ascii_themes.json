@@ -86,12 +86,12 @@
     },
     "stars": {
       "name": "Starry Night",
-      "description": "Celestial stars theme",
-      "left_decoration": "✦•·········",
-      "right_decoration": "·········•✦",
+      "description": "Celestial stars theme (Windows compatible)",
+      "left_decoration": "*•·········",
+      "right_decoration": "·········•*",
       "middle_char": "·",
-      "total_width": 55,
-      "timestamp_format": "%H:%M:%S ✦ %d.%m",
+      "total_width": 80,
+      "timestamp_format": "%H:%M:%S * %d.%m",
       "decoration_color": "GOLD",
       "middle_color": "YELLOW",
       "timestamp_color": "CYAN"

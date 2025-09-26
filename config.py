@@ -45,7 +45,7 @@ class Config:
     # ASCII Theme Configuration - Select your preferred visual theme
     # Available themes are loaded from ascii_themes.json
     # You can easily add new themes by editing the JSON file
-    ASCII_THEME = "elegant"  # Options: "default", "ancient", "elegant", "minimal", "hardcore", "royal", "cyber", "stars"
+    ASCII_THEME = "stars"  # Options: "default", "ancient", "elegant", "minimal", "hardcore", "royal", "cyber", "stars"
     
     @classmethod
     def get_ascii_theme_config(cls):
