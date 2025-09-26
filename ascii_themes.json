@@ -1,0 +1,100 @@
+{
+  "themes": {
+    "default": {
+      "name": "PoE2 Classic",
+      "description": "Default elegant theme with mystical symbols",
+      "left_decoration": "●▬▬▬๑۩۩๑▬▬▬",
+      "right_decoration": "▬▬▬๑۩۩๑▬▬▬●",
+      "middle_char": "─",
+      "total_width": 80,
+      "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+      "decoration_color": "CYAN",
+      "middle_color": "CYAN",
+      "timestamp_color": "GRAY"
+    },
+    "ancient": {
+      "name": "Ancient Runes",
+      "description": "Ancient mystical runes theme",
+      "left_decoration": "▬▬ι═══════ﺤ",
+      "right_decoration": "ﺤ═══════ι▬▬",
+      "middle_char": "═",
+      "total_width": 80,
+      "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+      "decoration_color": "GOLD",
+      "middle_color": "CYAN",
+      "timestamp_color": "GRAY"
+    },
+    "elegant": {
+      "name": "Elegant Curves",
+      "description": "Smooth curved design",
+      "left_decoration": "(¯`·._.·",
+      "right_decoration": "·._.·´¯)",
+      "middle_char": "~",
+      "total_width": 80,
+      "timestamp_format": "%H:%M:%S • %d.%m.%Y",
+      "decoration_color": "MAGENTA",
+      "middle_color": "CYAN",
+      "timestamp_color": "GRAY"
+    },
+    "minimal": {
+      "name": "Minimal Clean",
+      "description": "Simple and clean design",
+      "left_decoration": "◄───",
+      "right_decoration": "───►",
+      "middle_char": "─",
+      "total_width": 40,
+      "timestamp_format": "%H:%M:%S",
+      "decoration_color": "WHITE",
+      "middle_color": "GRAY",
+      "timestamp_color": "CYAN"
+    },
+    "hardcore": {
+      "name": "Hardcore Spikes",
+      "description": "Aggressive spiky theme for hardcore players",
+      "left_decoration": "▄▀█▀▄",
+      "right_decoration": "▄▀█▀▄",
+      "middle_char": "▬",
+      "total_width": 80,
+      "timestamp_format": "%H:%M:%S",
+      "decoration_color": "RED",
+      "middle_color": "RED",
+      "timestamp_color": "WHITE"
+    },
+    "royal": {
+      "name": "Royal Ornate",
+      "description": "Fancy royal ornaments",
+      "left_decoration": "╔══════",
+      "right_decoration": "══════╗",
+      "middle_char": "═",
+      "total_width": 60,
+      "timestamp_format": "%H:%M:%S • %d/%m",
+      "decoration_color": "GOLD",
+      "middle_color": "GOLD",
+      "timestamp_color": "WHITE"
+    },
+    "cyber": {
+      "name": "Cyberpunk",
+      "description": "Futuristic cyber theme",
+      "left_decoration": "►►►",
+      "right_decoration": "◄◄◄",
+      "middle_char": "━",
+      "total_width": 45,
+      "timestamp_format": "%H:%M:%S",
+      "decoration_color": "CYAN",
+      "middle_color": "BLUE",
+      "timestamp_color": "GREEN"
+    },
+    "stars": {
+      "name": "Starry Night",
+      "description": "Celestial stars theme",
+      "left_decoration": "✦•·········",
+      "right_decoration": "·········•✦",
+      "middle_char": "·",
+      "total_width": 55,
+      "timestamp_format": "%H:%M:%S ✦ %d.%m",
+      "decoration_color": "GOLD",
+      "middle_color": "YELLOW",
+      "timestamp_color": "CYAN"
+    }
+  }
+}

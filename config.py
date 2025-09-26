@@ -18,7 +18,7 @@ class Config:
     CHAR_TO_CHECK = "Mettmanwalking"  # Change this to your character name
     
     # File Paths
-    CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
+    CLIENT_LOG = r"D:\G\Path of Exile 2\logs\Client.txt"  # Update this path
     
     # Debug Settings - Control what debug information is displayed and logged
     # DEBUG_ENABLED: Master switch for debug mode. When True, enables additional debug output
@@ -42,41 +42,41 @@ class Config:
     # Display Settings
     OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
     
-    # ASCII Art Configuration - Customize the visual appearance
-    # Footer design elements - can be customized for different themes
-    ASCII_FOOTER = {
-        "left_decoration": "●▬▬▬๑۩۩๑▬▬▬",
-        "right_decoration": "▬▬▬๑۩۩๑▬▬▬●", 
-        "middle_char": "─",
-        "total_width": 80,
-        "timestamp_format": "%H:%M:%S • %d.%m.%Y",
-        "decoration_color": "CYAN",  # Single color for all decorations
-        "middle_color": "CYAN",      # Color for middle line
-        "timestamp_color": "GRAY"    # Color for timestamp
-    }
+    # ASCII Theme Configuration - Select your preferred visual theme
+    # Available themes are loaded from ascii_themes.json
+    # You can easily add new themes by editing the JSON file
+    ASCII_THEME = "elegant"  # Options: "default", "ancient", "elegant", "minimal", "hardcore", "royal", "cyber", "stars"
     
-    # Alternative ASCII designs (uncomment to use):
-    # ASCII_FOOTER = {
-    #     "left_decoration": "▬▬ι═══════ﺤ",
-    #     "right_decoration": "ﺤ═══════ι▬▬",
-    #     "middle_char": "═",
-    #     "total_width": 50,
-    #     "timestamp_format": "%H:%M:%S • %d.%m.%Y",
-    #     "decoration_color": "GOLD",
-    #     "middle_color": "CYAN", 
-    #     "timestamp_color": "GRAY"
-    # }
+    @classmethod
+    def get_ascii_theme_config(cls):
+        """Get the current ASCII theme configuration"""
+        from ascii_theme_manager import get_theme_manager
+        theme_manager = get_theme_manager()
+        return theme_manager.get_theme(cls.ASCII_THEME)
     
-    # ASCII_FOOTER = {
-    #     "left_decoration": "(¯`·._.·",
-    #     "right_decoration": "·._.·´¯)",
-    #     "middle_char": "~",
-    #     "total_width": 50,
-    #     "timestamp_format": "%H:%M:%S • %d.%m.%Y",
-    #     "decoration_color": "MAGENTA",
-    #     "middle_color": "CYAN",
-    #     "timestamp_color": "GRAY"
-    # }
+    @classmethod
+    def set_ascii_theme(cls, theme_name):
+        """Set the ASCII theme"""
+        from ascii_theme_manager import get_theme_manager
+        theme_manager = get_theme_manager()
+        if theme_manager.set_theme(theme_name):
+            cls.ASCII_THEME = theme_name
+            return True
+        return False
+    
+    @classmethod
+    def list_ascii_themes(cls):
+        """List available ASCII themes"""
+        from ascii_theme_manager import get_theme_manager
+        theme_manager = get_theme_manager()
+        return theme_manager.list_themes()
+    
+    @classmethod
+    def preview_ascii_theme(cls, theme_name):
+        """Preview an ASCII theme"""
+        from ascii_theme_manager import get_theme_manager
+        theme_manager = get_theme_manager()
+        return theme_manager.preview_theme(theme_name)
     
     # Rate Limiting
     API_RATE_LIMIT = 2.5  # Minimum seconds between API calls
