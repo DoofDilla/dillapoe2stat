@@ -15,7 +15,7 @@ Thin wrapper around the official Path of Exile API.
 | `snapshot_inventory(access_token, name)` | Convenience helper that returns only the `character.inventory` list from `get_character_details`. |
 
 ## `poe_stats_refactored_v2.py`
-Main orchestration script. See [[Core Loop Overview]] for the full lifecycle. The table below highlights helpers that other modules call back into.
+Main orchestration script. See [Core Loop Overview](Core-Loop-Overview.md) for the full lifecycle. The table below highlights helpers that other modules call back into.
 
 | Member | Description |
 | --- | --- |
