@@ -152,83 +152,43 @@ class DisplayManager:
                 print(f"  {Colors.RED}-{Colors.END} {item.get('typeLine')}{stack}")
     
     def display_price_analysis(self, added, removed, post_inventory=None, pre_inventory=None):
-        """Display price analysis for added/removed items with optional inventory data for better emoji analysis"""
+        """Display loot analysis for added items - simplified unified function"""
         try:
-            # Get price data for all items
-            price_data = self._get_price_data(added, removed)
-            
             # Store inventory data for emoji analysis
             self._current_post_inventory = post_inventory
             self._current_pre_inventory = pre_inventory
             
-            # Display prices based on current mode
-            self._display_prices_by_mode(price_data)
+            # Display loot based on output mode
+            if self.output_mode == "normal":
+                # Normal mode: Use unified display function
+                if added:
+                    self.display_items_with_values("💰 Valuable Loot:", added, show_totals=False)
+            else:
+                # Comprehensive mode: Line-by-line display
+                if added:
+                    from price_check_poe2 import valuate_items_raw
+                    added_rows, _ = valuate_items_raw(added)
+                    print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
+                    added_emojis = self._get_smart_emojis_for_items(added_rows)
+                    for r in added_rows:
+                        emoji = added_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
+                        print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
             
-            # Calculate and display net value
-            return self._calculate_and_display_net_value(price_data)
+            # Calculate and return net value (only from added items since removed is unused)
+            if added:
+                from price_check_poe2 import valuate_items_raw
+                _, (add_c, add_e) = valuate_items_raw(added)
+                return self._display_net_value(add_c or 0, add_e)
+            else:
+                return None
                 
         except Exception as pe:
             print(f"❌ [VALUE] price-check error: {pe}")
             return None
     
-    def _get_price_data(self, added, removed):
-        """Get and organize price data for items"""
-        added_rows, (add_c, add_e) = valuate_items_raw(added)
-        removed_rows, (rem_c, rem_e) = valuate_items_raw(removed)
-        
-        # Filter valuable items for normal mode
-        valuable_added = [r for r in added_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
-        valuable_removed = [r for r in removed_rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
-        
-        return {
-            'added_rows': added_rows,
-            'removed_rows': removed_rows,
-            'valuable_added': valuable_added,
-            'valuable_removed': valuable_removed,
-            'totals': {'add_c': add_c, 'add_e': add_e, 'rem_c': rem_c, 'rem_e': rem_e}
-        }
+
     
-    def _display_prices_by_mode(self, price_data):
-        """Display prices based on current output mode"""
-        if self.output_mode == "normal":
-            self._display_normal_mode_prices(price_data['valuable_added'], price_data['valuable_removed'])
-        else:  # comprehensive mode
-            # Display all items in comprehensive mode
-            added_rows, removed_rows = price_data['added_rows'], price_data['removed_rows']
-            
-            if added_rows:
-                print(f"\n💰 {Colors.BOLD}[VALUE] Added:{Colors.END}")
-                added_emojis = self._get_smart_emojis_for_items(added_rows)
-                for r in added_rows:
-                    emoji = added_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-                    print(self._format_comprehensive_item_line(r, "+", Colors.GREEN, emoji))
-            
-            if removed_rows:
-                print(f"\n💸 {Colors.BOLD}[VALUE] Removed:{Colors.END}")
-                removed_emojis = self._get_smart_emojis_for_items(removed_rows)
-                for r in removed_rows:
-                    emoji = removed_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-                    print(self._format_comprehensive_item_line(r, "-", Colors.RED, emoji))
-    
-    def _calculate_and_display_net_value(self, price_data):
-        """Calculate net value and display it"""
-        totals = price_data['totals']
-        net_c = (totals['add_c'] or 0) - (totals['rem_c'] or 0)
-        net_e = None
-        if totals['add_e'] is not None and totals['rem_e'] is not None:
-            net_e = (totals['add_e'] or 0) - (totals['rem_e'] or 0)
-        
-        return self._display_net_value(net_c, net_e)
-    
-    def _display_normal_mode_prices(self, valuable_added, valuable_removed):
-        """Display prices in normal mode (only valuable items)"""
-        if valuable_added:
-            # Display valuable loot with unified display logic
-            self._display_valuable_items_list("💰 Valuable Loot:", valuable_added)
-        
-        if valuable_removed:
-            # Display used items with unified display logic  
-            self._display_valuable_items_list("💸 Valuable Items Used:", valuable_removed)
+
     
 
     
@@ -333,64 +293,78 @@ class DisplayManager:
         """Display error messages"""
         print(f"❌ [{error_type}] Error: {error_message}")
     
-    def display_current_inventory_value(self, inventory_items):
-        """Display value analysis of current inventory with smart icons"""
+    def display_items_with_values(self, header, raw_items, original_inventory=None, show_totals=True, show_footer=False, show_stats=False):
+        """Universal function for displaying items with prices and SHOW_ALL_ITEMS logic
+        
+        Args:
+            header: Display header (e.g., "💰 Valuable Items:" or "💰 Valuable Loot:")
+            raw_items: Raw item data for price analysis
+            original_inventory: Optional original inventory for enhanced emoji analysis
+            show_totals: Whether to show total values
+            show_footer: Whether to show session footer
+            show_stats: Whether to show item count statistics
+        """
         try:
             from price_check_poe2 import valuate_items_raw
-            rows, (total_c, total_e) = valuate_items_raw(inventory_items)
+            rows, (total_c, total_e) = valuate_items_raw(raw_items)
             
-            print(f"\n� {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
-            
-            # Filter and prepare items for display
+            # Filter valuable and worthless items
             valuable_items = [r for r in rows if (r['chaos_total'] or 0) > 0.01 or (r['ex_total'] or 0) > 0.01]
+            worthless_items = [r for r in rows if (r['chaos_total'] or 0) <= 0.01 and (r['ex_total'] or 0) <= 0.01]
             
-            if self.config.SHOW_ALL_ITEMS:
+            # Apply SHOW_ALL_ITEMS logic
+            if self.config.SHOW_ALL_ITEMS and (valuable_items or worthless_items):
                 # Show all items with separator
-                worthless_items = [r for r in rows if (r['chaos_total'] or 0) <= 0.01 and (r['ex_total'] or 0) <= 0.01]
+                all_items = valuable_items.copy()
+                if valuable_items and worthless_items:
+                    all_items.append({"SEPARATOR": True})  # Special separator marker
+                all_items.extend(worthless_items)
                 
-                if valuable_items or worthless_items:
-                    # Combine lists with separator marker
-                    all_items = valuable_items.copy()
-                    if valuable_items and worthless_items:
-                        all_items.append({"SEPARATOR": True})  # Special separator marker
-                    all_items.extend(worthless_items)
-                    
-                    self._display_valuable_items_list("💰 Valuable Items:", all_items, inventory_items)
+                self._display_valuable_items_list(header, all_items, original_inventory)
+            elif valuable_items:
+                # Show only valuable items
+                self._display_valuable_items_list(header, valuable_items, original_inventory)
             else:
-                # Legacy: Show only valuable items
-                if valuable_items:
-                    self._display_valuable_items_list("💰 Valuable Items:", valuable_items, inventory_items)
-                
-                # Display totals
-                print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
-                print(f"💰 Chaos: {Colors.GOLD}{fmt(total_c)}c{Colors.END}")
-                if total_e is not None and total_e > 0.01:
-                    print(f"💰 Exalted: {Colors.GOLD}{fmt(total_e)}ex{Colors.END}")
-                
-                else:
-                    print(f"\n💰 {Colors.GRAY}No valuable items found in current inventory{Colors.END}")
+                # No items to show
+                print(f"\n💰 {Colors.GRAY}No valuable items found{Colors.END}")
+                return 0  # Return 0 value
             
-            # Always show totals
-            if valuable_items or (self.config.SHOW_ALL_ITEMS and worthless_items):
-                # Display totals
+            # Show totals if requested
+            if show_totals and (valuable_items or (self.config.SHOW_ALL_ITEMS and worthless_items)):
                 print(f"\n🏆 {Colors.BOLD}Total Inventory Value:{Colors.END}")
                 print(f"💰 Chaos: {Colors.GOLD}{fmt(total_c)}c{Colors.END}")
                 if total_e is not None and total_e > 0.01:
                     print(f"💰 Exalted: {Colors.GOLD}{fmt(total_e)}ex{Colors.END}")
-                
-                # Show item statistics
-                if self.config.SHOW_ALL_ITEMS:
-                    worthless_items = [r for r in rows if (r['chaos_total'] or 0) <= 0.01 and (r['ex_total'] or 0) <= 0.01]
-                    valuable_count = len(valuable_items) 
-                    worthless_count = len(worthless_items)
-                    total_count = valuable_count + worthless_count
-                    if total_count > 0:
-                        print(f"\n� {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} without value{Colors.END}")
-                
-            self._display_session_footer()
+            
+            # Show item statistics if requested
+            if show_stats and self.config.SHOW_ALL_ITEMS:
+                valuable_count = len(valuable_items) 
+                worthless_count = len(worthless_items)
+                total_count = valuable_count + worthless_count
+                if total_count > 0:
+                    print(f"\n� {Colors.GRAY}Items: {valuable_count} valuable, {worthless_count} without value{Colors.END}")
+            
+            # Show footer if requested
+            if show_footer:
+                self._display_session_footer()
+            
+            return total_e or 0  # Return exalted value for further processing
             
         except Exception as e:
-            print(f"❌ [INVENTORY VALUE] error: {e}")
+            print(f"❌ [ITEM VALUES] error: {e}")
+            return 0
+    
+    def display_current_inventory_value(self, inventory_items):
+        """Display value analysis of current inventory - now uses unified function"""
+        print(f"\n� {Colors.BOLD}CURRENT INVENTORY VALUE{Colors.END}")
+        self.display_items_with_values(
+            "💰 Valuable Items:", 
+            inventory_items, 
+            original_inventory=inventory_items,
+            show_totals=True, 
+            show_footer=True, 
+            show_stats=True
+        )
     
 
     
