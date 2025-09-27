@@ -598,9 +598,7 @@ class DisplayManager:
             items_data: List of item data dicts (from price analysis)
             inventory_items: Optional original inventory items for enhanced emoji analysis
         """
-        print(f"[DEBUG FUNCTION] _display_valuable_items_list called with {len(items_data) if items_data else 0} items")
         if not items_data:
-            print("[DEBUG FUNCTION] No items_data - returning early")
             return
             
         print(f"\n{Colors.BOLD}{header}{Colors.END}")
@@ -623,8 +621,6 @@ class DisplayManager:
         
         # Calculate column widths based on ALL data (including items without value, ignore separators)
         all_display_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
-        print(f"[DEBUG HEADER] Total items for width calculation: {len(all_display_items)}")
-        
         if all_display_items:
             # Use centralized emoji width function
             def get_emoji_display_width(emoji_char):
@@ -641,6 +637,8 @@ class DisplayManager:
             name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
         else:
             name_width = self.config.TABLE_MIN_NAME_WIDTH
+        
+
         
         # Table header
         header_line = (
