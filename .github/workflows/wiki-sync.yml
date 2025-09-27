@@ -18,59 +18,38 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build wiki copy (strip .md in links for Wiki only)
+      - name: Build wiki copy (strip .md for Wiki only)
         shell: bash
         run: |
           set -euo pipefail
           build_dir="_wikibuild"
-          rm -rf "$build_dir"
-          mkdir -p "$build_dir"
+          rm -rf "$build_dir"; mkdir -p "$build_dir"
           cp -R docs/wiki/. "$build_dir"/ || true
+          [ -f "$build_dir/Home.md" ] || printf '# Home\n\n' > "$build_dir/Home.md"
 
-          # Ensure Home.md exists
-          if [ ! -f "$build_dir/Home.md" ]; then
-            printf "# Home\n\n" > "$build_dir/Home.md"
-          fi
-
-          echo "== BEFORE rewrite (links ending with .md) =="
+          echo "== BEFORE rewrite =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
 
-          # Rewrite links only for local wiki pages (no scheme, no slash):
-          #   (Page.md)        -> (Page)
-          #   (Page.md#anchor) -> (Page#anchor)
-          # Leaves external/parent links like (../README.md) unchanged.
-          python3 - <<'PY'
-          import pathlib, re
-          root = pathlib.Path("_wikibuild")
-          # match (...)(Page.md) or (...)(Page.md#anchor), but not if target contains '/'
-          pat = re.compile(r'\((?!https?://)([^)/\s#?]+)\.md(\#[^)]+|\))')
-          def rewrite(text: str) -> str:
-              out, i, n = [], 0, len(text)
-              while i < n:
-                  m = pat.search(text, i)
-                  if not m:
-                      out.append(text[i:]); break
-                  # Avoid image links: '![alt](...)'
-                  excl = text.rfind('![', 0, m.start())
-                  is_img = (excl != -1) and (text.find('](', excl) == m.start()-1)
-                  if is_img:
-                      out.append(text[i:m.end()])
-                      i = m.end()
-                      continue
-                  out.append(text[i:m.start()])
-                  target = m.group(1)
-                  tail = m.group(2)  # ')' or '#anchor)'
-                  out.append(f'({target}{tail}')
-                  i = m.end()
-              return ''.join(out)
-          for p in root.rglob("*.md"):
-              s = p.read_text(encoding="utf-8")
-              t = rewrite(s)
-              if t != s:
-                  p.write_text(t, encoding="utf-8")
-          PY
+          # Write small Python rewriter to a file (no heredoc!)
+          py="$build_dir/_rewrite.py"
+          printf '%s\n' \
+"import pathlib, re, sys" \
+"root = pathlib.Path(sys.argv[1])" \
+"pat = re.compile(r'\\((?!https?://)([^)/\\s#?]+)\\.md(\\#[^)]+|\\))')" \
+"for p in root.rglob(\"*.md\"): " \
+"    s = p.read_text(encoding=\"utf-8\")" \
+"    def repl(m):" \
+"        # skip image links ![...](...)" \
+"        before = s.rfind('![', 0, m.start())" \
+"        if before != -1 and s.find('](', before) == m.start()-1:" \
+"            return m.group(0)" \
+"        return f'({m.group(1)}{m.group(2)}'" \
+"    t = pat.sub(repl, s)" \
+"    if t != s: p.write_text(t, encoding=\"utf-8\")" > \"$py\"
 
-          echo "== AFTER rewrite (should be empty) =="
+          python3 "$py" "$build_dir"
+
+          echo "== AFTER rewrite =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
 
       - name: Push to GitHub Wiki
@@ -85,16 +64,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-
-          # Idempotent: wenn nichts zu committen, sauber beenden
           if git diff --cached --quiet; then
-            echo "No wiki updates."
-            exit 0
+            echo "No wiki updates."; exit 0
           fi
-
           git commit -m "Sync wiki from docs/wiki at $GITHUB_SHA"
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git"
-
-          # Immer hart überschreiben (Lease-Override erzwingen)
           git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:main || \
           git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:master
