@@ -5,7 +5,61 @@ import os
 from pathlib import Path
 from collections import Counter
 
+def extract_waystone_attributes(map_info):
+    """Extract waystone attributes from map_info with proper fallback logic"""
+    if not map_info:
+        return get_fallback_waystone_attributes()
+    
+    # Check if we have waystone area_modifiers (from experimental waystone analysis)
+    area_modifiers = map_info.get("area_modifiers", {})
+    has_waystone_info = bool(area_modifiers and len(area_modifiers) > 0)
+    
+    if has_waystone_info:
+        # Extract numeric values from area modifier strings like "+70%"
+        return {
+            "hasAttributeInfo": True,
+            "tier": int(map_info.get("level", 0)) if map_info.get("level") != "Unknown" else 0,
+            "magic_monsters": extract_numeric_value(area_modifiers.get("magic_monsters", {}).get("value", "0")),
+            "rare_monsters": extract_numeric_value(area_modifiers.get("rare_monsters", {}).get("value", "0")),
+            "item_rarity": extract_numeric_value(area_modifiers.get("item_rarity", {}).get("value", "0")),
+            "item_quantity": extract_numeric_value(area_modifiers.get("item_quantity", {}).get("value", "0")),
+            "waystone_drop_chance": extract_numeric_value(area_modifiers.get("waystone_drop_chance", {}).get("value", "0")),
+            "pack_size": extract_numeric_value(area_modifiers.get("pack_size", {}).get("value", "0"))
+        }
+    else:
+        # No waystone info available (normal client log maps)
+        return get_fallback_waystone_attributes()
+
+def get_fallback_waystone_attributes():
+    """Return fallback waystone attributes with all values set to 0"""
+    return {
+        "hasAttributeInfo": False,
+        "tier": 0,
+        "magic_monsters": 0,
+        "rare_monsters": 0,
+        "item_rarity": 0,
+        "item_quantity": 0,
+        "waystone_drop_chance": 0,
+        "pack_size": 0
+    }
+
+def extract_numeric_value(value_string):
+    """Extract numeric value from strings like '+70%' or '70%' or '70'"""
+    if not value_string:
+        return 0
+    
+    # Remove common prefixes and suffixes
+    clean_value = str(value_string).replace("+", "").replace("%", "").replace("-", "").strip()
+    
+    try:
+        return int(float(clean_value))
+    except (ValueError, TypeError):
+        return 0
+
 def log_run(char, added, removed, current_map_info=None, map_value=None, log_file=None, map_runtime=None, session_id=None):
+    # Extract waystone attributes with fallback logic
+    waystone_attrs = extract_waystone_attributes(current_map_info)
+    
     rec = {
         "run_id": str(uuid.uuid4()),
         "session_id": session_id,
@@ -19,10 +73,12 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
             # Include waystone attributes if available (but not prefixes/suffixes)
             "waystone_tier": current_map_info.get("waystone_tier"),
             "area_modifiers": current_map_info.get("area_modifiers", {}),
-            "modifier_count": current_map_info.get("modifier_count")
+            "modifier_count": current_map_info.get("modifier_count"),
+            "waystone_attributes": waystone_attrs
         } if current_map_info else {
             "name": "Unknown",
-            "level": 0
+            "level": 0,
+            "waystone_attributes": get_fallback_waystone_attributes()
         },
         "map_value": map_value,
         "map_runtime": round(map_runtime, 2) if map_runtime is not None else None,
