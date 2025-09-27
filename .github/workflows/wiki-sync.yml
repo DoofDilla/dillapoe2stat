@@ -68,7 +68,7 @@ jobs:
               t = rewrite(s)
               if t != s:
                   p.write_text(t, encoding="utf-8")
-PY
+          PY
 
           echo "== AFTER rewrite (should be empty) =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
