@@ -42,20 +42,20 @@ jobs:
           fi
 
           find "$build_dir" -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
-            python - <<'PY' "$file"
-import re
-from pathlib import Path
-import sys
+            python - "$file" <<'PY'
+            import re
+            from pathlib import Path
+            import sys
 
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
+            path = Path(sys.argv[1])
+            text = path.read_text(encoding="utf-8")
 
-pattern = re.compile(r'(\((?!https?:\/\/)[^)#?]+)\.md(?=(\)|#[^)]+\)))')
-updated = pattern.sub(lambda match: match.group(1), text)
+            pattern = re.compile(r'(\((?!https?:\/\/)[^)#?]+)\.md(?=(\)|#[^)]+\)))')
+            updated = pattern.sub(lambda match: match.group(1), text)
 
-if updated != text:
-    path.write_text(updated, encoding="utf-8")
-PY
+            if updated != text:
+                path.write_text(updated, encoding="utf-8")
+            PY
           done
 
           pushd "$build_dir" > /dev/null
