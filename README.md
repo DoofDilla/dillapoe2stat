@@ -17,6 +17,7 @@ The tracker has evolved considerably since the last pull request. Highlights inc
 - [Overview](#overview)
 - [Feature Highlights](#feature-highlights)
 - [Repository Layout](#repository-layout)
+- [Documentation & Wiki](#documentation--wiki)
 - [Installation (Windows)](#installation-windows)
 - [Quick Start](#quick-start)
   - [1. Gather prerequisites](#1-gather-prerequisites)
@@ -74,6 +75,12 @@ DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming se
 | `config.py` | Declarative configuration (credentials, character name, log paths, debug switches, table/visual settings). |
 
 Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey_price2.py`, `poeninja_price_check*.py`, etc.) remain in the repository for reference.
+
+## Documentation & Wiki
+
+- The in-repo wiki lives under [`docs/wiki/`](docs/wiki/). Pages are written using GitHub-flavoured Markdown so they render both here and inside the hosted GitHub Wiki.
+- Start from [`docs/wiki/Home.md`](docs/wiki/Home.md) for navigation links to the core loop overview, module reference, and external API documentation.
+- A GitHub Actions workflow ([`.github/workflows/wiki-sync.yml`](.github/workflows/wiki-sync.yml)) mirrors the folder into the GitHub Wiki whenever changes land on `main`. Edit pages in-repo to keep the wiki source of truth under version control.
 
 ## Installation (Windows)
 
