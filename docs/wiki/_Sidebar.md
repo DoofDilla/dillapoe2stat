@@ -1,5 +1,5 @@
-* [[Home]]
-* [[Core Loop Overview]]
-* [[Module Reference]]
-* [[External API Usage]]
-* [[Maintaining the Wiki]]
+* [Home](Home.md)
+* [Core Loop Overview](Core-Loop-Overview.md)
+* [Module Reference](Module-Reference.md)
+* [External API Usage](External-API-Usage.md)
+* [Maintaining the Wiki](Maintaining-the-Wiki.md)
