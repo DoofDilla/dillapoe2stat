@@ -31,10 +31,13 @@ jobs:
 
           # Remove .md ONLY for local links (no scheme, no slash); keep ../README.md etc.
           find "$build_dir" -type f -name '*.md' -print0 | xargs -0 -I{} \
-            perl -0777 -i -pe 's/\((?!https?:\/\/)([^)\/\s#?]+)\.md(\)|#[^)]+)\)/(\1\2/g' {}
+            perl -0777 -i -pe 's/\((?!https?:\/\/)([^)\/\s#?]+)\.md(\#[^)]+|\))/(\1\2/g' {}
 
           echo "== AFTER =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
+
+          echo "== DIFF =="
+          git --no-pager diff --color || true
 
       - name: Push to GitHub Wiki
         shell: bash
@@ -50,7 +53,8 @@ jobs:
           git add -A
 
           if git diff --cached --quiet; then
-            echo "No wiki updates."; exit 0
+            echo "No wiki updates."
+            exit 0
           fi
 
           git commit -m "Sync wiki from docs/wiki at $GITHUB_SHA"
