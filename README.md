@@ -2,7 +2,18 @@
 
 > A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
 
+## Recent Enhancements
+
+The tracker has evolved considerably since the last pull request. Highlights include:
+
+- **Modular v2 main loop:** `poe_stats_refactored_v2.py` is now the recommended entry point, wiring together dedicated managers for display, hotkeys, sessions, notifications, and inventory diffing.
+- **Experimental waystone workflow:** `Ctrl+F2` inspects a waystone before a run, surfaces prefixes/suffixes, and enriches the subsequent `F2` map snapshot with cached tier data.
+- **Smart visual output:** ASCII footer themes, richer emoji mapping, and optional "show all items" tables make the terminal dashboard more legible at a glance.
+- **Notification control:** A centralized `NotificationManager` feeds Windows toasts for startup, experimental waystone checks, map transitions, inventory scans, and session milestones.
+- **Configurable display tables:** New settings in `config.py` expose column widths, ASCII themes, and output preferences so you can tailor summaries without touching core code.
+
 ## Table of Contents
+- [Recent Enhancements](#recent-enhancements)
 - [Overview](#overview)
 - [Feature Highlights](#feature-highlights)
 - [Repository Layout](#repository-layout)
@@ -14,7 +25,9 @@
 - [Usage Guide](#usage-guide)
   - [Hotkeys](#hotkeys)
   - [Output modes](#output-modes)
+  - [Experimental waystone analyzer](#experimental-waystone-analyzer)
   - [Notifications](#notifications)
+  - [ASCII themes & visual tuning](#ascii-themes--visual-tuning)
 - [Data & Logs](#data--logs)
 - [Debugging Toolkit](#debugging-toolkit)
 - [How loot valuation works](#how-loot-valuation-works)
@@ -23,37 +36,42 @@
 - [Acknowledgements](#acknowledgements)
 
 ## Overview
-DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming sessions. The refactored `poe_stats_refactored.py` script glues together OAuth-authenticated API calls, poe.ninja price lookups, inventory diffing, and session logging into a streamlined loop that you operate entirely with keyboard shortcuts. Whether you are min-maxing a single character or running long farming sessions, the tracker keeps consistent logs, highlights valuable drops, and summarizes your progress at a glance.
+DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming sessions. The refreshed `poe_stats_refactored_v2.py` script glues together OAuth-authenticated API calls, poe.ninja price lookups, inventory diffing, and session logging into a streamlined loop that you operate entirely with keyboard shortcuts. Whether you are min-maxing a single character or running long farming sessions, the tracker keeps consistent logs, highlights valuable drops, fires desktop toasts, and summarizes your progress at a glance with customizable ASCII theming.
 
 ## Feature Highlights
 - **Session-first workflow:** Start and finish map runs with two key presses while the tracker records runtimes, loot summaries, and session value trends automatically.
-- **Modular architecture:** Dedicated modules handle configuration, display, logging, API access, hotkeys, and analytics so you can replace or extend individual layers with minimal friction.
+- **Modular architecture:** Dedicated modules handle configuration, display, logging, API access, hotkeys, notifications, and analytics so you can replace or extend individual layers with minimal friction.
 - **Price intelligence:** poe.ninja data is cached and normalized for resilient lookups, ensuring consistent valuations across catalysts, runes, fragments, and more.
-- **Debug-friendly:** Toggle verbose dumps, export inventories to JSON, or inspect category breakdowns mid-session without restarting the tool.
+- **Debug-friendly:** Toggle verbose dumps, export inventories to JSON, inspect category breakdowns mid-session without restarting the tool, or search for a single item by name.
+- **Visual polish:** ASCII footer themes, dynamic emoji detection, and comprehensive item tables make the terminal output readable even during marathon sessions.
 - **Windows-native niceties:** Global hotkeys and toast notifications keep you informed even when the terminal is minimized.
 
 ### Core capabilities
 - 🔐 Securely authenticate against the official Path of Exile API, snapshot your character list, and capture inventory states on demand.
 - ⌨️ Bind hotkeys to grab "pre" and "post" map inventories, toggle debug output, and flip between concise and comprehensive reporting without touching your mouse.
 - 💰 Estimate the chaos- and exalt-equivalent value of your loot by querying poe.ninja's public economy endpoints and aggregating results per item name.
+- 🧪 Analyze a waystone before slotting it in, preview its prefixes/suffixes, and carry its tier data into the next `F2` map snapshot.
 - 📊 Log every map run (inventory deltas, runtime, and pricing) alongside session metadata and present digestible progress summaries right in the terminal.
-- 🔔 Send Windows toast notifications when a session starts, a map begins, or a run finishes, including runtime and value information.
+- 🔔 Send Windows toast notifications when a session starts, a map begins, a waystone is inspected, an inventory check finishes, or a run completes.
 
 ## Repository Layout
 
 | Path | Purpose |
 | ---- | ------- |
-| `poe_stats_refactored.py` | Main entry point; orchestrates hotkeys, inventory snapshots, notifications, and session analytics. |
+| `poe_stats_refactored_v2.py` | Main entry point; orchestrates hotkeys, inventory snapshots, notifications, and session analytics via modular managers. |
 | `poe_api.py` | Lightweight wrapper around the OAuth flow and character/inventory endpoints of the PoE API. |
 | `price_check_poe2.py` | Fetches poe.ninja economy data, normalizes item names, and calculates chaos/exalt values. |
 | `client_parsing.py` | Extracts the latest generated map instance from Path of Exile's `Client.txt` log. |
-| `inventory_analyzer.py` | Diffs pre/post inventories and generates summaries, categories, and heuristics for valuable drops. |
-| `inventory_debug.py` | Optional diagnostics for printing or exporting raw inventory JSON. |
+| `inventory_analyzer.py` | Diffs pre/post inventories, categorizes loot, and feeds price valuation. |
+| `inventory_debug.py` | Optional diagnostics for printing or exporting raw inventory JSON, plus targeted item search. |
 | `poe_logging.py` | Persists per-run and per-session records to JSON Lines files and retrieves session statistics. |
-| `display.py` | Centralized console formatting, color codes, and presentation logic. |
-| `session_manager.py` | Tracks cumulative session runtime, value, and history. |
+| `display.py` | Centralized console formatting, ASCII footer themes, emoji logic, and presentation tables. |
+| `session_manager.py` | Tracks cumulative session runtime, map history, and session summaries. |
 | `hotkey_manager.py` | Wraps the `keyboard` library for registering and cleaning up hotkeys. |
-| `config.py` | Declarative configuration (credentials, character name, log paths, debug switches). |
+| `notification_manager.py` | Sends Windows toast notifications for lifecycle events and inventory checks. |
+| `waystone_analyzer.py` | Parses waystones for experimental map previews and caches tier/mod info. |
+| `ascii_theme_manager.py` / `ascii_themes.json` | Configure decorative footer themes and timestamp styling. |
+| `config.py` | Declarative configuration (credentials, character name, log paths, debug switches, table/visual settings). |
 
 Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey_price2.py`, `poeninja_price_check*.py`, etc.) remain in the repository for reference.
 
@@ -95,24 +113,25 @@ Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey
    ```bash
    python -c "from config import Config; Config.print_config_summary()"
    ```
-   (The `Config.print_config_summary()` helper also runs automatically when `poe_stats_refactored.py` starts.)
+   (The `Config.print_config_summary()` helper also runs automatically when `poe_stats_refactored_v2.py` starts.)
 
 ### 3. Run the tracker
 With Path of Exile running and your character logged in:
 ```bash
-python poe_stats_refactored.py
+python poe_stats_refactored_v2.py
 ```
-You will see a configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys. Keep the terminal open while you play.
+You will see a configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer). Keep the terminal open while you play.
 
 ## Usage Guide
 
 ### Hotkeys
 | Key | Action |
 | --- | ------ |
-| `F2` | Capture the **pre-map** inventory snapshot and read the latest map info from `Client.txt`. |
-| `F3` | Capture the **post-map** inventory, diff changes, evaluate loot value, and log the run. |
+| `F2` | Capture the **pre-map** inventory snapshot and read the latest map info from `Client.txt` (augmented with cached waystone data when available). |
+| `Ctrl+F2` | Run the **experimental waystone analyzer**, exposing prefixes/suffixes and caching the results for the next `F2`. |
+| `F3` | Capture the **post-map** inventory, diff changes, evaluate loot value, update session totals, and log the run. |
 | `F4` | Toggle debug mode (enables verbose inventory dumps and file exports via `InventoryDebugger`). |
-| `F5` | Run an on-demand inventory scan and display your current stash value. |
+| `F5` | Run an on-demand inventory scan and display your current stash value with smart emoji hints. |
 | `F6` | End the active session (persist summary) and immediately start a fresh one. |
 | `F7` | Print the current session dashboard, including the last five maps. |
 | `F8` | Switch between `normal` (valuable items only) and `comprehensive` output modes. |
@@ -122,32 +141,44 @@ You will see a configuration summary, receive a Windows toast that monitoring ha
 
 ### Output modes
 - **Normal:** Minimal clutter; highlights only items whose chaos/exalt totals exceed 0.01.
-- **Comprehensive:** Prints every added/removed item, category tags, stack counts, and raw chaos/exalt conversions.
+- **Comprehensive:** Prints every added/removed item, category tags, stack counts, and raw chaos/exalt conversions (with optional zero-value rows when `SHOW_ALL_ITEMS` is enabled).
 Switch modes on the fly with `F8`.
 
 ### Inventory value check
 - Tap `F5` at any time (even mid-map) to snapshot your current inventory and display a full valuation breakdown.
-- The console highlights valuable finds, total chaos/exalt tallies, and how many items met the value threshold.
+- The console highlights valuable finds, optional zero-value rows, total chaos/exalt tallies, and how many items met the value threshold.
 - When notifications are enabled you'll also receive a toast summarizing item counts and value.
 
+### Experimental waystone analyzer
+- Press `Ctrl+F2` with a waystone in the top-left inventory slot to inspect its tier, prefixes, and suffixes without starting a map.
+- The analyzer caches tier and modifier counts so the next `F2` snapshot displays richer map context and notifications include the tier automatically.
+- Debug mode prints extra traces for troubleshooting waystone parsing.
+
 ### Notifications
-- Startup, new session, map start, map completion, and manual inventory checks pop toast notifications (icon provided in `cat64x64.png`).
+- Startup, new session, experimental waystone analysis, map start, map completion, and manual inventory checks pop toast notifications (icon provided in `cat64x64.png`).
 - Map start toasts include the current session runtime and total value so far.
 - Completion toasts report map runtime/value alongside the running session totals.
 - Disable notifications by setting `NOTIFICATION_ENABLED = False` in `config.py`.
 
+### ASCII themes & visual tuning
+- Pick a footer theme by setting `ASCII_THEME` in `config.py` (options live in `ascii_themes.json`).
+- Adjust table widths, separator characters, and whether to show zero-value loot through the `TABLE_*` and `SHOW_ALL_ITEMS` flags.
+- Theme rendering gracefully falls back to safe ASCII if your terminal cannot display the chosen Unicode glyphs.
+
 ## Data & Logs
-- **Run history:** `runs.jsonl` stores a JSON record per map containing runtime, map metadata, aggregated loot, and valuation totals.
-- **Session history:** `sessions.jsonl` records session start/end events, runtime, and cumulative value.
+- **Run history:** `runs.jsonl` stores a JSON record per map containing runtime, map metadata (augmented with cached waystone tiers when available), aggregated loot, and valuation totals.
+- **Session history:** `sessions.jsonl` records session start/end events, runtime, cumulative value, and per-map history for the in-terminal dashboard.
 - **Debug exports:** When `DEBUG_TO_FILE` is `True`, inventories are written to timestamped JSON files inside the `debug/` folder.
 - **Icon assets:** `cat64x64.png` is used for Windows toasts—swap it out if you prefer another image.
 
 The session dashboard (triggered via `F7`) reads from `runs.jsonl` to compute averages and shows the five most recent maps so you can track streaks at a glance.
 
 ## Debugging Toolkit
-- `InventoryDebugger` can print a compact table (`dump_item_summary`) or full JSON dumps (`dump_inventory_to_console`) of any snapshot.
-- `InventoryAnalyzer` exposes helpers such as `get_item_summary`, `categorize_items`, and `find_valuable_items` for deeper insights or custom reports.
+- `InventoryDebugger` can print a compact table (`dump_item_summary`), full JSON dumps (`dump_inventory_to_console`), export snapshots to disk, or search for an individual item by name.
+- `InventoryAnalyzer` exposes helpers such as `analyze_changes`, `categorize_items`, and `find_valuable_items` for deeper insights or custom reports.
+- `WaystoneAnalyzer` parses experimental waystone metadata, validates slot placement, and caches attributes for the next run.
 - Flip `DEBUG_ENABLED` and `DEBUG_TO_FILE` in `config.py` or press `F4` during runtime to toggle diagnostics without restarting.
+- Adjust `DEBUG_SHOW_SUMMARY` to swap between concise summaries and exhaustive JSON dumps.
 
 ## How loot valuation works
 1. The tracker hands `InventoryAnalyzer`'s "added" list to `price_check_poe2.valuate_items_raw`.
@@ -167,7 +198,7 @@ The session dashboard (triggered via `F7`) reads from `runs.jsonl` to compute av
 
 ## Extending the Project
 - Implement stash tab scraping or price thresholds using `InventoryAnalyzer.categorize_items` as a base.
-- Swap the notification backend (Discord webhooks, OBS overlays) by editing the notifier calls in `poe_stats_refactored.py`.
+- Swap the notification backend (Discord webhooks, OBS overlays) by editing the notifier calls in `poe_stats_refactored_v2.py` or `notification_manager.py`.
 - Add export commands (CSV, Google Sheets) by consuming the JSON Lines logs in `poe_logging.py`.
 - Integrate controller support or macros using the `dualsense_*.py` experiments bundled in this repository.
 
