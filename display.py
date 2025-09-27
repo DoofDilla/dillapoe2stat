@@ -421,6 +421,10 @@ class DisplayManager:
         # Format with specified precision
         formatted = f"{value:.{precision}f}".rstrip("0").rstrip(".")
         
+        # If after formatting it becomes "0", treat as zero value
+        if formatted == "0" or formatted == "0.0" or formatted == "0.00":
+            return f"{Colors.GRAY}-{Colors.END}"
+        
         # Split into integer and decimal parts
         if "." in formatted:
             integer_part, decimal_part = formatted.split(".")
@@ -431,6 +435,23 @@ class DisplayManager:
                 return f"{Colors.BROWN}{integer_part}{Colors.END}{Colors.DARK_BROWN}.{decimal_part}{Colors.END} {Colors.GOLD}{suffix}{Colors.END}"
         else:
             return f"{Colors.BROWN}{formatted}{Colors.END} {Colors.GOLD}{suffix}{Colors.END}"
+    
+    def _get_emoji_display_width(self, emoji_char):
+        """Get display width for emoji using simple string length"""
+        return len(emoji_char)
+    
+    def _get_emoji_spacing(self, emoji_char):
+        """Get number of spaces needed after emoji for proper alignment"""
+        # Some emojis in certain terminals need extra spacing for proper alignment
+        emoji_spacing_map = {
+            '⚔': 2,      # Sword emojis need 2 spaces
+            '⚔️': 2,     # Sword with variation selector
+            '🏹': 2,     # Bow emoji (if needed)
+            '🗡️': 2,    # Dagger emoji (if needed)
+            '🛡️': 2,    # Shield emoji (if needed)
+        }
+        
+        return emoji_spacing_map.get(emoji_char, 1)  # Default: 1 space for most emojis
     
     def _get_category_emoji(self, category):
         """Get emoji based on item category"""
@@ -577,7 +598,9 @@ class DisplayManager:
             items_data: List of item data dicts (from price analysis)
             inventory_items: Optional original inventory items for enhanced emoji analysis
         """
+        print(f"[DEBUG FUNCTION] _display_valuable_items_list called with {len(items_data) if items_data else 0} items")
         if not items_data:
+            print("[DEBUG FUNCTION] No items_data - returning early")
             return
             
         print(f"\n{Colors.BOLD}{header}{Colors.END}")
@@ -598,10 +621,23 @@ class DisplayManager:
             real_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
             item_emojis = self._get_smart_emojis_for_items(real_items, inventory_items)
         
-        # Calculate column widths based on data (without ANSI color codes, ignore separators)
-        real_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
-        if real_items:
-            max_name_len = max(len(f"{item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))} {r['name']}") for r in real_items)
+        # Calculate column widths based on ALL data (including items without value, ignore separators)
+        all_display_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
+        print(f"[DEBUG HEADER] Total items for width calculation: {len(all_display_items)}")
+        
+        if all_display_items:
+            # Use centralized emoji width function
+            def get_emoji_display_width(emoji_char):
+                return self._get_emoji_display_width(emoji_char)
+            
+            # Calculate max name length using consistent emoji spacing
+            max_name_len = 0
+            for r in all_display_items:
+                emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
+                spacing = self._get_emoji_spacing(emoji)
+                item_display_len = len(emoji) + spacing + len(r['name'])  # emoji + spaces + name
+                max_name_len = max(max_name_len, item_display_len)
+            
             name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
         else:
             name_width = self.config.TABLE_MIN_NAME_WIDTH
@@ -629,21 +665,32 @@ class DisplayManager:
                 
             emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
             
-            # Calculate visible lengths (without ANSI codes) for proper padding
-            item_name_visible = f"{emoji} {r['name']}"
+            # Calculate visible lengths using consistent emoji spacing
+            spacing = self._get_emoji_spacing(emoji)
+            item_name_visible_length = len(emoji) + spacing + len(r['name'])  # emoji + spaces + name
             
             # Use gray color for items without value
             is_worthless = (r.get('chaos_total', 0) <= 0.01 and r.get('ex_total', 0) <= 0.01)
             name_color = Colors.GRAY if is_worthless else Colors.WHITE
-            item_name_colored = f"{emoji} {name_color}{r['name']}{Colors.END}"
+            
+            # Get appropriate spacing for this emoji (some emojis need extra spaces for proper alignment)
+            spacing = self._get_emoji_spacing(emoji)
+            item_name_colored = f"{emoji}{' ' * spacing}{name_color}{r['name']}{Colors.END}"
             
             category = (r.get('category') or 'n/a')[:self.config.TABLE_CATEGORY_WIDTH]
             
-            # Get plain text values for width calculation (matching the colored format)
+            # Get plain text values for width calculation (matching the colored format exactly)
             def get_plain_value(val, suffix):
-                if not val or val < 0.005:
+                if val is None or val == 0:
                     return "-"
+                
+                # Format with same precision as _format_colored_number
                 formatted = f"{val:.2f}".rstrip("0").rstrip(".")
+                
+                # If after formatting it becomes "0", show as "-"
+                if formatted == "0" or formatted == "0.0" or formatted == "0.00":
+                    return "-"
+                
                 # Remove leading zero for values < 1 (to match colored format)
                 if formatted.startswith("0."):
                     formatted = formatted[1:]  # Remove the "0"
@@ -656,8 +703,8 @@ class DisplayManager:
             chaos_val = self._format_colored_number(r['chaos_total'], 2, "c")
             ex_val = self._format_colored_number(r['ex_total'], 2, "ex") if r['ex_total'] and r['ex_total'] >= 0.005 else f"{Colors.GRAY}-{Colors.END}"
             
-            # Calculate padding for each column
-            name_padding = name_width - len(item_name_visible)
+            # Calculate padding for each column using corrected visible length
+            name_padding = name_width - item_name_visible_length
             chaos_padding = self.config.TABLE_CHAOS_WIDTH - len(chaos_plain)
             ex_padding = self.config.TABLE_EXALTED_WIDTH - len(ex_plain)
             
