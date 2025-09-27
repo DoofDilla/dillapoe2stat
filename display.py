@@ -39,6 +39,60 @@ class DisplayManager:
         """Set output mode: 'normal' or 'comprehensive'"""
         self.output_mode = mode
     
+    def _display_themed_banner(self, content=None, use_timestamp=False):
+        """Display a beautiful themed banner with content or timestamp"""
+        from datetime import datetime
+        
+        try:
+            # Get current theme configuration
+            theme_config = self.config.get_ascii_theme_config()
+            if not theme_config:
+                # Fallback for no theme
+                display_text = content if content else datetime.now().strftime("%H:%M:%S • %d.%m.%Y")
+                print(f"=== {display_text} ===")
+                return
+            
+            # Determine content to display
+            if use_timestamp:
+                try:
+                    content_text = datetime.now().strftime(theme_config["timestamp_format"])
+                except UnicodeEncodeError:
+                    content_text = datetime.now().strftime("%H:%M:%S • %d.%m.%Y")
+            else:
+                content_text = content or "BANNER"
+            
+            # Get colors from theme (with fallbacks)
+            deco_color = getattr(Colors, theme_config.get("decoration_color", "CYAN"), Colors.CYAN)
+            middle_color = getattr(Colors, theme_config.get("middle_color", "CYAN"), Colors.CYAN)
+            text_color = getattr(Colors, theme_config.get("timestamp_color", "GRAY"), Colors.GRAY)
+            
+            # Apply colors to decorations
+            left_raw = theme_config["left_decoration"]
+            right_raw = theme_config["right_decoration"]
+            
+            left_deco = f"{deco_color}{left_raw}{Colors.END}"
+            right_deco = f"{deco_color}{right_raw}{Colors.END}"
+            
+            # Calculate padding for centered content
+            total_width = theme_config["total_width"]
+            display_content = f" {text_color}{content_text}{Colors.END} "
+            deco_width = len(left_raw) + len(right_raw)
+            content_width = len(content_text) + 2  # +2 for spaces
+            available_width = total_width - content_width - deco_width
+            padding = max(0, available_width // 2)
+            
+            # Create the middle section with whitespace padding (cleaner look)
+            middle_section = f"{middle_color}{' ' * padding}{Colors.END}"
+            
+            # Build the complete banner
+            banner = f"{left_deco}{middle_section}{display_content}{middle_section}{right_deco}"
+            
+            print(f"\n{banner}\n")
+            
+        except Exception as e:
+            # Fallback on any error
+            display_text = content if content else datetime.now().strftime("%H:%M:%S • %d.%m.%Y")
+            print(f"=== {display_text} ===")
 
     
     def display_startup_info(self, character_name, session_id, output_mode):
@@ -54,12 +108,22 @@ class DisplayManager:
         print(f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}")
     
     def _display_hotkey_help(self):
-        """Display hotkey help information"""
-        print(f"⌨️  Hotkeys: {Colors.GREEN}F2{Colors.END}=PRE | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Exp.PRE | "
-              f"{Colors.GREEN}F3{Colors.END}=POST | {Colors.GREEN}F4{Colors.END}=Debug")
-        print(f"         {Colors.GREEN}F5{Colors.END}=Inventory | {Colors.GREEN}F6{Colors.END}=New Session | "
-              f"{Colors.GREEN}F7{Colors.END}=Session Stats | {Colors.GREEN}F8{Colors.END}=Output Mode")
-        print(f"         {Colors.RED}Ctrl+Esc{Colors.END}=Quit | {Colors.MAGENTA}Ctrl+F2{Colors.END}=Experimental waystone mode")
+        """Display hotkey help information with themed header"""
+        self._display_themed_banner("HOTKEYS")
+        
+        # Hotkeys in nice table format
+        hotkeys = [
+            ("⌨️  F2", "PRE Snapshot", "⌨️  F3", "POST Analysis", "⌨️  F4", "Debug Toggle"),
+            ("⌨️  F5", "Inventory Check", "⌨️  F6", "New Session", "⌨️  F7", "Session Stats"),
+            ("⌨️  F8", "Output Mode", "⌨️  Ctrl+F2", "Waystone Analysis", "⌨️  Ctrl+Esc", "Quit")
+        ]
+        
+        for row in hotkeys:
+            key1, desc1, key2, desc2, key3, desc3 = row
+            print(f"{Colors.GREEN}{key1}{Colors.END} = {desc1:<15} "
+                  f"{Colors.GREEN}{key2}{Colors.END} = {desc2:<15} "
+                  f"{Colors.RED if 'Esc' in key3 else Colors.GREEN}{key3}{Colors.END} = {desc3}")
+        print()
     
     def display_map_info(self, map_info):
         """Display current map information"""
@@ -248,55 +312,7 @@ class DisplayManager:
     
     def _display_session_footer(self):
         """Display a beautiful PoE2-style footer with timestamp using theme system"""
-        from datetime import datetime
-        from config import Config
-        
-        try:
-            # Get current theme configuration
-            theme_config = Config.get_ascii_theme_config()
-            
-            # Get current timestamp in configured format (with Unicode fallback)
-            try:
-                timestamp = datetime.now().strftime(theme_config["timestamp_format"])
-            except UnicodeEncodeError:
-                # Fallback to safe ASCII timestamp if Unicode fails
-                timestamp = datetime.now().strftime("%H:%M:%S • %d.%m.%Y")
-                print(f"Warning: Theme timestamp format contains unsupported characters, using fallback")
-            
-            # Get colors from theme (with fallbacks for unknown colors)
-            deco_color = getattr(Colors, theme_config.get("decoration_color", "CYAN"), Colors.CYAN)
-            middle_color = getattr(Colors, theme_config.get("middle_color", "CYAN"), Colors.CYAN)
-            timestamp_color = getattr(Colors, theme_config.get("timestamp_color", "GRAY"), Colors.GRAY)
-            
-            # Apply colors to decorations (with Unicode fallback)
-            left_raw = theme_config["left_decoration"]
-            right_raw = theme_config["right_decoration"]
-            
-            left_deco = f"{deco_color}{left_raw}{Colors.END}"
-            right_deco = f"{deco_color}{right_raw}{Colors.END}"
-            
-            # Calculate padding for centered timestamp
-            total_width = theme_config["total_width"]
-            timestamp_text = f" {timestamp} "
-            deco_width = len(left_raw) + len(right_raw)  # Width without color codes
-            available_width = total_width - len(timestamp_text) - deco_width
-            padding = max(0, available_width // 2)
-            
-            # Create the beautiful footer line
-            middle_char = theme_config["middle_char"]
-            middle_line = f"{middle_color}{middle_char * padding}{Colors.END}"
-            footer_line = f"{left_deco}{middle_line}{timestamp_color}{timestamp_text}{Colors.END}{middle_line}{right_deco}"
-            
-            print(f"\n{footer_line}\n")
-            
-        except UnicodeEncodeError as e:
-            # Ultimate fallback to simple ASCII footer
-            print(f"\n{Colors.GRAY}--- {datetime.now().strftime('%H:%M:%S')} ---{Colors.END}\n")
-            print(f"Warning: Theme contains unsupported Unicode characters: {e}")
-        except Exception as e:
-            # Fallback for any other theme-related errors
-            print(f"\n{Colors.GRAY}--- {datetime.now().strftime('%H:%M:%S')} ---{Colors.END}\n")
-            print(f"Warning: Theme error: {e}")
+        self._display_themed_banner(use_timestamp=True)
     
     def display_session_completion(self, maps_completed, total_value):
         """Display session completion summary"""

@@ -157,14 +157,21 @@ class Config:
     
     @classmethod
     def print_config_summary(cls):
-        """Print a summary of current configuration"""
-        print("Configuration Summary:")
-        print(f"  Character: {cls.CHAR_TO_CHECK}")
-        print(f"  Output Mode: {cls.OUTPUT_MODE}")
-        print(f"  Debug Enabled: {cls.DEBUG_ENABLED}")
-        print(f"  Debug to File: {cls.DEBUG_TO_FILE}")
-        print(f"  Client Log: {cls.CLIENT_LOG}")
-        print(f"  API Rate Limit: {cls.API_RATE_LIMIT}s")
+        """Print a summary of current configuration with themed header"""
+        # Use display manager for themed banner
+        from display import DisplayManager
+        display = DisplayManager()
+        display._display_themed_banner("CONFIGURATION")
+        
+        # Configuration with colors (matching _display_basic_info style)
+        from display import Colors
+        print(f"📋 Character: {Colors.CYAN}{cls.CHAR_TO_CHECK}{Colors.END}{'':20} 🎮 Output Mode: {Colors.BOLD}{cls.OUTPUT_MODE.upper()}{Colors.END}")
+        debug_status = f"{Colors.GREEN}Enabled{Colors.END}" if cls.DEBUG_ENABLED else f"{Colors.GRAY}Disabled{Colors.END}"
+        debug_file_status = f"{Colors.GREEN}Enabled{Colors.END}" if cls.DEBUG_TO_FILE else f"{Colors.GRAY}Disabled{Colors.END}"
+        print(f"🐛 Debug: {debug_status}{'':15} 📁 Debug to File: {debug_file_status}")
+        print(f"📄 Client Log: {Colors.YELLOW}{cls.CLIENT_LOG}{Colors.END}")
+        print(f"⏱️  API Rate Limit: {Colors.CYAN}{cls.API_RATE_LIMIT}s{Colors.END}")
+        print()
         
         validation = cls.validate_config()
         if validation['warnings']:
