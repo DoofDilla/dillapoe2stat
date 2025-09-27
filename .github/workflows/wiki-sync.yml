@@ -40,34 +40,34 @@ jobs:
           #   (Page.md#anchor) -> (Page#anchor)
           # Leaves external/parent links like (../README.md) unchanged.
           python3 - <<'PY'
-import pathlib, re
-root = pathlib.Path("_wikibuild")
-# match (...)(Page.md) or (...)(Page.md#anchor), but not if target contains '/'
-pat = re.compile(r'\((?!https?://)([^)/\s#?]+)\.md(\#[^)]+|\))')
-def rewrite(text: str) -> str:
-    out, i, n = [], 0, len(text)
-    while i < n:
-        m = pat.search(text, i)
-        if not m:
-            out.append(text[i:]); break
-        # Avoid image links: '![alt](...)'
-        excl = text.rfind('![', 0, m.start())
-        is_img = (excl != -1) and (text.find('](', excl) == m.start()-1)
-        if is_img:
-            out.append(text[i:m.end()])
-            i = m.end()
-            continue
-        out.append(text[i:m.start()])
-        target = m.group(1)
-        tail = m.group(2)  # ')' or '#anchor)'
-        out.append(f'({target}{tail}')
-        i = m.end()
-    return ''.join(out)
-for p in root.rglob("*.md"):
-    s = p.read_text(encoding="utf-8")
-    t = rewrite(s)
-    if t != s:
-        p.write_text(t, encoding="utf-8")
+          import pathlib, re
+          root = pathlib.Path("_wikibuild")
+          # match (...)(Page.md) or (...)(Page.md#anchor), but not if target contains '/'
+          pat = re.compile(r'\((?!https?://)([^)/\s#?]+)\.md(\#[^)]+|\))')
+          def rewrite(text: str) -> str:
+              out, i, n = [], 0, len(text)
+              while i < n:
+                  m = pat.search(text, i)
+                  if not m:
+                      out.append(text[i:]); break
+                  # Avoid image links: '![alt](...)'
+                  excl = text.rfind('![', 0, m.start())
+                  is_img = (excl != -1) and (text.find('](', excl) == m.start()-1)
+                  if is_img:
+                      out.append(text[i:m.end()])
+                      i = m.end()
+                      continue
+                  out.append(text[i:m.start()])
+                  target = m.group(1)
+                  tail = m.group(2)  # ')' or '#anchor)'
+                  out.append(f'({target}{tail}')
+                  i = m.end()
+              return ''.join(out)
+          for p in root.rglob("*.md"):
+              s = p.read_text(encoding="utf-8")
+              t = rewrite(s)
+              if t != s:
+                  p.write_text(t, encoding="utf-8")
 PY
 
           echo "== AFTER rewrite (should be empty) =="
