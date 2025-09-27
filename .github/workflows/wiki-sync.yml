@@ -2,10 +2,10 @@ name: Sync Wiki
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
       - 'docs/wiki/**'
+      - '.github/workflows/wiki-sync.yml'
   workflow_dispatch:
 
 permissions:
@@ -15,89 +15,50 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Sync docs/wiki to GitHub Wiki
+      - name: Build wiki copy (strip .md in links for Wiki only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          build_dir="_wikibuild"
+          rm -rf "$build_dir"
+          mkdir -p "$build_dir"
+          cp -R docs/wiki/. "$build_dir"/ || true
+
+          # Ensure Home.md exists
+          if [ ! -f "$build_dir/Home.md" ]; then
+            printf "# Home\n\n" > "$build_dir/Home.md"
+          fi
+
+          # Rewrite [Text](Page.md) -> [Text](Page) and anchors too
+          # Only local links (no http/https), leave images alone.
+          find "$build_dir" -type f -name '*.md' -print0 | xargs -0 -I{} \
+            perl -0777 -pe 's/\((?!https?:\/\/)([^)#?]+)\.md(\)|#[^)]+)\)/(\1\2/g' -i {}
+
+      - name: Push to GitHub Wiki
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-
-          : "${GITHUB_TOKEN:?GITHUB_TOKEN is required}"
-
-          build_dir="_wikibuild"
-          rm -rf "$build_dir"
-          mkdir -p "$build_dir"
-
-          rsync -a --delete "docs/wiki/" "$build_dir/"
-
-          if [ ! -f "$build_dir/Home.md" ]; then
-            printf '%s\n%s\n%s\n' \
-              '# Home' \
-              '' \
-              'This page was automatically generated because no Home.md file existed in docs/wiki/.' \
-              > "$build_dir/Home.md"
-          fi
-
-          find "$build_dir" -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
-            python - "$file" <<'PY'
-            import re
-            from pathlib import Path
-            import sys
-
-            path = Path(sys.argv[1])
-            text = path.read_text(encoding="utf-8")
-
-            pattern = re.compile(r'(\((?!https?:\/\/)[^)#?]+)\.md(?=(\)|#[^)]+\)))')
-            updated = pattern.sub(lambda match: match.group(1), text)
-
-            if updated != text:
-                path.write_text(updated, encoding="utf-8")
-            PY
-          done
-
-          pushd "$build_dir" > /dev/null
-
+          cd _wikibuild
           git init
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
 
-          git add --all
-
+          # Idempotent: wenn nichts zu committen, sauber beenden
           if git diff --cached --quiet; then
-            echo "No wiki content to sync."
-            popd > /dev/null
+            echo "No wiki updates."
             exit 0
           fi
 
-          git commit -m "Sync wiki from docs/wiki"
+          git commit -m "Sync wiki from docs/wiki at $GITHUB_SHA"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git"
 
-          remote_url="https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git"
-          git remote add origin "$remote_url"
-
-          head_ref="$(git ls-remote --symref origin HEAD 2>/dev/null || true)"
-          default_branch="$(printf '%s' "$head_ref" | awk '/^ref:/ {print $2}' | sed 's@refs/heads/@@')"
-
-          if [ -z "$default_branch" ]; then
-            if git ls-remote --heads origin main | grep -q 'refs/heads/main'; then
-              default_branch="main"
-            elif git ls-remote --heads origin master | grep -q 'refs/heads/master'; then
-              default_branch="master"
-            else
-              default_branch="main"
-            fi
-          fi
-
-          git fetch origin "$default_branch" || true
-          if git rev-parse --verify "origin/$default_branch" >/dev/null 2>&1; then
-            if git diff --quiet HEAD "origin/$default_branch"; then
-              echo "Wiki already up to date; nothing to push."
-              popd > /dev/null
-              exit 0
-            fi
-          fi
-
-          git push --force-with-lease origin HEAD:"$default_branch"
-          popd > /dev/null
+          # Immer hart überschreiben (Lease-Override erzwingen)
+          git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:main || \
+          git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:master
