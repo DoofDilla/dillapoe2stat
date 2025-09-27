@@ -15,10 +15,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build wiki copy (strip .md for Wiki only)
+      - name: Build wiki copy (strip .md only in copy)
         shell: bash
         run: |
           set -euo pipefail
@@ -27,29 +26,14 @@ jobs:
           cp -R docs/wiki/. "$build_dir"/ || true
           [ -f "$build_dir/Home.md" ] || printf '# Home\n\n' > "$build_dir/Home.md"
 
-          echo "== BEFORE rewrite =="
+          echo "== BEFORE =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
 
-          # Write small Python rewriter to a file (no heredoc!)
-          py="$build_dir/_rewrite.py"
-          printf '%s\n' \
-"import pathlib, re, sys" \
-"root = pathlib.Path(sys.argv[1])" \
-"pat = re.compile(r'\\((?!https?://)([^)/\\s#?]+)\\.md(\\#[^)]+|\\))')" \
-"for p in root.rglob(\"*.md\"): " \
-"    s = p.read_text(encoding=\"utf-8\")" \
-"    def repl(m):" \
-"        # skip image links ![...](...)" \
-"        before = s.rfind('![', 0, m.start())" \
-"        if before != -1 and s.find('](', before) == m.start()-1:" \
-"            return m.group(0)" \
-"        return f'({m.group(1)}{m.group(2)}'" \
-"    t = pat.sub(repl, s)" \
-"    if t != s: p.write_text(t, encoding=\"utf-8\")" > \"$py\"
+          # Remove .md ONLY for local links (no scheme, no slash); keep ../README.md etc.
+          find "$build_dir" -type f -name '*.md' -print0 | xargs -0 -I{} \
+            perl -0777 -i -pe 's/\((?!https?:\/\/)([^)\/\s#?]+)\.md(\)|#[^)]+)\)/(\1\2/g' {}
 
-          python3 "$py" "$build_dir"
-
-          echo "== AFTER rewrite =="
+          echo "== AFTER =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
 
       - name: Push to GitHub Wiki
@@ -64,9 +48,11 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+
           if git diff --cached --quiet; then
             echo "No wiki updates."; exit 0
           fi
+
           git commit -m "Sync wiki from docs/wiki at $GITHUB_SHA"
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git"
           git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:main || \
