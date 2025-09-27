@@ -15,7 +15,7 @@ docs/
     ...
 ```
 - Create new wiki pages here using GitHub-flavoured Markdown.
-- Link between pages using the `[[Page Name]]` syntax so the same files render correctly inside the GitHub Wiki.
+- Link between pages using standard Markdown links such as `[Page Name](Page-Name.md)` so the same files render correctly inside this repo and the GitHub Wiki.
 - Assets (images, diagrams) should live under `docs/wiki/assets/` or a similar subdirectory.
 
 ## Editing workflow
@@ -27,9 +27,8 @@ docs/
 ## Sync automation
 The workflow defined in [`.github/workflows/wiki-sync.yml`](../.github/workflows/wiki-sync.yml) performs the following steps on every push to `main` that touches `docs/wiki/`:
 1. Check out the main repository.
-2. Check out the corresponding `wiki` repository into a temporary directory.
-3. Replace the wiki contents with the files from `docs/wiki/`.
-4. Commit and push using the GitHub Actions bot identity if differences are detected.
+2. Copy the wiki Markdown into a temporary working directory.
+3. Commit the snapshot, compare it with the live wiki repository, and push only when differences are detected.
 
 No additional secrets are required because GitHub Actions automatically grants push access to the wiki for the default token.
 
