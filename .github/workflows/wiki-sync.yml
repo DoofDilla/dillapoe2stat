@@ -34,11 +34,11 @@ jobs:
           rsync -a --delete "docs/wiki/" "$build_dir/"
 
           if [ ! -f "$build_dir/Home.md" ]; then
-            cat <<'EOT' > "$build_dir/Home.md"
-# Home
-
-This page was automatically generated because no Home.md file existed in docs/wiki/.
-EOT
+            printf '%s\n%s\n%s\n' \
+              '# Home' \
+              '' \
+              'This page was automatically generated because no Home.md file existed in docs/wiki/.' \
+              > "$build_dir/Home.md"
           fi
 
           find "$build_dir" -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
