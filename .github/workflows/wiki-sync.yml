@@ -18,56 +18,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build wiki copy (strip .md in links for Wiki only)
+      - name: Build wiki copy (strip .md only in copy)
         shell: bash
         run: |
           set -euo pipefail
           build_dir="_wikibuild"
-          rm -rf "$build_dir"
-          mkdir -p "$build_dir"
+          rm -rf "$build_dir"; mkdir -p "$build_dir"
           cp -R docs/wiki/. "$build_dir"/ || true
-
-          # Ensure Home.md exists
-          if [ ! -f "$build_dir/Home.md" ]; then
-            printf "# Home\n\n" > "$build_dir/Home.md"
-          fi
+          [ -f "$build_dir/Home.md" ] || printf '# Home\n\n' > "$build_dir/Home.md"
 
           echo "== BEFORE =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
 
-          # Rewrite local .md links -> no .md (for Wiki)
-          python3 <<'PY'
-import pathlib, re
-
-root = pathlib.Path("_wikibuild")
-pat = re.compile(r'\((?!https?://)([^)/\s#?]+)\.md(\#[^)]+|\))')
-
-def rewrite(text: str) -> str:
-    out, i, n = [], 0, len(text)
-    while i < n:
-        m = pat.search(text, i)
-        if not m:
-            out.append(text[i:]); break
-        # skip image links ![alt](...)
-        excl = text.rfind('![', 0, m.start())
-        is_img = (excl != -1) and (text.find('](', excl) == m.start()-1)
-        if is_img:
-            out.append(text[i:m.end()])
-            i = m.end()
-            continue
-        out.append(text[i:m.start()])
-        target = m.group(1)
-        tail = m.group(2)
-        out.append(f'({target}{tail}')
-        i = m.end()
-    return ''.join(out)
-
-for p in root.rglob("*.md"):
-    s = p.read_text(encoding="utf-8")
-    t = rewrite(s)
-    if t != s:
-        p.write_text(t, encoding="utf-8")
-PY
+          # Remove .md ONLY for local links (no scheme, no slash); keep ../README.md etc.
+          find "$build_dir" -type f -name '*.md' -print0 | xargs -0 -I{} \
+            perl -0777 -i -pe 's/\((?!https?:\/\/)([^)\/\s#?]+)\.md(\#[^)]+|\))/(\1\2/g' {}
 
           echo "== AFTER =="
           grep -R --line-number -E '\]\([^)]+\.md(#[^)]*)?\)' "$build_dir" || true
@@ -91,18 +56,10 @@ PY
           git commit -m "Sync wiki from docs/wiki at $GITHUB_SHA"
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git"
 
-          # Default-Branch des Wiki-Repos ermitteln
+          # Detect the wiki repo's default branch (main/master/etc.)
           DEFAULT_BRANCH=$(git ls-remote --symref origin HEAD 2>/dev/null | awk '/^ref:/ {sub("refs/heads/","",$2); print $2}')
           [ -n "$DEFAULT_BRANCH" ] || DEFAULT_BRANCH=main
-          echo "Wiki default branch detected: $DEFAULT_BRANCH"
+          echo "Wiki default branch: $DEFAULT_BRANCH"
 
-          # Push hart auf den Default
+          # Force push to the detected default (lease disabled)
           git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:"$DEFAULT_BRANCH"
-
-          # Optional: auch main aktualisieren, falls Default != main
-          if [ "$DEFAULT_BRANCH" != "main" ]; then
-            git -c push.forceWithLease=false push --force --no-force-with-lease origin HEAD:main || true
-          fi
-
-          # Optional: master löschen, wenn du nur main willst
-          # git push origin --delete master || true
