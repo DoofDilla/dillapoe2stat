@@ -381,3 +381,11 @@
 {"event_type": "session_end", "session_id": "a93111b8-0b69-4461-94a2-728817892364", "ts": "2025-09-28T13:10:09", "character": "Mettmanwalking", "session_runtime": 97.26, "total_value": 0.0, "total_maps": 0}
 {"event_type": "session_start", "session_id": "9a023e93-6588-4730-98f8-320342016435", "ts": "2025-09-28T13:11:17", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "9a023e93-6588-4730-98f8-320342016435", "ts": "2025-09-28T13:17:26", "character": "Mettmanwalking", "session_runtime": 368.47, "total_value": 4.740088459316674, "total_maps": 1}
+{"event_type": "session_start", "session_id": "35038bc1-3600-444d-a365-199a18a86eaa", "ts": "2025-09-28T13:24:44", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "35038bc1-3600-444d-a365-199a18a86eaa", "ts": "2025-09-28T13:29:14", "character": "Mettmanwalking", "session_runtime": 270.64, "total_value": 45.91837078019342, "total_maps": 1}
+{"event_type": "session_start", "session_id": "9c87af21-aaba-4a06-ad28-3953782094de", "ts": "2025-09-28T13:29:22", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "9c87af21-aaba-4a06-ad28-3953782094de", "ts": "2025-09-28T13:30:55", "character": "Mettmanwalking", "session_runtime": 92.06, "total_value": 100.16643417481323, "total_maps": 1}
+{"event_type": "session_start", "session_id": "1fdc70de-6b86-44af-9e76-c1924cb03234", "ts": "2025-09-28T13:41:16", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "1fdc70de-6b86-44af-9e76-c1924cb03234", "ts": "2025-09-28T13:42:57", "character": "Mettmanwalking", "session_runtime": 100.52, "total_value": 729.0845178357794, "total_maps": 1}
+{"event_type": "session_start", "session_id": "575094f4-503a-4f6a-ad6e-d31d77894119", "ts": "2025-09-28T13:44:15", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "575094f4-503a-4f6a-ad6e-d31d77894119", "ts": "2025-09-28T13:46:11", "character": "Mettmanwalking", "session_runtime": 115.63, "total_value": 308.9043103112144, "total_maps": 1}

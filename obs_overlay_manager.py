@@ -63,7 +63,7 @@ class OBSOverlayManager:
     def _create_item_table_html(self, added_items: List[Dict], removed_items: List[Dict], 
                               total_value: float, session_stats: Optional[Dict], 
                               map_info: Optional[Dict]) -> str:
-        """Create the HTML content for item value table"""
+        """Create HTML that looks EXACTLY like the terminal output"""
         
         # Ensure parameters are not None
         if added_items is None:
@@ -78,7 +78,11 @@ class OBSOverlayManager:
         # Get current timestamp
         timestamp = datetime.now().strftime("%H:%M:%S")
         
-        # Start HTML document
+        # Calculate total chaos value (assuming 1ex = 135c based on terminal)
+        chaos_rate = 135
+        total_chaos = total_value * chaos_rate
+        
+        # Create HTML that looks like terminal output
         html = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -90,193 +94,138 @@ class OBSOverlayManager:
     <style>
         body {{
             font-family: 'Consolas', 'Monaco', monospace;
-            background: rgba(0, 0, 0, 0.8);
+            background: #1e1e1e;
             color: #ffffff;
             margin: 0;
-            padding: 10px;
+            padding: 15px;
             font-size: 14px;
-            line-height: 1.2;
+            line-height: 1.4;
         }}
         
-        .container {{
-            max-width: 600px;
+        .terminal-output {{
+            max-width: 900px;
             margin: 0 0;
         }}
         
-        .header {{
-            text-align: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #444;
-            padding-bottom: 10px;
+        .map-header {{
+            color: #87CEEB;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: bold;
         }}
         
-        .map-info {{
-            color: #87CEEB;
-            font-size: 12px;
-            margin-bottom: 5px;
+        .runtime {{
+            color: #DDA0DD;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }}
+        
+        .valuable-loot-header {{
+            color: #FFD700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }}
+        
+        .loot-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-family: 'Consolas', monospace;
+        }}
+        
+        .loot-table th {{
+            color: #FFD700;
+            text-align: left;
+            padding: 4px 12px;
+            border-bottom: 1px solid #444;
+            font-weight: bold;
+        }}
+        
+        .loot-table td {{
+            padding: 2px 12px;
+            color: #ffffff;
+        }}
+        
+        .item-qty {{ color: #87CEEB; text-align: center; }}
+        .item-category {{ color: #87CEEB; }}
+        .chaos-value {{ color: #87CEEB; text-align: right; }}
+        .exalted-value {{ color: #FFD700; text-align: right; }}
+        
+        .net-value {{
+            color: #FFD700;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
         }}
         
         .timestamp {{
             color: #888;
-            font-size: 11px;
-        }}
-        
-        .summary {{
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #FFD700;
-            border-radius: 5px;
-            padding: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-        }}
-        
-        .total-value {{
-            color: #FFD700;
-            font-size: 18px;
-            font-weight: bold;
-        }}
-        
-        .session-stats {{
-            color: #90EE90;
             font-size: 12px;
-            margin-top: 5px;
-        }}
-        
-        .items-table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }}
-        
-        .items-table th {{
-            background: rgba(255, 255, 255, 0.1);
-            color: #FFD700;
-            padding: 8px 6px;
-            text-align: left;
-            border-bottom: 1px solid #444;
-            font-size: 12px;
-        }}
-        
-        .items-table td {{
-            padding: 6px;
-            border-bottom: 1px solid #333;
-            font-size: 11px;
-        }}
-        
-        .item-added {{
-            background: rgba(0, 255, 0, 0.05);
-            border-left: 3px solid #00ff00;
-        }}
-        
-        .item-removed {{
-            background: rgba(255, 0, 0, 0.05);
-            border-left: 3px solid #ff0000;
-        }}
-        
-        .item-name {{
-            color: #ffffff;
-            font-weight: bold;
-        }}
-        
-        .item-value {{
-            color: #FFD700;
-            text-align: right;
-        }}
-        
-        .item-type {{
-            color: #87CEEB;
-            font-size: 10px;
-        }}
-        
-        .rarity-normal {{ color: #c8c8c8; }}
-        .rarity-magic {{ color: #8888ff; }}
-        .rarity-rare {{ color: #ffff77; }}
-        .rarity-unique {{ color: #af6025; }}
-        
-        .no-items {{
-            text-align: center;
-            color: #888;
-            font-style: italic;
-            padding: 20px;
-        }}
-        
-        @keyframes fadeIn {{
-            from {{ opacity: 0; }}
-            to {{ opacity: 1; }}
-        }}
-        
-        .container {{
-            animation: fadeIn 0.3s ease-in;
+            margin-top: 15px;
         }}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="map-info">
-                {'📍 ' + map_info.get('map_name', 'Unknown Map') if map_info else 'PoE Stats Tracker'}
-            </div>
-            <div class="timestamp">Last Update: {timestamp}</div>
-        </div>
+    <div class="terminal-output">
+        <div class="map-header">🏔️ {map_info.get('map_name', 'Unknown Map')} (T{map_info.get('level', '?')}, seed {map_info.get('seed', '?')})</div>
         
-        <div class="summary">
-            <div class="total-value">💰 {total_value:.2f} Exalted</div>
-            {self._generate_session_stats_html(session_stats) if session_stats else ''}
-        </div>
+        <div class="runtime">⏱️ Runtime: {self._format_map_runtime(map_info.get('map_runtime_seconds'))}</div>
+        
+        <div class="valuable-loot-header">💰 Valuable Loot:</div>
+        
+        <table class="loot-table">
+            <tr>
+                <th>Item Name</th>
+                <th>Qty</th>
+                <th>Category</th>
+                <th>Chaos</th>
+                <th>Exalted</th>
+            </tr>
 """
         
-        # Add items table if we have items
-        if added_items or removed_items:
-            html += """
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Type</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-"""
-            
-            # Add added items (green)
+        # Add items exactly like terminal format
+        if added_items:
             for item in added_items:
-                rarity_class = self._get_rarity_class(item.get('rarity', 'normal'))
-                value_text = f"{item.get('value_exalted', 0):.2f}ex" if item.get('value_exalted', 0) > 0 else '-'
+                # Safe extraction with None handling
+                item_type = item.get('type') or 'Unknown'
+                item_name = item.get('name') or 'Unknown Item'
+                
+                emoji = self._get_item_emoji(item_type, item_name)
+                name = item_name
+                qty = item.get('quantity') or 1
+                category = item_type
+                exalted_value = item.get('value_exalted') or 0
+                chaos_value = exalted_value * chaos_rate
                 
                 html += f"""
-                <tr class="item-added">
-                    <td class="item-name {rarity_class}">+ {item.get('name', 'Unknown Item')}</td>
-                    <td class="item-type">{item.get('type', 'Unknown')}</td>
-                    <td class="item-value">{value_text}</td>
-                </tr>
-"""
-            
-            # Add removed items (red) 
-            for item in removed_items:
-                rarity_class = self._get_rarity_class(item.get('rarity', 'normal'))
-                value_text = f"{item.get('value_exalted', 0):.2f}ex" if item.get('value_exalted', 0) > 0 else '-'
-                
-                html += f"""
-                <tr class="item-removed">
-                    <td class="item-name {rarity_class}">- {item.get('name', 'Unknown Item')}</td>
-                    <td class="item-type">{item.get('type', 'Unknown')}</td>
-                    <td class="item-value">{value_text}</td>
-                </tr>
-"""
-            
-            html += """
-            </tbody>
-        </table>
+            <tr>
+                <td>{emoji} {name}</td>
+                <td class="item-qty">{qty}</td>
+                <td class="item-category">{category}</td>
+                <td class="chaos-value">.{chaos_value:05.0f} c</td>
+                <td class="exalted-value">{exalted_value:.0f} ex</td>
+            </tr>
 """
         else:
             html += """
-        <div class="no-items">
-            No items to display - Complete a map to see loot analysis
-        </div>
+            <tr>
+                <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+                    No items to display - Complete a map to see loot analysis
+                </td>
+            </tr>
 """
         
-        # Close HTML
+        # Close table and add net value
+        html += f"""
+        </table>
+        
+        <div class="net-value">💰 Net Value: {total_chaos:.0f}c | {total_value:.3f}ex</div>
+        
+        <div class="timestamp">Last Update: {timestamp}</div>
+"""
+        
+        # Close HTML  
         html += """
     </div>
 </body>
@@ -295,7 +244,7 @@ class OBSOverlayManager:
         
         return f"""
             <div class="session-stats">
-                Maps: {maps} | Total: {total_value:.1f}ex
+                🗺️ {maps} | 💎 {total_value:.1f}ex
             </div>
         """
     
@@ -310,6 +259,72 @@ class OBSOverlayManager:
             return 'rarity-magic'
         else:
             return 'rarity-normal'
+    
+    def _format_map_runtime(self, runtime_seconds):
+        """Format map runtime from seconds to 'Xm Ys' format"""
+        if runtime_seconds is None or runtime_seconds <= 0:
+            return "0m 0s"
+        
+        minutes = int(runtime_seconds // 60)
+        seconds = int(runtime_seconds % 60)
+        return f"{minutes}m {seconds}s"
+    
+    def _get_item_emoji(self, item_type: str, item_name: str) -> str:
+        """Get emoji for item like in terminal display"""
+        # Handle None values safely
+        item_type_lower = (item_type or '').lower()
+        item_name_lower = (item_name or '').lower()
+        
+        # Currency items
+        if 'currency' in item_type_lower:
+            if 'exalted' in item_name_lower:
+                return '🟡'  # Exalted Orb
+            elif 'divine' in item_name_lower:
+                return '🟡'  # Divine Orb
+            elif 'chaos' in item_name_lower:
+                return '🟡'  # Chaos Orb
+            elif 'chance' in item_name_lower:
+                return '🟡'  # Chance Shard
+            elif 'regal' in item_name_lower:
+                return '🟡'  # Regal Orb
+            elif 'armourer' in item_name_lower:
+                return '⚪'  # Armourer's Scrap
+            elif 'simulacrum' in item_name_lower:
+                return '🟣'  # Simulacrum Splinter
+            else:
+                return '🪙'  # Generic currency
+        
+        # Runes
+        elif 'rune' in item_type_lower or 'rune' in item_name_lower:
+            return '🔵'  # Runes
+        
+        # Catalysts
+        elif 'catalyst' in item_type_lower or 'catalyst' in item_name_lower:
+            return '🟣'  # Catalysts
+        
+        # Maps/Waystones
+        elif 'map' in item_type_lower or 'waystone' in item_name_lower:
+            return '🏔️'  # Waystone
+        
+        # Gems
+        elif 'gem' in item_type_lower or 'gem' in item_name_lower:
+            return '💎'  # Uncut Support Gem
+        
+        # Armour
+        elif 'armour' in item_type_lower:
+            return '🛡️'  # Armour
+        
+        # Weapons
+        elif 'weapon' in item_type_lower:
+            return '⚔️'  # Weapons
+        
+        # Accessories
+        elif 'accessory' in item_type_lower:
+            return '💍'  # Rings/Amulets
+        
+        # Default
+        else:
+            return '📦'  # Unknown items
     
     def generate_session_overlay(self, session_stats: Dict) -> str:
         """
@@ -406,10 +421,10 @@ class OBSOverlayManager:
 </head>
 <body>
     <div class="stats-container">
-        <div class="session-title">Session Stats</div>
-        <div class="stat-line maps">Maps: {maps_completed}</div>
-        <div class="stat-line value">Value: {total_value:.1f} Exalted</div>
-        <div class="stat-line time">Time: {hours}h {minutes}m</div>
+        <div class="session-title">📊 Session Stats</div>
+        <div class="stat-line maps">🗺️ {maps_completed} Maps</div>
+        <div class="stat-line value">💎 {total_value:.1f} Exalted</div>
+        <div class="stat-line time">⏱️ {hours}h {minutes}m</div>
         <div class="timestamp">Updated: {timestamp}</div>
     </div>
 </body>
