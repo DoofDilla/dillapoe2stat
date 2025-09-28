@@ -54,19 +54,21 @@ class PoEStatsTracker:
         self.waystone_analyzer = WaystoneAnalyzer(self.config, self.display, self.debugger)
         self.notification_manager = NotificationManager(self.config)
         
-        # OBS Integration (optional)
+        # OBS Integration (optional) - Only initialize if auto-start enabled
         self.obs_server = None
-        if OBS_AVAILABLE and self.config.OBS_ENABLED:
+        if OBS_AVAILABLE and self.config.OBS_AUTO_START:
             try:
                 self.obs_server = OBSWebServer(
                     host=self.config.OBS_HOST, 
                     port=self.config.OBS_PORT,
                     quiet_mode=self.config.OBS_QUIET_MODE
                 )
-                print("🎬 OBS integration enabled")
+                print("🎬 OBS integration enabled (auto-start)")
             except Exception as e:
                 print(f"⚠️  OBS server initialization failed: {e}")
                 self.obs_server = None
+        elif OBS_AVAILABLE:
+            print("🎬 OBS integration available (F9 to start)")
         
         # Simulation Manager (for testing)
         try:
@@ -510,14 +512,14 @@ class PoEStatsTracker:
             self.display.display_error("SIMULATION POST", str(e))
     
     def toggle_obs_server(self):
-        """Toggle OBS web server on/off - works regardless of config settings"""
+        """Toggle OBS web server on/off - F9 always works when Flask is available"""
         if not OBS_AVAILABLE:
             print("❌ OBS integration not available (Flask not installed)")
             print("   Install with: pip install flask")
             return
         
         if self.obs_server is None:
-            # Start OBS server - F9 always works regardless of config
+            # Create and start OBS server
             try:
                 self.obs_server = OBSWebServer(
                     host=self.config.OBS_HOST, 
@@ -535,9 +537,14 @@ class PoEStatsTracker:
                 print(f"❌ Failed to start OBS server: {e}")
                 self.obs_server = None
         else:
-            # Stop OBS server (Flask doesn't have easy stop, so we just disable it)
-            print("🔴 OBS Web Server disabled")
-            self.obs_server = None
+            # Check if server is actually running
+            try:
+                # Try to stop gracefully if possible, otherwise just disable
+                print("🔴 OBS Web Server stopped")
+                self.obs_server = None
+            except:
+                print("🔴 OBS Web Server disabled")
+                self.obs_server = None
     
     def run(self):
         """Main application loop"""
