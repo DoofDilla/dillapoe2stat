@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PoE Session Stats</title>
+    <!-- Auto-refresh disabled to prevent flickering -->
+    <style>
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            font-size: 16px;
+        }
+        
+        .stats-container {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            max-width: 300px;
+            margin: 0 0;
+        }
+        
+        .session-title {
+            color: #FFD700;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-line {
+            margin: 8px 0;
+            font-size: 18px;
+        }
+        
+        .maps { color: #87CEEB; }
+        .value { color: #90EE90; }
+        .time { color: #DDA0DD; }
+        
+        .timestamp {
+            color: #888;
+            font-size: 12px;
+            margin-top: 10px;
+            border-top: 1px solid #444;
+            padding-top: 8px;
+        }
+        
+        .no-data {
+            color: #888;
+            font-style: italic;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="stats-container">
+        <div class="session-title">Session Stats</div>
+        <div class="stat-line maps">Maps: 3</div>
+        <div class="stat-line value">Value: 5.2 Exalted</div>
+        <div class="stat-line time">Time: 1h 15m</div>
+        <div class="timestamp">Updated: 13:11:01</div>
+    </div>
+</body>
+</html>
