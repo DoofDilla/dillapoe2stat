@@ -43,10 +43,9 @@ class Config:
     OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
     
     # OBS Integration Settings
-    OBS_ENABLED = False  # Enable OBS web server integration
     OBS_HOST = "localhost"  # Host for OBS web server
     OBS_PORT = 5000  # Port for OBS web server
-    OBS_AUTO_START = False  # Automatically start OBS server on tracker startup
+    OBS_AUTO_START = False  # Automatically start OBS server on tracker startup (F9 always works)
     OBS_QUIET_MODE = True  # Suppress Flask request logs (cleaner terminal output)
     
     # ASCII Theme Configuration - Select your preferred visual theme
