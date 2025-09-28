@@ -228,56 +228,47 @@ class OBSWebServer:
             
             return self.overlay_manager._create_session_overlay_html(dummy_stats)
     
-    def update_item_table(self, added_items: list, removed_items: list, 
+    def update_item_table(self, processed_added_items: list, processed_removed_items: list, 
                          session_stats: Optional[Dict] = None, map_info: Optional[Dict] = None):
-        """Update item table data (called from main tracker)"""
+        """Update item table data (called from main tracker with already processed data)"""
         
-        # Process raw API items into formatted data with prices (like terminal display does)
-        processed_added = []
-        processed_removed = []
+        # Convert already-processed display data to OBS format (no calculations needed)
+        obs_added = []
+        obs_removed = []
         total_value = 0
         
-        try:
-            # Import price checking function
-            from price_check_poe2 import valuate_items_raw
+        # Process added items (already processed by display system)
+        if processed_added_items:
+            for row in processed_added_items:
+                obs_item = {
+                    'name': row.get('name', 'Unknown'),
+                    'type': row.get('category', 'Unknown'),
+                    'rarity': row.get('rarity', 'normal'),
+                    'value_exalted': row.get('ex_total', 0),  # Use the exact same value as terminal
+                    'value_chaos': row.get('chaos_total', 0),  # Use the exact same value as terminal  
+                    'quantity': row.get('qty', 1)
+                }
+                obs_added.append(obs_item)
             
-            # Process added items
-            if added_items:
-                added_rows, (_, add_e) = valuate_items_raw(added_items)
-                for row in added_rows:
-                    processed_item = {
-                        'name': row.get('name', 'Unknown'),
-                        'type': row.get('category', 'Unknown'),
-                        'rarity': row.get('rarity', 'normal'),
-                        'value_exalted': row.get('ex_each', 0),  # Use ex_each for individual item value
-                        'quantity': row.get('qty', 1)
-                    }
-                    processed_added.append(processed_item)
-                total_value = add_e or 0
-            
-            # Process removed items (usually not valued, but format consistently)
-            if removed_items:
-                removed_rows, _ = valuate_items_raw(removed_items)
-                for row in removed_rows:
-                    processed_item = {
-                        'name': row.get('name', 'Unknown'),
-                        'type': row.get('category', 'Unknown'),
-                        'rarity': row.get('rarity', 'normal'),
-                        'value_exalted': row.get('ex_each', 0),  # Use ex_each for individual item value
-                        'quantity': row.get('qty', 1)
-                    }
-                    processed_removed.append(processed_item)
+            # Calculate total value from the processed data
+            total_value = sum(row.get('ex_total', 0) for row in processed_added_items)
         
-        except Exception as e:
-            # Fallback to raw items if processing fails
-            print(f"[DEBUG] Item processing failed: {e}")
-            processed_added = added_items
-            processed_removed = removed_items
-            total_value = 0
+        # Process removed items (usually empty, but handle if present)
+        if processed_removed_items:
+            for row in processed_removed_items:
+                obs_item = {
+                    'name': row.get('name', 'Unknown'),
+                    'type': row.get('category', 'Unknown'),
+                    'rarity': row.get('rarity', 'normal'),
+                    'value_exalted': row.get('ex_total', 0),
+                    'value_chaos': row.get('chaos_total', 0),
+                    'quantity': row.get('qty', 1)
+                }
+                obs_removed.append(obs_item)
         
         self.current_data['item_table'] = {
-            'added_items': processed_added,
-            'removed_items': processed_removed,
+            'added_items': obs_added,
+            'removed_items': obs_removed,
             'total_value': total_value,
             'session_stats': session_stats,
             'map_info': map_info
