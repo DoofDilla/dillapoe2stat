@@ -21,6 +21,7 @@ from utils import format_time, get_current_timestamp
 from client_parsing import get_last_map_from_client
 from poe_logging import log_run
 from poe_api import get_token, get_characters, snapshot_inventory
+from gear_rarity_analyzer import GearRarityAnalyzer
 
 
 class PoEStatsTracker:
@@ -52,6 +53,10 @@ class PoEStatsTracker:
         self.last_api_call = 0.0
         self.map_start_time = None
         self.cached_waystone_info = None  # Cache for waystone info from Ctrl+F2
+        
+        # Gear Rarity variables
+        self.gear_rarity_analyzer = None  # Initialized after token is available
+        self.current_gear_rarity = None   # Cached gear rarity value
     
     def initialize(self):
         """Initialize the tracker with API token and character validation"""
@@ -76,6 +81,10 @@ class PoEStatsTracker:
             print("No characters found")
             raise SystemExit
         
+        # Initialize gear rarity analyzer with token
+        self.gear_rarity_analyzer = GearRarityAnalyzer(self.token)
+        self._update_gear_rarity()
+        
         # Start new session
         session_info = self.session_manager.start_new_session()
         
@@ -92,6 +101,9 @@ class PoEStatsTracker:
             self.config.OUTPUT_MODE
         )
         
+        # Display gear rarity info separately
+        self._display_gear_rarity_info()
+        
         self.display.display_session_header(
             session_info['session_id'],
             session_info['start_time_str']
@@ -105,6 +117,37 @@ class PoEStatsTracker:
         if wait > 0:
             time.sleep(wait)
         self.last_api_call = time.time()
+    
+    def _update_gear_rarity(self):
+        """Update the cached gear rarity value"""
+        try:
+            if self.gear_rarity_analyzer:
+                result = self.gear_rarity_analyzer.calculate_total_gear_rarity(self.config.CHAR_TO_CHECK)
+                if result.get('success', False):
+                    self.current_gear_rarity = result['total_rarity_bonus']
+                else:
+                    self.current_gear_rarity = None
+                    if self.config.DEBUG_ENABLED:
+                        print(f"[DEBUG] Gear rarity update failed: {result.get('error', 'Unknown error')}")
+        except Exception as e:
+            self.current_gear_rarity = None
+            if self.config.DEBUG_ENABLED:
+                print(f"[DEBUG] Gear rarity update exception: {e}")
+    
+    def get_gear_rarity(self):
+        """Get current gear rarity with refresh if needed"""
+        if self.current_gear_rarity is None:
+            self._update_gear_rarity()
+        return self.current_gear_rarity
+    
+    def _display_gear_rarity_info(self):
+        """Display gear rarity information"""
+        if self.current_gear_rarity is not None:
+            from display import Colors
+            rarity_color = Colors.GOLD if self.current_gear_rarity > 0 else Colors.GRAY
+            print(f"✨ Gear Rarity: {rarity_color}{self.current_gear_rarity}%{Colors.END}")
+        elif self.config.DEBUG_ENABLED:
+            print("[DEBUG] Gear rarity not available")
     
     def take_pre_snapshot(self):
         """Take PRE-map inventory snapshot"""
@@ -264,7 +307,8 @@ class PoEStatsTracker:
                 map_value, 
                 self.config.get_log_file_path(), 
                 map_runtime, 
-                self.session_manager.session_id
+                self.session_manager.session_id,
+                self.current_gear_rarity
             )
             
         except Exception as e:

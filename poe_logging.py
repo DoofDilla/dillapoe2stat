@@ -56,7 +56,7 @@ def extract_numeric_value(value_string):
     except (ValueError, TypeError):
         return 0
 
-def log_run(char, added, removed, current_map_info=None, map_value=None, log_file=None, map_runtime=None, session_id=None):
+def log_run(char, added, removed, current_map_info=None, map_value=None, log_file=None, map_runtime=None, session_id=None, gear_rarity=None):
     # Extract waystone attributes with fallback logic
     waystone_attrs = extract_waystone_attributes(current_map_info)
     
@@ -65,6 +65,7 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
         "session_id": session_id,
         "ts": dt.datetime.now().isoformat(timespec="seconds"),
         "character": char,
+        "gear_rarity": gear_rarity,  # Character's total item rarity from equipment
         "map": {
             "name": current_map_info["map_name"],
             "level": current_map_info["level"],
