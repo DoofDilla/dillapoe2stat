@@ -80,6 +80,8 @@ class HotkeyManager:
             ('f7', tracker_instance.display_session_stats, 'Display session stats'),
             ('f8', tracker_instance.toggle_output_mode, 'Toggle output mode'),
             ('f9', tracker_instance.toggle_obs_server, 'Toggle OBS web server'),
+            ('ctrl+shift+f2', tracker_instance.simulate_pre_snapshot, 'Simulate PRE-map snapshot'),
+            ('ctrl+shift+f3', tracker_instance.simulate_post_snapshot, 'Simulate POST-map snapshot'),
         ]
         
         successful_registrations = 0

@@ -68,6 +68,15 @@ class PoEStatsTracker:
                 print(f"⚠️  OBS server initialization failed: {e}")
                 self.obs_server = None
         
+        # Simulation Manager (for testing)
+        try:
+            from simulation_manager import SimulationManager
+            self.simulation_manager = SimulationManager(self.config.get_debug_dir())
+        except ImportError:
+            self.simulation_manager = None
+            if self.config.DEBUG_ENABLED:
+                print("[DEBUG] Simulation manager not available")
+        
         # State variables
         self.token = None
         self.pre_inventory = None
@@ -275,17 +284,22 @@ class PoEStatsTracker:
         """Backwards compatibility - redirect to analyze_waystone"""
         self.analyze_waystone()
     
-    def take_post_snapshot(self):
+    def take_post_snapshot(self, simulated_data=None):
         """Take POST-map inventory snapshot and analyze differences"""
         if self.pre_inventory is None:
             self.display.display_info_message("[POST] no PRE snapshot yet. Press F2 first.")
             return
         
-        self.rate_limit()
+        if not simulated_data:
+            self.rate_limit()
+        
         try:
-            post_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
-            
-            self.display.display_inventory_count(len(post_inventory), "[POST]")
+            if simulated_data:
+                post_inventory = simulated_data
+                self.display.display_inventory_count(len(post_inventory), "[SIMULATED POST]")
+            else:
+                post_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+                self.display.display_inventory_count(len(post_inventory), "[POST]")
             
             # Debug output
             if self.config.DEBUG_SHOW_SUMMARY:
@@ -331,9 +345,16 @@ class PoEStatsTracker:
                     if map_runtime is not None:
                         obs_map_info['map_runtime_seconds'] = map_runtime
                     
+                    # Get the same processed data that terminal displays
+                    from price_check_poe2 import valuate_items_raw
+                    processed_added = []
+                    if analysis['added']:
+                        added_rows, _ = valuate_items_raw(analysis['added'])
+                        processed_added = added_rows
+                    
                     self.obs_server.update_item_table(
-                        analysis['added'], 
-                        analysis['removed'], 
+                        processed_added, 
+                        [], 
                         progress, 
                         obs_map_info
                     )
@@ -438,6 +459,55 @@ class PoEStatsTracker:
         
         # Send new session notification
         self.notification_manager.notify_session_start(session_info)
+    
+    def simulate_pre_snapshot(self):
+        """Simulate PRE-map snapshot using debug files or hardcoded data"""
+        if not self.simulation_manager:
+            print("⚠️  Simulation not available")
+            return
+        
+        try:
+            # Get simulation data
+            pre_data, _ = self.simulation_manager.get_simulation_data()
+            
+            # Set up simulated state
+            self.map_start_time = time.time()
+            self.pre_inventory = pre_data
+            
+            # Create simulated map info
+            self.current_map_info = self.simulation_manager.create_simulated_map_info()
+            
+            # Cache simulated waystone info (like experimental waystone analysis)
+            self.cached_waystone_info = self.simulation_manager.create_simulated_waystone_info()
+            
+            self.display.display_inventory_count(len(self.pre_inventory), "[SIMULATED PRE]")
+            self.display.display_map_info(self.current_map_info)
+            
+            print(f"🧪 Simulated waystone: T{self.cached_waystone_info['tier']} with {len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes'])} modifiers")
+            print("💾 Ready for simulated POST (Ctrl+Shift+F3)")
+            
+        except Exception as e:
+            self.display.display_error("SIMULATION PRE", str(e))
+    
+    def simulate_post_snapshot(self):
+        """Simulate POST-map snapshot using debug files or hardcoded data"""
+        if not self.simulation_manager:
+            print("⚠️  Simulation not available")
+            return
+            
+        if self.pre_inventory is None:
+            print("⚠️  No PRE snapshot. Use Ctrl+Shift+F2 first.")
+            return
+        
+        try:
+            # Get simulation data
+            _, post_data = self.simulation_manager.get_simulation_data()
+            
+            # Call normal post-snapshot with simulated data
+            self.take_post_snapshot(simulated_data=post_data)
+            
+        except Exception as e:
+            self.display.display_error("SIMULATION POST", str(e))
     
     def toggle_obs_server(self):
         """Toggle OBS web server on/off - works regardless of config settings"""

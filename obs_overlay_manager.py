@@ -78,9 +78,11 @@ class OBSOverlayManager:
         # Get current timestamp
         timestamp = datetime.now().strftime("%H:%M:%S")
         
-        # Calculate total chaos value (assuming 1ex = 135c based on terminal)
-        chaos_rate = 135
-        total_chaos = total_value * chaos_rate
+        # Calculate total chaos value from processed data
+        total_chaos = 0
+        for item in added_items:
+            if 'value_chaos' in item:
+                total_chaos += item['value_chaos']
         
         # Create HTML that looks like terminal output
         html = f"""
@@ -196,15 +198,27 @@ class OBSOverlayManager:
                 qty = item.get('quantity') or 1
                 category = item_type
                 exalted_value = item.get('value_exalted') or 0
-                chaos_value = exalted_value * chaos_rate
+                chaos_value = item.get('value_chaos') or 0
+                
+                # Format values exactly like terminal (precision=2, strip trailing zeros, remove leading zero)
+                def format_terminal_style(value, suffix):
+                    if value is None or value == 0:
+                        return "-"
+                    formatted = f"{value:.2f}".rstrip("0").rstrip(".")
+                    if formatted.startswith("0."):
+                        formatted = formatted[1:]  # Remove leading zero: 0.15 -> .15
+                    return f"{formatted} {suffix}"
+                
+                chaos_formatted = format_terminal_style(chaos_value, "c")
+                exalted_formatted = format_terminal_style(exalted_value, "ex")
                 
                 html += f"""
             <tr>
                 <td>{emoji} {name}</td>
                 <td class="item-qty">{qty}</td>
                 <td class="item-category">{category}</td>
-                <td class="chaos-value">.{chaos_value:05.0f} c</td>
-                <td class="exalted-value">{exalted_value:.0f} ex</td>
+                <td class="chaos-value">{chaos_formatted}</td>
+                <td class="exalted-value">{exalted_formatted}</td>
             </tr>
 """
         else:
@@ -220,7 +234,7 @@ class OBSOverlayManager:
         html += f"""
         </table>
         
-        <div class="net-value">💰 Net Value: {total_chaos:.0f}c | {total_value:.3f}ex</div>
+        <div class="net-value">💰 Net Value: {f"{total_chaos:.3f}".rstrip("0").rstrip(".")}c | {f"{total_value:.3f}".rstrip("0").rstrip(".")}ex</div>
         
         <div class="timestamp">Last Update: {timestamp}</div>
 """
