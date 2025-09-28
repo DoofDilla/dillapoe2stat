@@ -325,11 +325,17 @@ class PoEStatsTracker:
             if self.obs_server:
                 try:
                     progress = self.session_manager.get_session_progress()
+                    
+                    # Add map runtime to map_info for OBS display
+                    obs_map_info = self.current_map_info.copy() if self.current_map_info else {}
+                    if map_runtime is not None:
+                        obs_map_info['map_runtime_seconds'] = map_runtime
+                    
                     self.obs_server.update_item_table(
                         analysis['added'], 
                         analysis['removed'], 
                         progress, 
-                        self.current_map_info
+                        obs_map_info
                     )
                     self.obs_server.update_session_stats(progress)
                 except Exception as e:
@@ -434,14 +440,14 @@ class PoEStatsTracker:
         self.notification_manager.notify_session_start(session_info)
     
     def toggle_obs_server(self):
-        """Toggle OBS web server on/off"""
+        """Toggle OBS web server on/off - works regardless of config settings"""
         if not OBS_AVAILABLE:
             print("❌ OBS integration not available (Flask not installed)")
             print("   Install with: pip install flask")
             return
         
         if self.obs_server is None:
-            # Start OBS server
+            # Start OBS server - F9 always works regardless of config
             try:
                 self.obs_server = OBSWebServer(
                     host=self.config.OBS_HOST, 
@@ -454,6 +460,7 @@ class PoEStatsTracker:
                 print(f"   📈 Session Stats: http://{self.config.OBS_HOST}:{self.config.OBS_PORT}/obs/session_stats")
                 if self.config.OBS_QUIET_MODE:
                     print("   🔇 Quiet mode enabled - no request logs")
+                print("   💡 F9 again to stop, or F2→F3 to see live data!")
             except Exception as e:
                 print(f"❌ Failed to start OBS server: {e}")
                 self.obs_server = None

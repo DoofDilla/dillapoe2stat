@@ -231,11 +231,53 @@ class OBSWebServer:
     def update_item_table(self, added_items: list, removed_items: list, 
                          session_stats: Optional[Dict] = None, map_info: Optional[Dict] = None):
         """Update item table data (called from main tracker)"""
-        total_value = sum(item.get('value_exalted', 0) for item in added_items)
+        
+        # Process raw API items into formatted data with prices (like terminal display does)
+        processed_added = []
+        processed_removed = []
+        total_value = 0
+        
+        try:
+            # Import price checking function
+            from price_check_poe2 import valuate_items_raw
+            
+            # Process added items
+            if added_items:
+                added_rows, (_, add_e) = valuate_items_raw(added_items)
+                for row in added_rows:
+                    processed_item = {
+                        'name': row.get('name', 'Unknown'),
+                        'type': row.get('category', 'Unknown'),
+                        'rarity': row.get('rarity', 'normal'),
+                        'value_exalted': row.get('ex_each', 0),  # Use ex_each for individual item value
+                        'quantity': row.get('qty', 1)
+                    }
+                    processed_added.append(processed_item)
+                total_value = add_e or 0
+            
+            # Process removed items (usually not valued, but format consistently)
+            if removed_items:
+                removed_rows, _ = valuate_items_raw(removed_items)
+                for row in removed_rows:
+                    processed_item = {
+                        'name': row.get('name', 'Unknown'),
+                        'type': row.get('category', 'Unknown'),
+                        'rarity': row.get('rarity', 'normal'),
+                        'value_exalted': row.get('ex_each', 0),  # Use ex_each for individual item value
+                        'quantity': row.get('qty', 1)
+                    }
+                    processed_removed.append(processed_item)
+        
+        except Exception as e:
+            # Fallback to raw items if processing fails
+            print(f"[DEBUG] Item processing failed: {e}")
+            processed_added = added_items
+            processed_removed = removed_items
+            total_value = 0
         
         self.current_data['item_table'] = {
-            'added_items': added_items,
-            'removed_items': removed_items,
+            'added_items': processed_added,
+            'removed_items': processed_removed,
             'total_value': total_value,
             'session_stats': session_stats,
             'map_info': map_info
