@@ -449,6 +449,7 @@ class DisplayManager:
             '🏹': 2,     # Bow emoji (if needed)
             '🗡️': 2,    # Dagger emoji (if needed)
             '🛡️': 2,    # Shield emoji (if needed)
+
         }
         
         return emoji_spacing_map.get(emoji_char, 1)  # Default: 1 space for most emojis
@@ -622,16 +623,12 @@ class DisplayManager:
         # Calculate column widths based on ALL data (including items without value, ignore separators)
         all_display_items = [r for r in items_data if not (isinstance(r, dict) and r.get("SEPARATOR"))]
         if all_display_items:
-            # Use centralized emoji width function
-            def get_emoji_display_width(emoji_char):
-                return self._get_emoji_display_width(emoji_char)
-            
-            # Calculate max name length using consistent emoji spacing
+            # Calculate max name length using base spacing (1 space) for all items
             max_name_len = 0
             for r in all_display_items:
                 emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
-                spacing = self._get_emoji_spacing(emoji)
-                item_display_len = len(emoji) + spacing + len(r['name'])  # emoji + spaces + name
+                base_spacing = 1  # Use fixed base spacing for width calculation
+                item_display_len = len(emoji) + base_spacing + len(r['name'])  # emoji + 1 space + name
                 max_name_len = max(max_name_len, item_display_len)
             
             name_width = max(self.config.TABLE_MIN_NAME_WIDTH, max_name_len + 1)
@@ -663,17 +660,18 @@ class DisplayManager:
                 
             emoji = item_emojis.get(r['name'], self._get_category_emoji(r.get('category', 'Unknown')))
             
-            # Calculate visible lengths using consistent emoji spacing
-            spacing = self._get_emoji_spacing(emoji)
-            item_name_visible_length = len(emoji) + spacing + len(r['name'])  # emoji + spaces + name
+            # Calculate visible lengths and get emoji spacing once
+            spacing = self._get_emoji_spacing(emoji)  # Get spacing once and reuse
+            item_name_visible_length = len(emoji) + spacing + len(r['name'])  # emoji + actual spaces + name
             
             # Use gray color for items without value
             is_worthless = (r.get('chaos_total', 0) <= 0.01 and r.get('ex_total', 0) <= 0.01)
             name_color = Colors.GRAY if is_worthless else Colors.WHITE
             
-            # Get appropriate spacing for this emoji (some emojis need extra spaces for proper alignment)
-            spacing = self._get_emoji_spacing(emoji)
+            # Create colored item name using the same spacing
             item_name_colored = f"{emoji}{' ' * spacing}{name_color}{r['name']}{Colors.END}"
+            
+
             
             category = (r.get('category') or 'n/a')[:self.config.TABLE_CATEGORY_WIDTH]
             
@@ -701,10 +699,16 @@ class DisplayManager:
             chaos_val = self._format_colored_number(r['chaos_total'], 2, "c")
             ex_val = self._format_colored_number(r['ex_total'], 2, "ex") if r['ex_total'] and r['ex_total'] >= 0.005 else f"{Colors.GRAY}-{Colors.END}"
             
-            # Calculate padding for each column using corrected visible length
-            name_padding = name_width - item_name_visible_length
+            # Calculate padding - add 3 extra spaces for weapon emojis as visual correction
+            if spacing > 1:  # Weapon emojis that need special treatment
+                name_padding = name_width - item_name_visible_length + 3  # +3 spaces for visual correction
+            else:  # Normal emojis
+                name_padding = name_width - item_name_visible_length + 1  # +1 normal correction
             chaos_padding = self.config.TABLE_CHAOS_WIDTH - len(chaos_plain)
             ex_padding = self.config.TABLE_EXALTED_WIDTH - len(ex_plain)
+            
+
+
             
             # Format row with proper padding
             row = (
