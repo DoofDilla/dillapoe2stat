@@ -44,6 +44,7 @@ class SimulationManager:
         ]
         
         self.fallback_post_inventory = [
+            # Keep original PRE items
             {
                 "id": "sim_pre_1",
                 "typeLine": "Armourer's Scrap", 
@@ -53,52 +54,206 @@ class SimulationManager:
                 "x": 1,
                 "y": 1
             },
+            # Real loot from Necropolis run - 25 added items
             {
                 "id": "sim_post_1",
-                "typeLine": "Exalted Orb",
-                "baseType": "Exalted Orb", 
+                "typeLine": "Preserved Cranium",
+                "baseType": "Preserved Cranium",
                 "rarity": "Currency",
-                "stackSize": 2,
+                "stackSize": 1,
                 "x": 2,
                 "y": 1
             },
             {
-                "id": "sim_post_2",
-                "typeLine": "Chaos Orb",
-                "baseType": "Chaos Orb",
-                "rarity": "Currency", 
-                "stackSize": 5,
+                "id": "sim_post_2", 
+                "typeLine": "Preserved Vertebrae",
+                "baseType": "Preserved Vertebrae",
+                "rarity": "Currency",
+                "stackSize": 1,
                 "x": 3,
                 "y": 1
             },
             {
                 "id": "sim_post_3",
-                "typeLine": "Catalyst",
-                "baseType": "Adaptive Catalyst",
+                "typeLine": "Greater Regal Orb",
+                "baseType": "Greater Regal Orb",
                 "rarity": "Currency",
-                "stackSize": 3,
+                "stackSize": 1,
                 "x": 4,
                 "y": 1
+            },
+            {
+                "id": "sim_post_4",
+                "typeLine": "Sione's Temper",
+                "baseType": "Sione's Temper",
+                "rarity": "Unique",
+                "stackSize": 1,
+                "x": 5,
+                "y": 1
+            },
+            {
+                "id": "sim_post_5",
+                "typeLine": "Chayula's Catalyst",
+                "baseType": "Chayula's Catalyst",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 6,
+                "y": 1
+            },
+            {
+                "id": "sim_post_6",
+                "typeLine": "Reaver Catalyst",
+                "baseType": "Reaver Catalyst",
+                "rarity": "Currency", 
+                "stackSize": 1,
+                "x": 7,
+                "y": 1
+            },
+            {
+                "id": "sim_post_7",
+                "typeLine": "Diluted Liquid Guilt",
+                "baseType": "Diluted Liquid Guilt",
+                "rarity": "Currency",
+                "stackSize": 2,
+                "x": 8,
+                "y": 1
+            },
+            {
+                "id": "sim_post_8",
+                "typeLine": "Gold Amulet",
+                "baseType": "Gold Amulet",
+                "rarity": "Normal",
+                "stackSize": 1,
+                "x": 9,
+                "y": 1
+            },
+            {
+                "id": "sim_post_9",
+                "typeLine": "Utility Belt",
+                "baseType": "Utility Belt",
+                "rarity": "Normal",
+                "stackSize": 1,
+                "x": 0,
+                "y": 2
+            },
+            {
+                "id": "sim_post_10",
+                "typeLine": "Gemcutter's Prism",
+                "baseType": "Gemcutter's Prism",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 1,
+                "y": 2
+            },
+            {
+                "id": "sim_post_11",
+                "typeLine": "Regal Orb",
+                "baseType": "Regal Orb",
+                "rarity": "Currency",
+                "stackSize": 5,
+                "x": 2,
+                "y": 2
+            },
+            {
+                "id": "sim_post_12",
+                "typeLine": "Chance Shard",
+                "baseType": "Chance Shard",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 3,
+                "y": 2
+            },
+            {
+                "id": "sim_post_13",
+                "typeLine": "Uncut Support Gem (Level 5)",
+                "baseType": "Uncut Support Gem",
+                "rarity": "Gem",
+                "stackSize": 2,
+                "x": 4,
+                "y": 2
+            },
+            {
+                "id": "sim_post_14",
+                "typeLine": "Greater Desert Rune",
+                "baseType": "Greater Desert Rune",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 5,
+                "y": 2
+            },
+            {
+                "id": "sim_post_15",
+                "typeLine": "Waystone (Tier 15)",
+                "baseType": "Waystone",
+                "rarity": "Normal",
+                "stackSize": 2,
+                "x": 6,
+                "y": 2
+            },
+            {
+                "id": "sim_post_16",
+                "typeLine": "Exalted Orb",
+                "baseType": "Exalted Orb",
+                "rarity": "Currency",
+                "stackSize": 6,
+                "x": 7,
+                "y": 2
+            },
+            {
+                "id": "sim_post_17",
+                "typeLine": "Simulacrum Splinter",
+                "baseType": "Simulacrum Splinter",
+                "rarity": "Currency",
+                "stackSize": 6,
+                "x": 8,
+                "y": 2
+            },
+            {
+                "id": "sim_post_18",
+                "typeLine": "Greater Jeweller's Orb",
+                "baseType": "Greater Jeweller's Orb",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 9,
+                "y": 2
+            },
+            {
+                "id": "sim_post_19",
+                "typeLine": "Breach Splinter",
+                "baseType": "Breach Splinter",
+                "rarity": "Currency",
+                "stackSize": 13,
+                "x": 0,
+                "y": 3
+            },
+            {
+                "id": "sim_post_20",
+                "typeLine": "Perfect Orb of Augmentation",
+                "baseType": "Perfect Orb of Augmentation",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 1,
+                "y": 3
+            },
+            {
+                "id": "sim_post_21",
+                "typeLine": "Chaos Orb",
+                "baseType": "Chaos Orb",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 2,
+                "y": 3
+            },
+            {
+                "id": "sim_post_22",
+                "typeLine": "Diluted Liquid Greed",
+                "baseType": "Diluted Liquid Greed",
+                "rarity": "Currency",
+                "stackSize": 1,
+                "x": 3,
+                "y": 3
             }
         ]
-    
-    def get_latest_debug_files(self) -> Tuple[Optional[str], Optional[str]]:
-        """Find the latest debug files"""
-        try:
-            pre_pattern = os.path.join(self.debug_dir, "pre_inventory_*.json")
-            post_pattern = os.path.join(self.debug_dir, "post_inventory_*.json")
-            
-            pre_files = glob.glob(pre_pattern)
-            post_files = glob.glob(post_pattern)
-            
-            if pre_files and post_files:
-                latest_pre = max(pre_files, key=os.path.getctime)
-                latest_post = max(post_files, key=os.path.getctime)
-                return latest_pre, latest_post
-        except Exception as e:
-            print(f"[DEBUG] Failed to find debug files: {e}")
-        
-        return None, None
     
     def load_json_file(self, filepath: str) -> Optional[List[Dict]]:
         """Load inventory data from JSON file"""
@@ -159,22 +314,31 @@ class SimulationManager:
     def create_simulated_waystone_info(self) -> Dict:
         """Create simulated waystone information"""
         return {
-            'name': 'Simulated Waystone (Tier 8)',
-            'tier': 8,
-            'prefixes': ['Area contains additional Monster Packs'],
-            'suffixes': ['25% increased Monster Damage'],
+            'name': 'Simulated Waystone (Tier 15)',
+            'tier': 15,
+            'prefixes': ['Magic Monsters', 'Item Rarity'],
+            'suffixes': ['Rare Monsters', 'Waystone Drop Chance'],
             'area_modifiers': {
-                'monster_packs': True,
-                'monster_damage': 25
+                'magic_monsters': {
+                    'name': 'Magic Monsters',
+                    'value': '+58%',
+                    'display': 'Magic Monsters: +58%'
+                },
+                'rare_monsters': {
+                    'name': 'Rare Monsters',
+                    'value': '+45%',
+                    'display': 'Rare Monsters: +45%'
+                },
+                'item_rarity': {
+                    'name': 'Item Rarity',
+                    'value': '+89%',
+                    'display': 'Item Rarity: +89%'
+                },
+                'waystone_drop_chance': {
+                    'name': 'Waystone Drop Chance',
+                    'value': '+105%',
+                    'display': 'Waystone Drop Chance: +105%'
+                }
             }
         }
     
-    def list_available_debug_files(self) -> Dict[str, List[str]]:
-        """List all available debug files"""
-        pre_files = glob.glob(os.path.join(self.debug_dir, "pre_inventory_*.json"))
-        post_files = glob.glob(os.path.join(self.debug_dir, "post_inventory_*.json"))
-        
-        return {
-            'pre_files': [os.path.basename(f) for f in sorted(pre_files, key=os.path.getctime, reverse=True)],
-            'post_files': [os.path.basename(f) for f in sorted(post_files, key=os.path.getctime, reverse=True)]
-        }

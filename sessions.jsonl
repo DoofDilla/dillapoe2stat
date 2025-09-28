@@ -397,3 +397,5 @@
 {"event_type": "session_end", "session_id": "c03c879a-9831-4de1-b4b0-e2d8800a68e3", "ts": "2025-09-28T14:17:32", "character": "Mettmanwalking", "session_runtime": 78.83, "total_value": 139.23662579309786, "total_maps": 2}
 {"event_type": "session_start", "session_id": "fd52ccf4-856e-49ea-a6e2-ff7c162f4b90", "ts": "2025-09-28T14:23:17", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "fd52ccf4-856e-49ea-a6e2-ff7c162f4b90", "ts": "2025-09-28T14:26:03", "character": "Mettmanwalking", "session_runtime": 165.93, "total_value": 139.23662579309786, "total_maps": 2}
+{"event_type": "session_start", "session_id": "8d3ab2e1-7fdb-446f-8a81-f1a585712578", "ts": "2025-09-28T14:35:44", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "8d3ab2e1-7fdb-446f-8a81-f1a585712578", "ts": "2025-09-28T14:35:58", "character": "Mettmanwalking", "session_runtime": 14.88, "total_value": 42.830903828538595, "total_maps": 1}
