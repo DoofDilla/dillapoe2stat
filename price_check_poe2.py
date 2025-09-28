@@ -44,7 +44,7 @@ OVERVIEW_ALIASES: Dict[str, List[str]] = {
 }
 
 DEFAULT_PROBE = ["Currency", "Ritual", "catalysts", "ultimatum", "runes",
-                 "Fragments", "essences", "waystones", "talismans", "expeditions", "delirium"]
+                 "Fragments", "essences", "waystones", "talismans", "expeditions", "delirium", "abyss"]
 
 # --- Fetch Layer --------------------------------------------------------------
 def _fetch_items_once(overview_name: str, league: str = LEAGUE):

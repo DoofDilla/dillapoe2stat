@@ -399,3 +399,11 @@
 {"event_type": "session_end", "session_id": "fd52ccf4-856e-49ea-a6e2-ff7c162f4b90", "ts": "2025-09-28T14:26:03", "character": "Mettmanwalking", "session_runtime": 165.93, "total_value": 139.23662579309786, "total_maps": 2}
 {"event_type": "session_start", "session_id": "8d3ab2e1-7fdb-446f-8a81-f1a585712578", "ts": "2025-09-28T14:35:44", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "8d3ab2e1-7fdb-446f-8a81-f1a585712578", "ts": "2025-09-28T14:35:58", "character": "Mettmanwalking", "session_runtime": 14.88, "total_value": 42.830903828538595, "total_maps": 1}
+{"event_type": "session_start", "session_id": "8b79fa8b-f5e8-4898-9502-ec7e8df38cf0", "ts": "2025-09-28T14:38:07", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "8b79fa8b-f5e8-4898-9502-ec7e8df38cf0", "ts": "2025-09-28T14:39:29", "character": "Mettmanwalking", "session_runtime": 81.98, "total_value": 42.830903828538595, "total_maps": 1}
+{"event_type": "session_start", "session_id": "f0e116f3-1242-4c3f-af8d-1798a48b9bda", "ts": "2025-09-28T18:16:28", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "f0e116f3-1242-4c3f-af8d-1798a48b9bda", "ts": "2025-09-28T18:38:40", "character": "Mettmanwalking", "session_runtime": 1332.6, "total_value": 17.22179033701447, "total_maps": 1}
+{"event_type": "session_start", "session_id": "bd43b820-bc91-476e-844a-1b2145dc79be", "ts": "2025-09-28T18:39:02", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "bd43b820-bc91-476e-844a-1b2145dc79be", "ts": "2025-09-28T18:39:19", "character": "Mettmanwalking", "session_runtime": 16.38, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "81e1ac9c-b3e6-4088-9339-5f5a603fd4c2", "ts": "2025-09-28T18:44:28", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "81e1ac9c-b3e6-4088-9339-5f5a603fd4c2", "ts": "2025-09-28T18:45:20", "character": "Mettmanwalking", "session_runtime": 51.97, "total_value": 0.0, "total_maps": 0}
