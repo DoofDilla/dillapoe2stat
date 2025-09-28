@@ -79,6 +79,7 @@ class HotkeyManager:
             ('f6', tracker_instance.start_new_session, 'Start new session'),
             ('f7', tracker_instance.display_session_stats, 'Display session stats'),
             ('f8', tracker_instance.toggle_output_mode, 'Toggle output mode'),
+            ('f9', tracker_instance.toggle_obs_server, 'Toggle OBS web server'),
         ]
         
         successful_registrations = 0

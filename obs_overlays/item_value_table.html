@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoE Stats - Item Values</title>
+    <!-- Auto-refresh disabled to prevent flickering -->
+    <style>
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+        }
+        
+        .map-info {
+            color: #87CEEB;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .timestamp {
+            color: #888;
+            font-size: 11px;
+        }
+        
+        .summary {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #FFD700;
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .total-value {
+            color: #FFD700;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .session-stats {
+            color: #90EE90;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        .items-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFD700;
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+            font-size: 12px;
+        }
+        
+        .items-table td {
+            padding: 6px;
+            border-bottom: 1px solid #333;
+            font-size: 11px;
+        }
+        
+        .item-added {
+            background: rgba(0, 255, 0, 0.05);
+            border-left: 3px solid #00ff00;
+        }
+        
+        .item-removed {
+            background: rgba(255, 0, 0, 0.05);
+            border-left: 3px solid #ff0000;
+        }
+        
+        .item-name {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        .item-value {
+            color: #FFD700;
+            text-align: right;
+        }
+        
+        .item-type {
+            color: #87CEEB;
+            font-size: 10px;
+        }
+        
+        .rarity-normal { color: #c8c8c8; }
+        .rarity-magic { color: #8888ff; }
+        .rarity-rare { color: #ffff77; }
+        .rarity-unique { color: #af6025; }
+        
+        .no-items {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .container {
+            animation: fadeIn 0.3s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="map-info">
+                PoE Stats Tracker
+            </div>
+            <div class="timestamp">Last Update: 13:11:01</div>
+        </div>
+        
+        <div class="summary">
+            <div class="total-value">💰 0.85 Exalted</div>
+            
+            <div class="session-stats">
+                Maps: 3 | Total: 5.2ex
+            </div>
+        
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr class="item-added">
+                    <td class="item-name rarity-normal">+ Divine Orb</td>
+                    <td class="item-type">Currency</td>
+                    <td class="item-value">0.85ex</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</body>
+</html>

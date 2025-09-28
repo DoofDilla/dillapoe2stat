@@ -1,3 +1,4 @@
 keyboard
 requests
 win11toast
+flask

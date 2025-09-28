@@ -23,6 +23,14 @@ from poe_logging import log_run
 from poe_api import get_token, get_characters, snapshot_inventory
 from gear_rarity_analyzer import GearRarityAnalyzer
 
+# Import OBS integration (optional)
+try:
+    from obs_web_server import OBSWebServer
+    OBS_AVAILABLE = True
+except ImportError:
+    OBS_AVAILABLE = False
+    print("⚠️  OBS integration not available (Flask not installed)")
+
 
 class PoEStatsTracker:
     """Main tracker class - now simplified and modular"""
@@ -45,6 +53,20 @@ class PoEStatsTracker:
         )
         self.waystone_analyzer = WaystoneAnalyzer(self.config, self.display, self.debugger)
         self.notification_manager = NotificationManager(self.config)
+        
+        # OBS Integration (optional)
+        self.obs_server = None
+        if OBS_AVAILABLE and self.config.OBS_ENABLED:
+            try:
+                self.obs_server = OBSWebServer(
+                    host=self.config.OBS_HOST, 
+                    port=self.config.OBS_PORT,
+                    quiet_mode=self.config.OBS_QUIET_MODE
+                )
+                print("🎬 OBS integration enabled")
+            except Exception as e:
+                print(f"⚠️  OBS server initialization failed: {e}")
+                self.obs_server = None
         
         # State variables
         self.token = None
@@ -91,6 +113,15 @@ class PoEStatsTracker:
         # Setup hotkeys
         if not self.hotkey_manager.setup_default_hotkeys(self):
             print("Warning: Some hotkeys failed to register")
+        
+        # Start OBS server if enabled and auto-start is on
+        if self.obs_server and self.config.OBS_AUTO_START:
+            try:
+                self.obs_server.start_background()
+                print(f"🌐 OBS Web Server: http://{self.config.OBS_HOST}:{self.config.OBS_PORT}")
+            except Exception as e:
+                print(f"⚠️  Failed to start OBS server: {e}")
+                self.obs_server = None
         
         # Display startup information and send notification
         self.notification_manager.notify_startup(session_info)
@@ -290,6 +321,21 @@ class PoEStatsTracker:
             # Update session tracking FIRST
             self.session_manager.add_completed_map(map_value)
             
+            # Update OBS overlays if available
+            if self.obs_server:
+                try:
+                    progress = self.session_manager.get_session_progress()
+                    self.obs_server.update_item_table(
+                        analysis['added'], 
+                        analysis['removed'], 
+                        progress, 
+                        self.current_map_info
+                    )
+                    self.obs_server.update_session_stats(progress)
+                except Exception as e:
+                    if self.config.DEBUG_ENABLED:
+                        print(f"[DEBUG] OBS update failed: {e}")
+            
             # Send POST-map notification AFTER session update
             progress = self.session_manager.get_session_progress()
             self.notification_manager.notify_post_map(self.current_map_info, map_runtime, map_value, progress)
@@ -386,6 +432,35 @@ class PoEStatsTracker:
         
         # Send new session notification
         self.notification_manager.notify_session_start(session_info)
+    
+    def toggle_obs_server(self):
+        """Toggle OBS web server on/off"""
+        if not OBS_AVAILABLE:
+            print("❌ OBS integration not available (Flask not installed)")
+            print("   Install with: pip install flask")
+            return
+        
+        if self.obs_server is None:
+            # Start OBS server
+            try:
+                self.obs_server = OBSWebServer(
+                    host=self.config.OBS_HOST, 
+                    port=self.config.OBS_PORT,
+                    quiet_mode=self.config.OBS_QUIET_MODE
+                )
+                self.obs_server.start_background()
+                print(f"🎬 OBS Web Server started: http://{self.config.OBS_HOST}:{self.config.OBS_PORT}")
+                print(f"   📊 Item Table: http://{self.config.OBS_HOST}:{self.config.OBS_PORT}/obs/item_table")
+                print(f"   📈 Session Stats: http://{self.config.OBS_HOST}:{self.config.OBS_PORT}/obs/session_stats")
+                if self.config.OBS_QUIET_MODE:
+                    print("   🔇 Quiet mode enabled - no request logs")
+            except Exception as e:
+                print(f"❌ Failed to start OBS server: {e}")
+                self.obs_server = None
+        else:
+            # Stop OBS server (Flask doesn't have easy stop, so we just disable it)
+            print("🔴 OBS Web Server disabled")
+            self.obs_server = None
     
     def run(self):
         """Main application loop"""
