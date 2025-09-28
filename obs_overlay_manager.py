@@ -92,7 +92,7 @@ class OBSOverlayManager:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PoE Stats - Item Values</title>
-    <!-- Auto-refresh disabled to prevent flickering -->
+    <!-- Smart refresh: only when data changes -->
     <style>
         body {{
             font-family: 'Consolas', 'Monaco', monospace;
@@ -239,8 +239,35 @@ class OBSOverlayManager:
         <div class="timestamp">Last Update: {timestamp}</div>
 """
         
-        # Close HTML  
-        html += """
+        # Add JavaScript for smart refresh (only when data changes)
+        html += f"""
+        <script>
+            let lastUpdate = "{timestamp}";
+            let pollCount = 0;
+            
+            function checkForUpdates() {{
+                pollCount++;
+                fetch('/api/status')
+                    .then(response => response.json())
+                    .then(data => {{
+                        const serverTime = new Date(data.last_update * 1000).toLocaleTimeString();
+                        if (serverTime !== lastUpdate) {{
+                            console.log('Data changed, refreshing...', serverTime);
+                            window.location.reload();
+                        }}
+                        // Poll more frequently right after POST (first 30 seconds), then slower
+                        const interval = pollCount < 10 ? 2000 : 10000;
+                        setTimeout(checkForUpdates, interval);
+                    }})
+                    .catch(error => {{
+                        console.log('Poll failed, retrying in 5s');
+                        setTimeout(checkForUpdates, 5000);
+                    }});
+            }}
+            
+            // Start polling after 2 seconds
+            setTimeout(checkForUpdates, 2000);
+        </script>
     </div>
 </body>
 </html>
@@ -373,8 +400,26 @@ class OBSOverlayManager:
         maps_completed = session_stats.get('maps_completed', 0)
         total_value = session_stats.get('total_value', 0.0)
         runtime = session_stats.get('runtime', {})
-        hours = runtime.get('hours', 0) if runtime else 0
-        minutes = runtime.get('minutes', 0) if runtime else 0
+        
+        # Handle both old and new runtime formats
+        if runtime:
+            if 'hours' in runtime and 'minutes' in runtime:
+                # New format from session manager
+                hours = runtime.get('hours', 0)
+                minutes = runtime.get('minutes', 0)
+            elif 'runtime_seconds' in session_stats:
+                # Calculate from total seconds
+                total_seconds = session_stats.get('runtime_seconds', 0)
+                hours = int(total_seconds // 3600)
+                minutes = int((total_seconds % 3600) // 60)
+            else:
+                hours = 0
+                minutes = 0
+        else:
+            # Try to get from total runtime_seconds if available
+            total_seconds = session_stats.get('runtime_seconds', 0)
+            hours = int(total_seconds // 3600)
+            minutes = int((total_seconds % 3600) // 60)
         
         html = f"""
 <!DOCTYPE html>
@@ -382,7 +427,7 @@ class OBSOverlayManager:
 <head>
     <meta charset="UTF-8">
     <title>PoE Session Stats</title>
-    <!-- Auto-refresh disabled to prevent flickering -->
+    <!-- Smart refresh: only when data changes -->
     <style>
         body {{
             font-family: 'Consolas', 'Monaco', monospace;
@@ -441,6 +486,34 @@ class OBSOverlayManager:
         <div class="stat-line time">⏱️ {hours}h {minutes}m</div>
         <div class="timestamp">Updated: {timestamp}</div>
     </div>
+    
+    <script>
+        let lastUpdate = "{timestamp}";
+        let pollCount = 0;
+        
+        function checkForUpdates() {{
+            pollCount++;
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {{
+                    const serverTime = new Date(data.last_update * 1000).toLocaleTimeString();
+                    if (serverTime !== lastUpdate) {{
+                        console.log('Session data changed, refreshing...');
+                        window.location.reload();
+                    }}
+                    // Poll more frequently right after POST (first 30 seconds), then slower
+                    const interval = pollCount < 10 ? 2000 : 10000;
+                    setTimeout(checkForUpdates, interval);
+                }})
+                .catch(error => {{
+                    console.log('Poll failed, retrying in 5s');
+                    setTimeout(checkForUpdates, 5000);
+                }});
+        }}
+        
+        // Start polling after 2 seconds
+        setTimeout(checkForUpdates, 2000);
+    </script>
 </body>
 </html>
 """
