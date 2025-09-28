@@ -358,3 +358,12 @@
 {"event_type": "session_end", "session_id": "28f6bdfe-13ff-41bc-b405-cc5670e2bae6", "ts": "2025-09-28T11:21:05", "character": "Mettmanwalking", "session_runtime": 11.45, "total_value": 0.0, "total_maps": 0}
 {"event_type": "session_start", "session_id": "ea925092-246f-4678-829e-eaf4bda2a2e3", "ts": "2025-09-28T11:21:23", "character": "Mettmanwalking"}
 {"event_type": "session_end", "session_id": "ea925092-246f-4678-829e-eaf4bda2a2e3", "ts": "2025-09-28T11:21:57", "character": "Mettmanwalking", "session_runtime": 34.6, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "e80de52d-0114-4444-a7ea-77de3f50b457", "ts": "2025-09-28T12:10:04", "character": "Mettmanwalking"}
+{"event_type": "session_start", "session_id": "3c8a1fc8-831b-46ca-a94b-9794bb982558", "ts": "2025-09-28T12:13:50", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "3c8a1fc8-831b-46ca-a94b-9794bb982558", "ts": "2025-09-28T12:17:05", "character": "Mettmanwalking", "session_runtime": 195.61, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "ef36e397-ca1a-41c4-bf06-a1397a13ed01", "ts": "2025-09-28T12:17:07", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "ef36e397-ca1a-41c4-bf06-a1397a13ed01", "ts": "2025-09-28T12:19:36", "character": "Mettmanwalking", "session_runtime": 149.06, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "389cc2d4-4456-4876-818b-5d2c976dc379", "ts": "2025-09-28T12:19:56", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "389cc2d4-4456-4876-818b-5d2c976dc379", "ts": "2025-09-28T12:20:13", "character": "Mettmanwalking", "session_runtime": 16.65, "total_value": 0.0, "total_maps": 0}
+{"event_type": "session_start", "session_id": "b02a68f8-8a3f-449b-93fb-0a43fd64876d", "ts": "2025-09-28T12:23:39", "character": "Mettmanwalking"}
+{"event_type": "session_end", "session_id": "b02a68f8-8a3f-449b-93fb-0a43fd64876d", "ts": "2025-09-28T12:27:38", "character": "Mettmanwalking", "session_runtime": 239.17, "total_value": 6.313999442805508, "total_maps": 1}
