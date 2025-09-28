@@ -1,6 +1,7 @@
 # DillaPoE2Stat Tracker
 
 > A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
+> Optional OBS overlay mode streams your loot breakdown and session dashboard straight into Browser Sources for easy broadcasting.
 
 ## Recent Enhancements
 
@@ -11,6 +12,7 @@ The tracker has evolved considerably since the last pull request. Highlights inc
 - **Smart visual output:** ASCII footer themes, richer emoji mapping, and optional "show all items" tables make the terminal dashboard more legible at a glance.
 - **Notification control:** A centralized `NotificationManager` feeds Windows toasts for startup, experimental waystone checks, map transitions, inventory scans, and session milestones.
 - **Configurable display tables:** New settings in `config.py` expose column widths, ASCII themes, and output preferences so you can tailor summaries without touching core code.
+- **OBS overlay mode:** Spin up a Flask-backed overlay server, drop Browser Source URLs into OBS, and keep stream viewers synced with your latest loot and session stats.
 
 ## Table of Contents
 - [Recent Enhancements](#recent-enhancements)
@@ -27,6 +29,7 @@ The tracker has evolved considerably since the last pull request. Highlights inc
   - [Hotkeys](#hotkeys)
   - [Output modes](#output-modes)
   - [Experimental waystone analyzer](#experimental-waystone-analyzer)
+  - [OBS overlay mode](#obs-overlay-mode)
   - [Notifications](#notifications)
   - [ASCII themes & visual tuning](#ascii-themes--visual-tuning)
 - [Data & Logs](#data--logs)
@@ -46,6 +49,7 @@ DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming se
 - **Debug-friendly:** Toggle verbose dumps, export inventories to JSON, inspect category breakdowns mid-session without restarting the tool, or search for a single item by name.
 - **Visual polish:** ASCII footer themes, dynamic emoji detection, and comprehensive item tables make the terminal output readable even during marathon sessions.
 - **Windows-native niceties:** Global hotkeys and toast notifications keep you informed even when the terminal is minimized.
+- **Stream-ready overlays:** Built-in OBS overlay server (Flask) mirrors loot tables and session dashboards as browser sources for streaming or recording.
 
 ### Core capabilities
 - 🔐 Securely authenticate against the official Path of Exile API, snapshot your character list, and capture inventory states on demand.
@@ -116,7 +120,8 @@ Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey
    - `CHAR_TO_CHECK` to the character you want to monitor.
    - `CLIENT_LOG` to the absolute path of your `Client.txt`.
    - Toggle `OUTPUT_MODE`, `DEBUG_ENABLED`, and related flags as desired.
-2. Run the configuration sanity check:
+2. (Optional) Enable OBS overlays by setting `OBS_ENABLED = True`. Adjust `OBS_HOST`, `OBS_PORT`, `OBS_AUTO_START`, and `OBS_QUIET_MODE` if you want the Flask web server to start automatically or surface request logs while testing scene layouts.
+3. Run the configuration sanity check:
    ```bash
    python -c "from config import Config; Config.print_config_summary()"
    ```
@@ -127,7 +132,9 @@ With Path of Exile running and your character logged in:
 ```bash
 python poe_stats_refactored_v2.py
 ```
-You will see a configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer). Keep the terminal open while you play.
+You will see a configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer and OBS controls). Keep the terminal open while you play.
+
+If the OBS server is enabled (or you toggle it on mid-run with `F9`), the console prints the Browser Source URLs you can paste into OBS Studio.
 
 ## Usage Guide
 
@@ -137,11 +144,14 @@ You will see a configuration summary, receive a Windows toast that monitoring ha
 | `F2` | Capture the **pre-map** inventory snapshot and read the latest map info from `Client.txt` (augmented with cached waystone data when available). |
 | `Ctrl+F2` | Run the **experimental waystone analyzer**, exposing prefixes/suffixes and caching the results for the next `F2`. |
 | `F3` | Capture the **post-map** inventory, diff changes, evaluate loot value, update session totals, and log the run. |
+| `Ctrl+Shift+F2` | Simulate a pre-map snapshot (helpful for rehearsal and overlay layout tests). |
+| `Ctrl+Shift+F3` | Simulate a post-map snapshot to preview notifications and OBS overlays without running a map. |
 | `F4` | Toggle debug mode (enables verbose inventory dumps and file exports via `InventoryDebugger`). |
 | `F5` | Run an on-demand inventory scan and display your current stash value with smart emoji hints. |
 | `F6` | End the active session (persist summary) and immediately start a fresh one. |
 | `F7` | Print the current session dashboard, including the last five maps. |
 | `F8` | Switch between `normal` (valuable items only) and `comprehensive` output modes. |
+| `F9` | Toggle the OBS overlay web server on/off (prints Browser Source URLs when enabled). |
 | `Ctrl+Esc` | Gracefully exit the tracker and unregister all hotkeys. |
 
 > Tip: The hotkeys are registered globally through the `keyboard` package—no terminal focus required.
@@ -160,6 +170,14 @@ Switch modes on the fly with `F8`.
 - Press `Ctrl+F2` with a waystone in the top-left inventory slot to inspect its tier, prefixes, and suffixes without starting a map.
 - The analyzer caches tier and modifier counts so the next `F2` snapshot displays richer map context and notifications include the tier automatically.
 - Debug mode prints extra traces for troubleshooting waystone parsing.
+
+### OBS overlay mode
+- Toggle the Flask web server at any time with `F9`. Successful startups print:
+  - `http://<host>:<port>/obs/item_table` – Loot recap table sized for a ~600×400 Browser Source.
+  - `http://<host>:<port>/obs/session_stats` – Slim session dashboard ideal for a ~300×200 Browser Source.
+- In OBS Studio add a **Browser Source**, paste the printed URL, set the suggested width/height, and enable *Refresh browser when scene becomes active* plus *Shutdown source when not visible* to avoid stale overlays.
+- Overlays refresh whenever you finish a map and mirror the same emoji/value formatting shown in the terminal.
+- Use the simulation hotkeys (`Ctrl+Shift+F2` / `Ctrl+Shift+F3`) to test overlay styling without running real maps.
 
 ### Notifications
 - Startup, new session, experimental waystone analysis, map start, map completion, and manual inventory checks pop toast notifications (icon provided in `cat64x64.png`).
