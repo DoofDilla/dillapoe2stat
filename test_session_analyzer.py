@@ -33,7 +33,7 @@ def test_basic_functionality():
     try:
         stats = analyzer.get_total_statistics()
         print(f"{Colors.GREEN}✅ Statistics calculation successful{Colors.END}")
-        print(f"   📊 {stats['total_sessions']} sessions, {stats['total_maps']} maps, {stats['total_value']:.2f} exalted")
+        print(f"   📊 {stats['total_sessions']} sessions, {stats['total_maps']} maps, {stats['total_value']:.2f} {stats['currency_symbol']}")
     except Exception as e:
         print(f"{Colors.RED}❌ Statistics calculation failed: {e}{Colors.END}")
         return False
@@ -74,14 +74,14 @@ def demo_different_views():
     top_value = analyzer.get_top_sessions(3, 'value')
     for i, session in enumerate(top_value, 1):
         date = session.start_time.split('T')[0]
-        print(f"  {i}. {date}: {Colors.GOLD}{session.total_value:.2f} exalted{Colors.END} ({session.total_maps} maps)")
+        print(f"  {i}. {date}: {Colors.GOLD}{analyzer._convert_value(session.total_value):.2f} {analyzer._get_currency_symbol()}{Colors.END} ({session.total_maps} maps)")
     
     # Top sessions by maps
     print(f"\n{Colors.YELLOW}🗺️  Top 3 Sessions by Maps:{Colors.END}")
     top_maps = analyzer.get_top_sessions(3, 'maps')
     for i, session in enumerate(top_maps, 1):
         date = session.start_time.split('T')[0]
-        print(f"  {i}. {date}: {Colors.GREEN}{session.total_maps} maps{Colors.END} ({session.total_value:.2f} exalted)")
+        print(f"  {i}. {date}: {Colors.GREEN}{session.total_maps} maps{Colors.END} ({analyzer._convert_value(session.total_value):.2f} {analyzer._get_currency_symbol()})")
     
     # Recent activity
     print(f"\n{Colors.YELLOW}📊 Recent Activity (Last 5 Days):{Colors.END}")
@@ -89,7 +89,7 @@ def demo_different_views():
     if recent:
         total_value = sum(s.total_value for s in recent)
         total_maps = sum(s.total_maps for s in recent)
-        print(f"  Sessions: {len(recent)}, Maps: {total_maps}, Value: {total_value:.2f} exalted")
+        print(f"  Sessions: {len(recent)}, Maps: {total_maps}, Value: {analyzer._convert_value(total_value):.2f} {analyzer._get_currency_symbol()}")
     else:
         print(f"  {Colors.GRAY}No recent activity found{Colors.END}")
 
@@ -134,12 +134,12 @@ def performance_comparison():
     recent_stats = calc_stats(recent_sessions)
     
     print(f"\n{Colors.BLUE}📈 Early Period:{Colors.END} {early_stats['sessions']} sessions")
-    print(f"  Maps: {early_stats['maps']}, Value: {early_stats['value']:.2f} exalted")
-    print(f"  Efficiency: {early_stats['maps_per_hour']:.2f} maps/h, {early_stats['efficiency']:.2f} exalted/h")
+    print(f"  Maps: {early_stats['maps']}, Value: {analyzer._convert_value(early_stats['value']):.2f} {analyzer._get_currency_symbol()}")
+    print(f"  Efficiency: {early_stats['maps_per_hour']:.2f} maps/h, {analyzer._convert_value(early_stats['efficiency']):.2f} {analyzer._get_currency_symbol()}/h")
     
     print(f"\n{Colors.GREEN}📊 Recent Period:{Colors.END} {recent_stats['sessions']} sessions")
-    print(f"  Maps: {recent_stats['maps']}, Value: {recent_stats['value']:.2f} exalted")
-    print(f"  Efficiency: {recent_stats['maps_per_hour']:.2f} maps/h, {recent_stats['efficiency']:.2f} exalted/h")
+    print(f"  Maps: {recent_stats['maps']}, Value: {analyzer._convert_value(recent_stats['value']):.2f} {analyzer._get_currency_symbol()}")
+    print(f"  Efficiency: {recent_stats['maps_per_hour']:.2f} maps/h, {analyzer._convert_value(recent_stats['efficiency']):.2f} {analyzer._get_currency_symbol()}/h")
     
     # Calculate improvements
     if early_stats['efficiency'] > 0:
@@ -163,6 +163,27 @@ def performance_comparison():
             print(f"  🗺️  Map Speed: {Colors.YELLOW}{maps_change:.1f}%{Colors.END} (stable)")
 
 
+def demo_currency_switching():
+    """Demonstrate currency switching between exalted and divine"""
+    print(f"\n{Colors.BOLD}{Colors.MAGENTA}💰 Demo: Currency Switching{Colors.END}")
+    
+    # Show both currency modes
+    print(f"\n{Colors.YELLOW}🪙 Exalted Mode (1:1):{Colors.END}")
+    analyzer_ex = SessionAnalyzer(currency_display="exalted")
+    if analyzer_ex.sessions:
+        stats_ex = analyzer_ex.get_total_statistics()
+        print(f"  Total Value: {stats_ex['total_value']:.2f} {stats_ex['currency_symbol']}")
+        print(f"  Avg Map Value: {stats_ex['avg_map_value']:.2f} {stats_ex['currency_symbol']}")
+    
+    print(f"\n{Colors.YELLOW}💎 Divine Mode (1:400):{Colors.END}")
+    analyzer_div = SessionAnalyzer(currency_display="divine", divine_rate=400.0)
+    if analyzer_div.sessions:
+        stats_div = analyzer_div.get_total_statistics()
+        print(f"  Total Value: {stats_div['total_value']:.2f} {stats_div['currency_symbol']}")
+        print(f"  Avg Map Value: {stats_div['avg_map_value']:.2f} {stats_div['currency_symbol']}")
+        print(f"  {Colors.GRAY}(Conversion rate: 1 divine = {analyzer_div.divine_rate} exalted){Colors.END}")
+
+
 def main():
     """Run all tests and demonstrations"""
     print(f"{Colors.BOLD}{Colors.WHITE}🔍 Session Analyzer - Test & Demo Suite{Colors.END}")
@@ -178,6 +199,7 @@ def main():
     # Run demonstrations
     demo_different_views()
     performance_comparison()
+    demo_currency_switching()
     
     # Show full analysis
     print(f"\n{Colors.BOLD}{Colors.WHITE}📊 Full Session Analysis{Colors.END}")
