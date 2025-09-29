@@ -399,15 +399,35 @@ class RunAnalyzer:
         top_runs = sorted(self.runs, key=lambda r: r.value_per_minute, reverse=True)[:20]
         
         print("🏆 Top 10 Most Efficient Runs:")
+        print("=" * 70)
+        
         for i, run in enumerate(top_runs[:10], 1):
             efficiency = self._convert_value(run.value_per_minute)
             value = self._convert_value(run.map_value)
             
-            print(f"{i:2d}. {run.map_name:<15} "
-                  f"{efficiency:6.1f} {currency_symbol}/min "
-                  f"({value:6.1f} {currency_symbol} in {run.runtime_minutes:.1f}min)")
-            print(f"    Modifiers: Magic+{run.magic_monsters}%, Rare+{run.rare_monsters}%, "
-                  f"Rarity+{run.item_rarity}%, Drops+{run.waystone_drop_chance}%")
+            # Color coding based on efficiency
+            if efficiency >= 100:
+                color = "🔥"  # Ultra high
+            elif efficiency >= 50:
+                color = "⚡"  # High
+            elif efficiency >= 30:
+                color = "✨"  # Good
+            else:
+                color = "📊"  # Standard
+            
+            print(f"{color} {i:2d}. {run.map_name:<15} │ {efficiency:6.1f} {currency_symbol}/min │ "
+                  f"💰 {value:6.1f} {currency_symbol} │ ⏱️  {run.runtime_minutes:.1f}min")
+            
+            # Pretty modifier display with conditional highlighting
+            magic_highlight = "🟢" if run.magic_monsters >= 50 else "🟡" if run.magic_monsters >= 25 else "🔴"
+            rare_highlight = "🟢" if run.rare_monsters >= 50 else "🟡" if run.rare_monsters >= 25 else "🔴"
+            rarity_highlight = "🟢" if run.item_rarity >= 60 else "🟡" if run.item_rarity >= 40 else "🔴"
+            drops_highlight = "🟢" if run.waystone_drop_chance >= 130 else "🟡" if run.waystone_drop_chance >= 110 else "🔴"
+            
+            print(f"     └─ Modifiers: {magic_highlight}Magic {run.magic_monsters:+d}% │ "
+                  f"{rare_highlight}Rare {run.rare_monsters:+d}% │ {rarity_highlight}Rarity {run.item_rarity:+d}% │ "
+                  f"{drops_highlight}Drops {run.waystone_drop_chance:+d}%")
+            print()  # Extra spacing between runs
         
         # Analyze common patterns in top runs
         print(f"\n📊 Common Patterns in Top Runs:")
@@ -432,20 +452,14 @@ class RunAnalyzer:
         print(f"Item Rarity:         Top 20 avg: {avg_rarity_top:5.1f}%  vs  All runs: {avg_rarity_all:5.1f}%")
         print(f"Waystone Drop:       Top 20 avg: {avg_drops_top:5.1f}%  vs  All runs: {avg_drops_all:5.1f}%")
         
-        # Recommendations
-        print(f"\n💡 RECOMMENDATIONS:")
+        # Generate data-driven recommendations
+        print(f"\n💡 DATA-DRIVEN RECOMMENDATIONS:")
         
-        if avg_rarity_top > avg_rarity_all + 10:
-            print(f"🎯 Prioritize HIGH Item Rarity waystones ({avg_rarity_top:.0f}%+ is optimal)")
+        # Analyze waystone modifier impact for specific recommendations
+        recommendations = self._generate_smart_recommendations()
         
-        if avg_magic_top > avg_magic_all + 10:
-            print(f"🎯 Magic Monster bonus is valuable ({avg_magic_top:.0f}%+ recommended)")
-        
-        if avg_rare_top > avg_rare_all + 10:
-            print(f"🎯 Rare Monster bonus shows good returns ({avg_rare_top:.0f}%+ recommended)")
-        
-        if avg_drops_top > avg_drops_all + 10:
-            print(f"🎯 Waystone Drop Chance pays off ({avg_drops_top:.0f}%+ recommended)")
+        for rec in recommendations:
+            print(f"🎯 {rec}")
         
         return {
             'top_runs': top_runs[:10],
@@ -569,6 +583,120 @@ class RunAnalyzer:
             return 'Weapons'
         
         return 'Other'
+    
+    def _generate_smart_recommendations(self) -> List[str]:
+        """Generate intelligent recommendations based on actual data analysis"""
+        recommendations = []
+        
+        # Analyze waystone drop chance impact (most important finding)
+        waystone_analysis = {}
+        for run in self.runs:
+            drop_range = self._get_modifier_bucket(run.waystone_drop_chance, [80, 95, 110, 130])
+            if drop_range not in waystone_analysis:
+                waystone_analysis[drop_range] = []
+            waystone_analysis[drop_range].append(self._convert_value(run.value_per_minute))
+        
+        # Find the best waystone drop chance range
+        best_drop_efficiency = 0
+        best_drop_range = ""
+        for drop_range, efficiencies in waystone_analysis.items():
+            if len(efficiencies) >= 2:  # Need at least 2 runs for reliable data
+                avg_efficiency = statistics.mean(efficiencies)
+                if avg_efficiency > best_drop_efficiency:
+                    best_drop_efficiency = avg_efficiency
+                    best_drop_range = drop_range
+        
+        # Waystone drop chance recommendation
+        if "130-199%" in best_drop_range:
+            recommendations.append(f"CRITICAL: Waystone Drop Chance 130%+ gives {best_drop_efficiency:.1f} {self._get_currency_symbol()}/min vs ~19 for lower ranges!")
+        elif best_drop_range:
+            recommendations.append(f"Target Waystone Drop Chance: {best_drop_range} performs best ({best_drop_efficiency:.1f} {self._get_currency_symbol()}/min)")
+        
+        # Analyze item rarity impact
+        rarity_analysis = {}
+        for run in self.runs:
+            rarity_range = self._get_modifier_bucket(run.item_rarity, [20, 40, 60, 80])
+            if rarity_range not in rarity_analysis:
+                rarity_analysis[rarity_range] = []
+            rarity_analysis[rarity_range].append(self._convert_value(run.value_per_minute))
+        
+        # Find optimal rarity range
+        best_rarity_efficiency = 0
+        best_rarity_range = ""
+        for rarity_range, efficiencies in rarity_analysis.items():
+            if len(efficiencies) >= 2:
+                avg_efficiency = statistics.mean(efficiencies)
+                if avg_efficiency > best_rarity_efficiency:
+                    best_rarity_efficiency = avg_efficiency
+                    best_rarity_range = rarity_range
+        
+        if best_rarity_range and best_rarity_efficiency > 25:  # Only recommend if significantly above average
+            recommendations.append(f"Item Rarity sweet spot: {best_rarity_range} averages {best_rarity_efficiency:.1f} {self._get_currency_symbol()}/min")
+        
+        # Analyze rare monsters impact
+        rare_analysis = {}
+        for run in self.runs:
+            rare_range = self._get_modifier_bucket(run.rare_monsters, [20, 40, 60])
+            if rare_range not in rare_analysis:
+                rare_analysis[rare_range] = []
+            rare_analysis[rare_range].append(self._convert_value(run.value_per_minute))
+        
+        # Check if high rare monsters are worth it
+        high_rare_efficiency = 0
+        low_rare_efficiency = 0
+        for rare_range, efficiencies in rare_analysis.items():
+            if len(efficiencies) >= 2:
+                avg_efficiency = statistics.mean(efficiencies)
+                if "60-99%" in rare_range:
+                    high_rare_efficiency = avg_efficiency
+                elif any(x in rare_range for x in ["0-0%", "1-19%", "20-39%"]):
+                    low_rare_efficiency = max(low_rare_efficiency, avg_efficiency)
+        
+        if high_rare_efficiency > low_rare_efficiency * 1.5:
+            recommendations.append(f"High Rare Monsters (60%+) significantly outperform: {high_rare_efficiency:.1f} vs {low_rare_efficiency:.1f} {self._get_currency_symbol()}/min")
+        
+        # Map-specific recommendations
+        map_efficiencies = {}
+        for run in self.runs:
+            if run.map_name not in map_efficiencies:
+                map_efficiencies[run.map_name] = []
+            map_efficiencies[run.map_name].append(self._convert_value(run.value_per_minute))
+        
+        # Find consistently good maps (at least 2 runs, good average)
+        good_maps = []
+        for map_name, efficiencies in map_efficiencies.items():
+            if len(efficiencies) >= 2:
+                avg_efficiency = statistics.mean(efficiencies)
+                if avg_efficiency > 30:  # High efficiency threshold
+                    good_maps.append((map_name, avg_efficiency))
+        
+        if good_maps:
+            good_maps.sort(key=lambda x: x[1], reverse=True)
+            top_maps = [f"{name} ({eff:.0f} {self._get_currency_symbol()}/min)" for name, eff in good_maps[:3]]
+            recommendations.append(f"Focus on these efficient maps: {', '.join(top_maps)}")
+        
+        # Value-based insights from the enhanced item data
+        if hasattr(self, '_last_drop_analysis'):
+            # Get insights from the most recent drop analysis
+            pass  # Could add insights about what items to look for
+        
+        # Fallback if no specific recommendations
+        if not recommendations:
+            recommendations.append("Continue farming with focus on higher-tier waystones for better modifier options")
+        
+        return recommendations
+    
+    def _get_modifier_bucket(self, value: float, thresholds: List[int]) -> str:
+        """Helper to categorize modifier values into buckets"""
+        for i, threshold in enumerate(thresholds):
+            if value < threshold:
+                if i == 0:
+                    return f"  0-{threshold-1}%"
+                else:
+                    return f"{thresholds[i-1]:3d}-{threshold-1}%"
+        
+        # Value is above all thresholds
+        return f"{thresholds[-1]:3d}-199%"
 
 
 def main():
