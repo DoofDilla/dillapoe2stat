@@ -378,7 +378,8 @@ class RunAnalyzer:
             category_summary[category]['value'] += item_values.get(name, 0)
         
         for category, data in sorted(category_summary.items(), key=lambda x: x[1]['value'], reverse=True):
-            print(f"  {category:<20} {data['count']:4d} items ({self._convert_value(data['value']):6.1f} {currency_symbol})")
+            category_name = category if category is not None else "Unknown"
+            print(f"  {category_name:<20} {data['count']:4d} items ({self._convert_value(data['value']):6.1f} {currency_symbol})")
         
         return {
             'currency_drops': dict(currency_drops),
