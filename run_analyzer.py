@@ -295,40 +295,96 @@ class RunAnalyzer:
         return map_analysis
     
     def analyze_drop_patterns(self) -> Dict:
-        """Analyze currency and item drop patterns"""
+        """Analyze currency and item drop patterns with accurate values"""
         print(f"\n💎 DROP PATTERN ANALYSIS")
         print("="*60)
         
         # Count currency drops
         currency_drops = Counter()
         valuable_items = Counter()
+        all_items = Counter()
+        item_values = {}  # Track total value contributed by each item type
+        item_categories = {}  # Track categories
+        
+        # Check if we have enhanced item data with values
+        has_enhanced_data = any(
+            hasattr(run, 'added_items') and run.added_items and 
+            any('value_each_exalted' in item for item in run.added_items)
+            for run in self.runs
+        )
+        
+        if has_enhanced_data:
+            print("🔍 Using accurate item values from pricing system")
+        else:
+            print("⚠️  Using estimated values (consider upgrading runs.jsonl format)")
         
         for run in self.runs:
             for item in run.added_items:
                 name = item.get('name', '')
                 stack = item.get('stack', 1)
+                category = item.get('category', 'Unknown')
+                all_items[name] += stack
                 
-                # Count currency
-                if 'orb' in name.lower():
+                # Store category information
+                if name not in item_categories:
+                    item_categories[name] = category
+                
+                # Count currency (expanded)
+                if any(term in name.lower() for term in ['orb', 'shard']):
                     currency_drops[name] += stack
                 
-                # Count valuable items
-                if any(term in name.lower() for term in ['divine', 'exalted', 'greater', 'perfect']):
+                # Count valuable items (expanded criteria)
+                if any(term in name.lower() for term in ['divine', 'exalted', 'greater', 'perfect', 'waystone', 'essence', 'catalyst', 'rune']):
                     valuable_items[name] += stack
+                
+                # Get accurate item value if available, otherwise estimate
+                if 'value_each_exalted' in item:
+                    # Use accurate value from pricing system
+                    item_value = item['total_value_exalted']
+                else:
+                    # Fallback to estimation for old format
+                    item_value = self._estimate_item_value(name, stack, {})
+                
+                if item_value > 0:
+                    if name in item_values:
+                        item_values[name] += item_value
+                    else:
+                        item_values[name] = item_value
+        
+        # Sort items by total value contribution
+        items_by_value = sorted(item_values.items(), key=lambda x: x[1], reverse=True)
+        currency_symbol = self._get_currency_symbol()
         
         print("🪙 Most Common Currency Drops:")
         for i, (currency, count) in enumerate(currency_drops.most_common(10), 1):
             avg_per_run = count / len(self.runs)
-            print(f"{i:2d}. {currency:<30} {count:4d} total ({avg_per_run:.2f}/run)")
+            total_value = item_values.get(currency, 0)
+            print(f"{i:2d}. {currency:<30} {count:4d} total ({avg_per_run:.2f}/run) [{self._convert_value(total_value):5.1f} {currency_symbol}]")
         
-        print(f"\n💰 Most Valuable Items:")
-        for i, (item, count) in enumerate(valuable_items.most_common(10), 1):
+        print(f"\n💰 Most Valuable Items by Total Value:")
+        for i, (item, total_value) in enumerate(items_by_value[:15], 1):
+            count = all_items[item]
             avg_per_run = count / len(self.runs)
-            print(f"{i:2d}. {item:<35} {count:3d} total ({avg_per_run:.2f}/run)")
+            avg_value = self._convert_value(total_value / count) if count > 0 else 0
+            print(f"{i:2d}. {item:<35} {count:3d} total ({avg_per_run:.2f}/run) [{self._convert_value(total_value):6.1f} {currency_symbol}, {avg_value:.1f} each]")
+        
+        print(f"\n🎲 All Item Categories:")
+        category_summary = {}
+        for name, count in all_items.most_common():
+            category = item_categories.get(name, self._categorize_item(name))
+            if category not in category_summary:
+                category_summary[category] = {'count': 0, 'value': 0}
+            category_summary[category]['count'] += count
+            category_summary[category]['value'] += item_values.get(name, 0)
+        
+        for category, data in sorted(category_summary.items(), key=lambda x: x[1]['value'], reverse=True):
+            print(f"  {category:<20} {data['count']:4d} items ({self._convert_value(data['value']):6.1f} {currency_symbol})")
         
         return {
             'currency_drops': dict(currency_drops),
-            'valuable_items': dict(valuable_items)
+            'valuable_items': dict(valuable_items),
+            'item_values': dict(item_values),
+            'all_items': dict(all_items)
         }
     
     def find_optimal_strategies(self) -> Dict:
@@ -429,6 +485,89 @@ class RunAnalyzer:
                 'last': max(run.timestamp for run in self.runs).split('T')[0]
             }
         }
+    
+    def _estimate_item_value(self, name: str, stack: int, manual_mappings: dict) -> float:
+        """Estimate item value in exalted orbs based on name patterns and manual mappings"""
+        # Check manual mappings first
+        if name in manual_mappings:
+            mapping = manual_mappings[name]
+            base_value = mapping.get('amount', 1)
+            # Convert to exalted if needed (assuming the mapped items are in exalted equivalent)
+            return base_value * stack
+        
+        # Basic value estimation based on item name patterns
+        name_lower = name.lower()
+        
+        # High value items
+        if 'divine orb' in name_lower:
+            return 400 * stack  # 1 Divine = 400 Exalted
+        if 'exalted orb' in name_lower:
+            return 1 * stack
+        if 'greater exalted orb' in name_lower:
+            return 3 * stack
+        
+        # Medium value items
+        if 'greater' in name_lower and any(term in name_lower for term in ['regal', 'essence', 'rune']):
+            return 0.5 * stack
+        if 'perfect orb of augmentation' in name_lower:
+            return 0.8 * stack
+        if 'regal orb' in name_lower:
+            return 0.1 * stack
+        
+        # Currency items
+        if 'chaos orb' in name_lower:
+            return 0.05 * stack
+        if 'vaal orb' in name_lower:
+            return 0.02 * stack
+        if 'orb of chance' in name_lower:
+            return 0.01 * stack
+        
+        # Waystones (rough estimate)
+        if 'waystone' in name_lower:
+            if 'tier 15' in name_lower or 'tier 16' in name_lower:
+                return 0.2 * stack
+            return 0.1 * stack
+        
+        # Gems
+        if 'uncut' in name_lower and 'gem' in name_lower:
+            return 0.05 * stack
+        
+        # Equipment - assume minimal value unless unique/rare
+        if any(term in name_lower for term in ['ring', 'amulet', 'belt', 'gloves', 'boots', 'helmet', 'armour', 'sword', 'bow', 'staff']):
+            return 0.01 * stack  # Very low base value for rares
+        
+        # Other currency/materials
+        if any(term in name_lower for term in ['essence', 'catalyst', 'rune', 'splinter']):
+            return 0.02 * stack
+        
+        return 0  # Unknown items have no estimated value
+    
+    def _categorize_item(self, name: str) -> str:
+        """Categorize items for analysis"""
+        name_lower = name.lower()
+        
+        if any(term in name_lower for term in ['orb', 'shard']):
+            return 'Currency'
+        if 'waystone' in name_lower:
+            return 'Waystones'
+        if any(term in name_lower for term in ['essence', 'catalyst']):
+            return 'Crafting Materials'
+        if 'rune' in name_lower:
+            return 'Runes'
+        if 'gem' in name_lower:
+            return 'Gems'
+        if 'splinter' in name_lower:
+            return 'Splinters'
+        if 'tablet' in name_lower:
+            return 'Precursor Tablets'
+        if any(term in name_lower for term in ['ring', 'amulet', 'belt']):
+            return 'Jewelry'
+        if any(term in name_lower for term in ['gloves', 'boots', 'helmet', 'armour', 'mitts', 'cap']):
+            return 'Armor'
+        if any(term in name_lower for term in ['sword', 'bow', 'staff', 'hammer', 'axe']):
+            return 'Weapons'
+        
+        return 'Other'
 
 
 def main():

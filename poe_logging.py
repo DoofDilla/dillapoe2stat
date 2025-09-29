@@ -60,6 +60,41 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
     # Extract waystone attributes with fallback logic
     waystone_attrs = extract_waystone_attributes(current_map_info)
     
+    # Enhanced item aggregation with value information
+    def aggregate_with_values(items):
+        """Aggregate items with individual value information"""
+        try:
+            from price_check_poe2 import valuate_items_raw
+            # Get detailed value information for each item
+            valued_items, _ = valuate_items_raw(items)
+            
+            # Convert to enhanced format with values
+            enhanced_items = []
+            for item_data in valued_items:
+                enhanced_item = {
+                    "name": item_data["name"],
+                    "stack": item_data["qty"],
+                    "category": item_data.get("category", "Unknown")
+                }
+                
+                # Add value information if available
+                if item_data.get("ex_each") is not None:
+                    enhanced_item["value_each_exalted"] = round(item_data["ex_each"], 6)
+                    enhanced_item["total_value_exalted"] = round(item_data["ex_total"], 6)
+                
+                if item_data.get("chaos_each") is not None:
+                    enhanced_item["value_each_chaos"] = round(item_data["chaos_each"], 2)
+                    enhanced_item["total_value_chaos"] = round(item_data["chaos_total"], 2)
+                
+                enhanced_items.append(enhanced_item)
+            
+            return enhanced_items
+            
+        except Exception as e:
+            # Fallback to old aggregation method if pricing fails
+            print(f"[LOG_RUN] Warning: Could not calculate item values, using basic aggregation: {e}")
+            return aggregate(items)
+    
     rec = {
         "run_id": str(uuid.uuid4()),
         "session_id": session_id,
@@ -85,12 +120,18 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
         "map_runtime": round(map_runtime, 2) if map_runtime is not None else None,
         "added_count": len(added),
         "removed_count": len(removed),
-        "added": aggregate(added),       # ggf. strippen/kompakt machen
-        "removed": aggregate(removed),
+        "added": aggregate_with_values(added),  # Enhanced with individual item values
+        "removed": aggregate_with_values(removed),
+        # Add metadata about the enhanced format
+        "format_version": "2.0",  # Indicates enhanced item format with values
+        "enhanced_items": True    # Flag for backwards compatibility
     }
     if log_file is None:
         # Default log file path if not provided
         log_file = Path(os.path.dirname(os.path.abspath(__file__))) / "runs.jsonl"
+    else:
+        # Ensure log_file is a Path object
+        log_file = Path(log_file)
     
     log_file.parent.mkdir(parents=True, exist_ok=True)
     with log_file.open("a", encoding="utf-8") as f:
