@@ -92,29 +92,48 @@ class RunAnalyzer:
             print(f"❌ Error reading runs file: {e}")
             return
         
-        # Filter to recent, complete runs (with modern data structure)
-        processed_runs = []
+        # Process runs with different requirements
+        self.all_runs = []  # For drop patterns and basic map analysis
+        self.modifier_runs = []  # For waystone modifier analysis
+        
         for run in raw_runs:
-            # Only process runs with complete modern data
-            if not self._is_complete_run(run):
-                continue
-                
             try:
-                processed_run = self._process_run(run)
-                if processed_run:
-                    processed_runs.append(processed_run)
+                # Basic run requirements (for drop patterns and map efficiency)
+                if self._has_basic_data(run):
+                    processed_run = self._process_run(run)
+                    if processed_run:
+                        self.all_runs.append(processed_run)
+                        
+                        # Additional check for modifier analysis
+                        if self._has_modifier_data(run):
+                            self.modifier_runs.append(processed_run)
             except Exception as e:
                 # Skip problematic runs silently
                 continue
         
-        self.runs = processed_runs
-        print(f"✅ Loaded {len(self.runs)} complete runs for analysis")
+        # Use modifier runs for the main analysis (backwards compatibility)
+        self.runs = self.modifier_runs
+        
+        print(f"✅ Loaded {len(self.all_runs)} runs for general analysis")
+        print(f"✅ Loaded {len(self.modifier_runs)} runs for modifier analysis")
     
-    def _is_complete_run(self, run: Dict) -> bool:
-        """Check if run has all required modern fields"""
-        required_fields = ['run_id', 'ts', 'map', 'map_value', 'map_runtime', 'added', 'removed']
+    def _has_basic_data(self, run: Dict) -> bool:
+        """Check if run has basic data for drop patterns and map efficiency"""
+        required_fields = ['run_id', 'ts', 'map', 'map_value', 'map_runtime', 'added']
         
         if not all(field in run for field in required_fields):
+            return False
+        
+        # Must have valid map value and runtime
+        if run.get('map_value') is None or run.get('map_runtime', 0) <= 0:
+            return False
+        
+        return True
+    
+    def _has_modifier_data(self, run: Dict) -> bool:
+        """Check if run has waystone modifier data for advanced analysis"""
+        # First check basic data
+        if not self._has_basic_data(run):
             return False
         
         # Check for waystone attributes
@@ -124,11 +143,11 @@ class RunAnalyzer:
         if not waystone_attrs.get('hasAttributeInfo', False):
             return False
         
-        # Must have valid map value and runtime
-        if run.get('map_value') is None or run.get('map_runtime', 0) <= 0:
-            return False
-        
         return True
+    
+    def _is_complete_run(self, run: Dict) -> bool:
+        """Legacy method for backwards compatibility"""
+        return self._has_modifier_data(run)
     
     def _process_run(self, run: Dict) -> Optional[RunData]:
         """Convert raw run data to processed RunData object"""
@@ -242,9 +261,9 @@ class RunAnalyzer:
         print(f"\n🗺️  MAP EFFICIENCY ANALYSIS")
         print("="*60)
         
-        # Group by map name
+        # Group by map name (use all runs for better data coverage)
         map_stats = defaultdict(list)
-        for run in self.runs:
+        for run in self.all_runs:
             map_stats[run.map_name].append(run)
         
         # Calculate statistics for each map
@@ -253,6 +272,10 @@ class RunAnalyzer:
         
         for map_name, runs in map_stats.items():
             if len(runs) < 2:  # Need minimum sample size
+                continue
+            
+            # Filter out hideout activities (not real maps)
+            if 'hideout' in map_name.lower():
                 continue
             
             avg_value = statistics.mean([self._convert_value(run.map_value) for run in runs])
@@ -318,7 +341,7 @@ class RunAnalyzer:
         else:
             print("⚠️  Using estimated values (consider upgrading runs.jsonl format)")
         
-        for run in self.runs:
+        for run in self.all_runs:
             for item in run.added_items:
                 name = item.get('name', '')
                 stack = item.get('stack', 1)
