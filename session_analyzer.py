@@ -1,6 +1,7 @@
 """
 Session Statistics Analyzer
 Analyzes all sessions from sessions.jsonl and provides comprehensive statistics
+Supports both Exalted and Divine Orb display modes with configurable exchange rates
 """
 
 import json
@@ -9,6 +10,10 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import statistics
+
+# Currency Configuration
+DEFAULT_CURRENCY_DISPLAY = "divine"  # "exalted" or "divine"
+DEFAULT_DIVINE_TO_EXALTED_RATE = 400.0  # Current market rate: 1 Divine = 400 Exalted
 
 
 @dataclass
@@ -30,10 +35,24 @@ class SessionStats:
 class SessionAnalyzer:
     """Analyzes session data from sessions.jsonl"""
     
-    def __init__(self, sessions_file: str = "sessions.jsonl"):
+    def __init__(self, sessions_file: str = "sessions.jsonl", 
+                 currency_display: str = DEFAULT_CURRENCY_DISPLAY,
+                 divine_rate: float = DEFAULT_DIVINE_TO_EXALTED_RATE):
         self.sessions_file = sessions_file
+        self.currency_display = currency_display.lower()
+        self.divine_rate = divine_rate
         self.sessions: List[SessionStats] = []
         self._load_sessions()
+    
+    def _convert_value(self, exalted_value: float) -> float:
+        """Convert exalted value to display currency"""
+        if self.currency_display == "divine":
+            return exalted_value / self.divine_rate
+        return exalted_value
+    
+    def _get_currency_symbol(self) -> str:
+        """Get currency symbol for display"""
+        return "divine" if self.currency_display == "divine" else "exalted"
     
     def _load_sessions(self):
         """Load and parse sessions from jsonl file"""
@@ -144,27 +163,32 @@ class SessionAnalyzer:
         first_session = min(self.sessions, key=lambda s: s.start_time) if self.sessions else None
         last_session = max(self.sessions, key=lambda s: s.start_time) if self.sessions else None
         
+        # Convert all values to display currency
+        currency_symbol = self._get_currency_symbol()
+        
         return {
             'total_sessions': len(self.sessions),
             'sessions_with_maps': len(sessions_with_maps),
             'total_runtime_seconds': total_runtime_seconds,
             'total_runtime_formatted': str(runtime_td).split('.')[0],  # Remove microseconds
             'total_runtime_hours': total_runtime_hours,
-            'total_value': total_value,
+            'total_value': self._convert_value(total_value),
             'total_maps': total_maps,
-            'avg_session_value': avg_session_value,
+            'avg_session_value': self._convert_value(avg_session_value),
             'avg_session_runtime_seconds': avg_session_runtime,
             'avg_session_runtime_formatted': str(timedelta(seconds=avg_session_runtime)).split('.')[0],
             'avg_session_maps': avg_session_maps,
-            'avg_map_value': avg_map_value,
+            'avg_map_value': self._convert_value(avg_map_value),
             'avg_map_time_seconds': avg_map_time,
             'avg_map_time_formatted': str(timedelta(seconds=avg_map_time)).split('.')[0],
             'maps_per_hour': maps_per_hour,
-            'value_per_hour': value_per_hour,
+            'value_per_hour': self._convert_value(value_per_hour),
             'best_session_by_value': best_session_by_value,
             'best_session_by_maps': best_session_by_maps,
             'first_session_date': first_session.start_time if first_session else None,
-            'last_session_date': last_session.start_time if last_session else None
+            'last_session_date': last_session.start_time if last_session else None,
+            'currency_symbol': currency_symbol,
+            'divine_rate': self.divine_rate
         }
     
     def get_character_statistics(self) -> Dict[str, Dict]:
@@ -193,11 +217,11 @@ class SessionAnalyzer:
                 'sessions_with_maps': len(sessions_with_maps),
                 'total_runtime_seconds': total_runtime,
                 'total_runtime_formatted': str(timedelta(seconds=total_runtime)).split('.')[0],
-                'total_value': total_value,
+                'total_value': self._convert_value(total_value),
                 'total_maps': total_maps,
                 'maps_per_hour': total_maps / runtime_hours if runtime_hours > 0 else 0,
-                'value_per_hour': total_value / runtime_hours if runtime_hours > 0 else 0,
-                'avg_map_value': statistics.mean([s.avg_map_value for s in sessions_with_maps]) if sessions_with_maps else 0,
+                'value_per_hour': self._convert_value(total_value / runtime_hours if runtime_hours > 0 else 0),
+                'avg_map_value': self._convert_value(statistics.mean([s.avg_map_value for s in sessions_with_maps]) if sessions_with_maps else 0),
                 'avg_map_time': statistics.mean([s.avg_map_time for s in sessions_with_maps]) if sessions_with_maps else 0
             }
         
@@ -230,10 +254,10 @@ class SessionAnalyzer:
                 'sessions_with_maps': len(sessions_with_maps),
                 'total_runtime_seconds': total_runtime,
                 'total_runtime_formatted': str(timedelta(seconds=total_runtime)).split('.')[0],
-                'total_value': total_value,
+                'total_value': self._convert_value(total_value),
                 'total_maps': total_maps,
                 'maps_per_hour': total_maps / runtime_hours if runtime_hours > 0 else 0,
-                'value_per_hour': total_value / runtime_hours if runtime_hours > 0 else 0
+                'value_per_hour': self._convert_value(total_value / runtime_hours if runtime_hours > 0 else 0)
             }
         
         return daily_stats
@@ -274,6 +298,8 @@ class SessionAnalyzer:
 
 def main():
     """Example usage of the SessionAnalyzer"""
+    # You can configure currency display here
+    # analyzer = SessionAnalyzer(currency_display="divine", divine_rate=400.0)
     analyzer = SessionAnalyzer()
     
     if not analyzer.sessions:
@@ -291,17 +317,17 @@ def main():
     print(f"├─ Total Sessions: {stats['total_sessions']:,}")
     print(f"├─ Sessions with Maps: {stats['sessions_with_maps']:,}")
     print(f"├─ Total Runtime: {stats['total_runtime_formatted']}")
-    print(f"├─ Total Value: {stats['total_value']:.2f} exalted")
+    print(f"├─ Total Value: {stats['total_value']:.2f} {stats['currency_symbol']}")
     print(f"└─ Total Maps: {stats['total_maps']:,}")
     
     print(f"\n⚡ EFFICIENCY METRICS")
     print(f"├─ Maps per Hour: {stats['maps_per_hour']:.2f}")
-    print(f"├─ Value per Hour: {stats['value_per_hour']:.2f} exalted")
-    print(f"├─ Avg Map Value: {stats['avg_map_value']:.2f} exalted")
+    print(f"├─ Value per Hour: {stats['value_per_hour']:.2f} {stats['currency_symbol']}")
+    print(f"├─ Avg Map Value: {stats['avg_map_value']:.2f} {stats['currency_symbol']}")
     print(f"└─ Avg Map Time: {stats['avg_map_time_formatted']}")
     
     print(f"\n📈 SESSION AVERAGES")
-    print(f"├─ Avg Session Value: {stats['avg_session_value']:.2f} exalted")
+    print(f"├─ Avg Session Value: {stats['avg_session_value']:.2f} {stats['currency_symbol']}")
     print(f"├─ Avg Session Runtime: {stats['avg_session_runtime_formatted']}")
     print(f"└─ Avg Maps per Session: {stats['avg_session_maps']:.2f}")
     
@@ -309,7 +335,7 @@ def main():
         best = stats['best_session_by_value']
         print(f"\n🏆 BEST SESSION (VALUE)")
         print(f"├─ Date: {best.start_time}")
-        print(f"├─ Value: {best.total_value:.2f} exalted")
+        print(f"├─ Value: {analyzer._convert_value(best.total_value):.2f} {stats['currency_symbol']}")
         print(f"├─ Maps: {best.total_maps}")
         print(f"└─ Runtime: {str(timedelta(seconds=best.duration_seconds)).split('.')[0]}")
     
@@ -325,16 +351,16 @@ def main():
             print(f"├─ {char}:")
             print(f"│  ├─ Sessions: {cstats['sessions']} (with maps: {cstats['sessions_with_maps']})")
             print(f"│  ├─ Runtime: {cstats['total_runtime_formatted']}")
-            print(f"│  ├─ Value: {cstats['total_value']:.2f} exalted")
+            print(f"│  ├─ Value: {cstats['total_value']:.2f} {stats['currency_symbol']}")
             print(f"│  ├─ Maps: {cstats['total_maps']}")
-            print(f"│  └─ Efficiency: {cstats['maps_per_hour']:.2f} maps/h, {cstats['value_per_hour']:.2f} exalted/h")
+            print(f"│  └─ Efficiency: {cstats['maps_per_hour']:.2f} maps/h, {cstats['value_per_hour']:.2f} {stats['currency_symbol']}/h")
     
     # Top sessions
     print(f"\n🌟 TOP 5 SESSIONS BY VALUE")
     top_sessions = analyzer.get_top_sessions(5, 'value')
     for i, session in enumerate(top_sessions, 1):
         runtime_str = str(timedelta(seconds=session.duration_seconds)).split('.')[0]
-        print(f"{i}. {session.start_time} | {session.total_value:.2f} exalted | {session.total_maps} maps | {runtime_str}")
+        print(f"{i}. {session.start_time} | {analyzer._convert_value(session.total_value):.2f} {stats['currency_symbol']} | {session.total_maps} maps | {runtime_str}")
 
 
 if __name__ == "__main__":
