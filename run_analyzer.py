@@ -384,15 +384,41 @@ class RunAnalyzer:
             total_value = item_values.get(currency, 0)
             print(f"{i:2d}. {currency:<30} {count:4d} total ({avg_per_run:.2f}/run) [{self._convert_value(total_value):5.1f} {currency_symbol}]")
         
-        print(f"\n💰 Most Valuable Items by Total Value:")
+        print(f"\n💰 MOST VALUABLE ITEMS BY TOTAL VALUE")
+        print("=" * 70)
+        
         for i, (item, total_value) in enumerate(items_by_value[:15], 1):
             count = all_items[item]
-            avg_per_run = count / len(self.runs)
+            avg_per_run = count / len(self.all_runs)
             avg_value = self._convert_value(total_value / count) if count > 0 else 0
-            print(f"{i:2d}. {item:<35} {count:3d} total ({avg_per_run:.2f}/run) [{self._convert_value(total_value):6.1f} {currency_symbol}, {avg_value:.1f} each]")
+            
+            # Value tier icons
+            if total_value >= 5000:
+                value_icon = "💎"  # Ultra rare
+            elif total_value >= 1000:
+                value_icon = "🔥"  # Very valuable
+            elif total_value >= 100:
+                value_icon = "⚡"  # Valuable
+            elif total_value >= 20:
+                value_icon = "✨"  # Good
+            else:
+                value_icon = "📊"  # Standard
+            
+            print(f"{value_icon} {i:2d}. {item:<30} │ {count:3d} drops │ "
+                  f"{avg_per_run:4.2f}/run │ {self._convert_value(total_value):7.1f} {currency_symbol} │ "
+                  f"{avg_value:6.1f} each")
         
-        print(f"\n🎲 All Item Categories:")
+        print(f"\n🎲 ITEM CATEGORIES BY VALUE")
+        print("=" * 70)
+        
         category_summary = {}
+        category_icons = {
+            'Currency': '💰', 'Ritual': '🩸', 'catalysts': '⚗️', 'Fragments': '🧩',
+            'essences': '✨', 'runes': '🔮', 'delirium': '👁️', 'abyss': '🕳️',
+            'Waystones': '🗿', 'Gems': '💎', 'Armor': '🛡️', 'Weapons': '⚔️',
+            'Jewelry': '💍', 'Precursor Tablets': '📜', 'Unknown': '❓'
+        }
+        
         for name, count in all_items.most_common():
             category = item_categories.get(name, self._categorize_item(name))
             if category not in category_summary:
@@ -400,9 +426,43 @@ class RunAnalyzer:
             category_summary[category]['count'] += count
             category_summary[category]['value'] += item_values.get(name, 0)
         
-        for category, data in sorted(category_summary.items(), key=lambda x: x[1]['value'], reverse=True):
+        # Sort by value and create ranking
+        sorted_categories = sorted(category_summary.items(), key=lambda x: x[1]['value'], reverse=True)
+        
+        for i, (category, data) in enumerate(sorted_categories, 1):
             category_name = category if category is not None else "Unknown"
-            print(f"  {category_name:<20} {data['count']:4d} items ({self._convert_value(data['value']):6.1f} {currency_symbol})")
+            icon = category_icons.get(category, '📦')
+            value_per_item = data['value'] / data['count'] if data['count'] > 0 else 0
+            
+            # Color coding by value tier
+            if data['value'] >= 1000:
+                tier_color = "🔥"  # Ultra valuable
+            elif data['value'] >= 100:
+                tier_color = "⚡"  # High value
+            elif data['value'] >= 20:
+                tier_color = "✨"  # Good value
+            else:
+                tier_color = "📊"  # Standard
+            
+            print(f"{tier_color} {i:2d}. {icon} {category_name:<18} │ {data['count']:4d} items │ "
+                  f"{self._convert_value(data['value']):7.1f} {currency_symbol} │ "
+                  f"{self._convert_value(value_per_item):5.2f} avg")
+        
+        # Add summary insights
+        total_unique_items = len(all_items)
+        total_item_count = sum(all_items.values())
+        total_estimated_value = sum(item_values.values())
+        
+        # Special analysis for Divine Orb drops
+        self._analyze_divine_drops()
+        
+        print(f"\n📈 DROP SUMMARY INSIGHTS")
+        print("=" * 40)
+        print(f"📦 Unique Items: {total_unique_items:,}")
+        print(f"🎯 Total Drops: {total_item_count:,}")
+        print(f"💰 Est. Total Value: {self._convert_value(total_estimated_value):,.1f} {currency_symbol}")
+        print(f"📊 Avg Items/Run: {total_item_count / len(self.all_runs):.1f}")
+        print(f"💎 Avg Value/Run: {self._convert_value(total_estimated_value / len(self.all_runs)):.1f} {currency_symbol}")
         
         return {
             'currency_drops': dict(currency_drops),
@@ -606,6 +666,104 @@ class RunAnalyzer:
             return 'Weapons'
         
         return 'Other'
+    
+    def _analyze_divine_drops(self):
+        """Special analysis for Divine Orb drops and their waystone attributes"""
+        print(f"\n💎 DIVINE ORB DROP ANALYSIS")
+        print("=" * 50)
+        
+        divine_runs = []
+        
+        # Find all runs with Divine Orb drops
+        for run in self.all_runs:
+            for item in run.added_items:
+                if item.get('name', '').lower() == 'divine orb':
+                    divine_count = item.get('stack', 1)
+                    
+                    # Try to get waystone attributes if this run has modifier data
+                    waystone_attrs = None
+                    modifier_run = None
+                    
+                    # Find corresponding run in modifier_runs (has waystone data)
+                    for mod_run in self.runs:  # self.runs = modifier_runs
+                        if (mod_run.run_id == run.run_id or 
+                            (mod_run.timestamp == run.timestamp and mod_run.map_name == run.map_name)):
+                            modifier_run = mod_run
+                            waystone_attrs = {
+                                'magic_monsters': mod_run.magic_monsters,
+                                'rare_monsters': mod_run.rare_monsters,
+                                'item_rarity': mod_run.item_rarity,
+                                'waystone_drop_chance': mod_run.waystone_drop_chance
+                            }
+                            break
+                    
+                    divine_runs.append({
+                        'run_id': run.run_id[:8],
+                        'timestamp': run.timestamp,
+                        'map_name': run.map_name,
+                        'divine_count': divine_count,
+                        'map_value': run.map_value,
+                        'runtime_minutes': run.runtime_minutes,
+                        'efficiency': self._convert_value(run.value_per_minute),
+                        'waystone_attrs': waystone_attrs
+                    })
+        
+        if not divine_runs:
+            print("🔍 No Divine Orb drops found in analyzed runs")
+            return
+        
+        total_divines = sum(run['divine_count'] for run in divine_runs)
+        print(f"🎯 Found {total_divines} Divine Orbs across {len(divine_runs)} runs")
+        print(f"📊 Drop rate: {total_divines / len(self.all_runs) * 100:.2f}%")
+        print()
+        
+        # Show each Divine drop with details
+        print("🔥 INDIVIDUAL DIVINE DROPS:")
+        print("-" * 70)
+        
+        for i, run in enumerate(divine_runs, 1):
+            print(f"💎 {i}. {run['map_name']} ({run['timestamp'][:10]})")
+            print(f"    📦 {run['divine_count']}x Divine Orb | ⚡ {run['efficiency']:.1f} ex/min | ⏱️ {run['runtime_minutes']:.1f}min")
+            
+            if run['waystone_attrs']:
+                attrs = run['waystone_attrs']
+                print(f"    🗿 Waystone: Magic+{attrs['magic_monsters']}% | Rare+{attrs['rare_monsters']}% | "
+                      f"Rarity+{attrs['item_rarity']}% | Drops+{attrs['waystone_drop_chance']}%")
+            else:
+                print(f"    🗿 Waystone: No modifier data available")
+            print()
+        
+        # Analyze patterns if we have waystone data
+        divine_with_attrs = [run for run in divine_runs if run['waystone_attrs']]
+        
+        if divine_with_attrs:
+            print("📊 DIVINE DROP PATTERNS:")
+            print("-" * 40)
+            
+            avg_magic = sum(run['waystone_attrs']['magic_monsters'] for run in divine_with_attrs) / len(divine_with_attrs)
+            avg_rare = sum(run['waystone_attrs']['rare_monsters'] for run in divine_with_attrs) / len(divine_with_attrs)
+            avg_rarity = sum(run['waystone_attrs']['item_rarity'] for run in divine_with_attrs) / len(divine_with_attrs)
+            avg_drops = sum(run['waystone_attrs']['waystone_drop_chance'] for run in divine_with_attrs) / len(divine_with_attrs)
+            
+            # Compare to overall averages
+            overall_magic = sum(run.magic_monsters for run in self.runs) / len(self.runs)
+            overall_rare = sum(run.rare_monsters for run in self.runs) / len(self.runs)
+            overall_rarity = sum(run.item_rarity for run in self.runs) / len(self.runs)
+            overall_drops = sum(run.waystone_drop_chance for run in self.runs) / len(self.runs)
+            
+            print(f"Magic Monsters:  Divine avg {avg_magic:5.1f}% vs Overall {overall_magic:5.1f}% {'📈' if avg_magic > overall_magic else '📉'}")
+            print(f"Rare Monsters:   Divine avg {avg_rare:5.1f}% vs Overall {overall_rare:5.1f}% {'📈' if avg_rare > overall_rare else '📉'}")
+            print(f"Item Rarity:     Divine avg {avg_rarity:5.1f}% vs Overall {overall_rarity:5.1f}% {'📈' if avg_rarity > overall_rarity else '📉'}")
+            print(f"Waystone Drops:  Divine avg {avg_drops:5.1f}% vs Overall {overall_drops:5.1f}% {'📈' if avg_drops > overall_drops else '📉'}")
+            
+            # Best Divine run
+            best_divine = max(divine_with_attrs, key=lambda x: x['efficiency'])
+            print(f"\n🏆 Most efficient Divine run: {best_divine['map_name']} ({best_divine['efficiency']:.1f} ex/min)")
+            attrs = best_divine['waystone_attrs']
+            print(f"    🗿 Magic+{attrs['magic_monsters']}% | Rare+{attrs['rare_monsters']}% | "
+                  f"Rarity+{attrs['item_rarity']}% | Drops+{attrs['waystone_drop_chance']}%")
+        else:
+            print("⚠️ No waystone modifier data available for Divine drops")
     
     def _generate_smart_recommendations(self) -> List[str]:
         """Generate intelligent recommendations based on actual data analysis"""
