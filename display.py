@@ -95,17 +95,117 @@ class DisplayManager:
             print(f"=== {display_text} ===")
 
     
-    def display_startup_info(self, character_name, session_id, output_mode):
+    def display_startup_info(self, character_name, session_id, output_mode, gear_rarity=None):
         """Display startup information"""
-        self._display_basic_info(character_name, session_id, output_mode)
+        # Display CONFIGURATION banner first
+        self._display_themed_banner("CONFIGURATION")
+        self._display_basic_info(character_name, session_id, output_mode, gear_rarity)
         self._display_hotkey_help()
         self._display_session_footer()
     
-    def _display_basic_info(self, character_name, session_id, output_mode):
-        """Display basic tracker information"""
-        print(f"🎮 Using character: {Colors.CYAN}{character_name}{Colors.END}")
-        print(f"📋 Output mode: {Colors.BOLD}{output_mode.upper()}{Colors.END}")
-        print(f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}")
+    def _display_basic_info(self, character_name, session_id, output_mode, gear_rarity=None):
+        """Display basic tracker information with HasiSkull ANSI art"""
+        hasiskull_lines = self._load_hasiskull_ansi()
+        
+        # Get configuration info
+        from config import Config
+        debug_status = f"{Colors.GREEN}Enabled{Colors.END}" if Config.DEBUG_ENABLED else f"{Colors.GRAY}Disabled{Colors.END}"
+        debug_file_status = f"{Colors.GREEN}Enabled{Colors.END}" if Config.DEBUG_TO_FILE else f"{Colors.GRAY}Disabled{Colors.END}"
+        
+        # Check OBS availability
+        try:
+            from obs_web_server import OBSWebServer
+            obs_status = "🎬 OBS integration available (F9 to start)"
+        except ImportError:
+            obs_status = "⚠️  OBS integration not available (Flask not installed)"
+        
+        # Format gear rarity
+        if gear_rarity is not None:
+            rarity_color = Colors.GOLD if gear_rarity > 0 else Colors.GRAY
+            gear_rarity_text = f"✨ Gear Rarity: {rarity_color}{gear_rarity}%{Colors.END}"
+        else:
+            gear_rarity_text = "✨ Gear Rarity: Not available yet"
+        
+        # Create info lines - each on its own line, with padding at top
+        info_lines = [
+            "",  # Empty line for top padding
+            "",  # Another empty line for top padding
+            f"📋 Character: {Colors.CYAN}{character_name}{Colors.END}",
+            f"🎮 Output Mode: {Colors.BOLD}{output_mode.upper()}{Colors.END}",
+            f"🐛 Debug: {debug_status}",
+            f"📁 Debug to File: {debug_file_status}",
+            f"📄 Client Log: {Colors.YELLOW}{Config.CLIENT_LOG}{Colors.END}",
+            f"⏱️  API Rate Limit: {Colors.CYAN}{Config.API_RATE_LIMIT}s{Colors.END}",
+            f"{gear_rarity_text}",
+            "",
+            f"{obs_status}",
+            f"🆔 Session ID: {Colors.GRAY}{session_id[:8]}...{Colors.END}"
+        ]
+        
+        # Display HasiSkull on the left, info on the right
+        self._display_side_by_side(hasiskull_lines, info_lines)
+    
+    def _load_hasiskull_ansi(self):
+        """Load HasiSkull 32x32 colored blocks ANSI art"""
+        try:
+            with open('hasiskull_colored_blocks_32x32.ansi', 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            # Skip header comments and empty lines, return only ANSI art lines
+            ansi_lines = []
+            for line in lines:
+                line = line.rstrip()
+                if line and not line.startswith('#'):
+                    ansi_lines.append(line)
+            
+            return ansi_lines
+        except FileNotFoundError:
+            # Fallback if ANSI file not found - simple ASCII skull
+            return [
+                "    💀    ",
+                "  💀💀💀  ",
+                " 💀💀💀💀 ",
+                "💀💀💀💀💀",
+                " 💀   💀 ",
+                "  💀💀💀  "
+            ]
+        except Exception:
+            # Ultimate fallback
+            return ["🎮 PoE2", "Stats", "Tracker"]
+    
+    def _display_side_by_side(self, left_lines, right_lines):
+        """Display two columns side by side with fixed 32-char width for left column"""
+        import re
+        
+        # Fixed width for ANSI art (32 characters + padding)
+        left_column_width = 37  # 32 chars + 5 padding
+        
+        # Pad shorter list with empty strings
+        max_lines = max(len(left_lines), len(right_lines))
+        left_padded = left_lines + [''] * (max_lines - len(left_lines))
+        right_padded = right_lines + [''] * (max_lines - len(right_lines))
+        
+        # Display side by side with fixed width
+        for left, right in zip(left_padded, right_padded):
+            if left and right:
+                # Truncate ANSI art to exactly 32 visual characters
+                clean_left = re.sub(r'\033\[[0-9;]*[mK]', '', left)
+                if len(clean_left) > 32:
+                    # Truncate the visual content to 32 chars
+                    # This is complex with ANSI codes, so we'll just use padding approach
+                    pass
+                
+                # Calculate visual width and pad accordingly
+                visual_width = len(clean_left)
+                padding = ' ' * (left_column_width - visual_width)
+                print(f"{left}{padding}{right}")
+            elif left:
+                print(left)
+            elif right:
+                # Empty left, pad with spaces
+                print(f"{' ' * left_column_width}{right}")
+            else:
+                print()
     
     def _display_hotkey_help(self):
         """Display hotkey help information with themed header"""

@@ -69,7 +69,7 @@ class PoEStatsTracker:
                 print(f"⚠️  OBS server initialization failed: {e}")
                 self.obs_server = None
         elif OBS_AVAILABLE:
-            print("🎬 OBS integration available (F9 to start)")
+            pass  # OBS status will be shown in the startup display
         
         # Simulation Manager (for testing)
         try:
@@ -145,7 +145,8 @@ class PoEStatsTracker:
         self.display.display_startup_info(
             self.config.CHAR_TO_CHECK, 
             session_info['session_id'], 
-            self.config.OUTPUT_MODE
+            self.config.OUTPUT_MODE,
+            self.current_gear_rarity
         )
         
         # Display gear rarity info separately
@@ -697,9 +698,9 @@ def main():
     # You can customize the configuration here if needed
     config = Config()
     
-    # Print configuration summary
-    config.print_config_summary()
-    print()
+    # Configuration summary is now shown in display_startup_info with HasiSkull
+    # config.print_config_summary()
+    # print()
     
     # Create and run tracker
     tracker = PoEStatsTracker(config)

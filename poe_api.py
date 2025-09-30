@@ -16,7 +16,7 @@ def get_token(client_id, client_secret):
     r = requests.post(AUTH_URL, data=data, headers={"User-Agent": USER_AGENT})
     r.raise_for_status()
     tok = r.json()
-    print("Got token, expires in", tok.get("expires_in"), "seconds")
+    # Token obtained successfully - info will be shown in startup display
     return tok["access_token"]
 
 def get_characters(access_token):
