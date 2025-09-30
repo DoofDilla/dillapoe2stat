@@ -22,6 +22,7 @@ from client_parsing import get_last_map_from_client
 from poe_logging import log_run
 from poe_api import get_token, get_characters, snapshot_inventory
 from gear_rarity_analyzer import GearRarityAnalyzer
+from auto_map_detector import AutoMapDetector
 
 # Import OBS integration (optional)
 try:
@@ -90,6 +91,10 @@ class PoEStatsTracker:
         # Gear Rarity variables
         self.gear_rarity_analyzer = None  # Initialized after token is available
         self.current_gear_rarity = None   # Cached gear rarity value
+        
+        # Auto Map Detection
+        self.auto_detector = None
+        self.auto_mode_enabled = False
     
     def initialize(self):
         """Initialize the tracker with API token and character validation"""
@@ -145,6 +150,14 @@ class PoEStatsTracker:
         
         # Display gear rarity info separately
         self._display_gear_rarity_info()
+        
+        # Initialize auto map detector
+        self.auto_detector = AutoMapDetector(
+            self.config.CLIENT_LOG,
+            self.config,
+            on_map_enter=self._auto_pre_snapshot,
+            on_map_exit=self._auto_post_snapshot
+        )
         
         self.display.display_session_header(
             session_info['session_id'],
@@ -429,6 +442,10 @@ class PoEStatsTracker:
         """Display current session statistics"""
         stats = self.session_manager.get_current_session_stats(self.config.get_log_file_path())
         if stats:
+            # Add auto detection status to stats
+            auto_status = self.get_auto_status()
+            print(f"🤖 {auto_status}")
+            
             self.display.display_session_stats(
                 stats['session_id'],
                 stats['runtime']['hours'],
@@ -546,6 +563,82 @@ class PoEStatsTracker:
                 print("🔴 OBS Web Server disabled")
                 self.obs_server = None
     
+    def toggle_auto_mode(self):
+        """Toggle automatic map detection on/off"""
+        if not self.auto_detector:
+            print("⚠️  Auto detector not initialized")
+            return
+            
+        if self.auto_mode_enabled:
+            # Turn off auto mode
+            self.auto_detector.stop()
+            self.auto_mode_enabled = False
+            print("🔄 Auto mode OFF - Manual F2/F3 required")
+            self.notification_manager.notify_info("Auto Detection", "Manual mode enabled")
+        else:
+            # Turn on auto mode  
+            self.auto_detector.start()
+            self.auto_mode_enabled = True
+            print("🤖 Auto mode ON - F2/F3 triggered automatically")
+            print("     🏠 Hideout → Map: Auto F2")
+            print("     🗺️  Map → Hideout: Auto F3")
+            print("     🕳️  Map → Abyss → Map: No triggers (stays in map)")
+            self.notification_manager.notify_info("Auto Detection", "Automatic F2/F3 enabled")
+    
+    def _auto_pre_snapshot(self, map_info):
+        """Automatic PRE snapshot when entering a map"""
+        print(f"🤖 AUTO F2: Entering {map_info['area_name']}")
+        try:
+            # Set the map info from auto detection
+            self.current_map_info = {
+                'map_name': map_info['area_name'],
+                'level': map_info['level'],
+                'seed': map_info['seed'],
+                'source': 'auto_detection',
+                'map_code': map_info['area_code'],
+                'timestamp': map_info['timestamp']
+            }
+            
+            # Combine with cached waystone info if available
+            if self.cached_waystone_info:
+                self.current_map_info.update({
+                    'waystone_tier': self.cached_waystone_info['tier'],
+                    'area_modifiers': self.cached_waystone_info['area_modifiers'],
+                    'modifier_count': len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes']),
+                    'source': 'auto_detection_with_waystone'
+                })
+                print(f"📊 Enhanced with waystone data: T{self.cached_waystone_info['tier']}, {self.current_map_info['modifier_count']} modifiers")
+            
+            # Trigger the actual pre snapshot
+            self.take_pre_snapshot()
+            
+        except Exception as e:
+            print(f"⚠️  Auto F2 failed: {e}")
+    
+    def _auto_post_snapshot(self, map_info):
+        """Automatic POST snapshot when exiting a map"""
+        print(f"🤖 AUTO F3: Finished {map_info['area_name']}")
+        try:
+            # Trigger the actual post snapshot
+            self.take_post_snapshot()
+            
+        except Exception as e:
+            print(f"⚠️  Auto F3 failed: {e}")
+    
+    def get_auto_status(self):
+        """Get current auto detection status"""
+        if not self.auto_detector:
+            return "Auto detector not initialized"
+            
+        status = self.auto_detector.get_status()
+        if not status['running']:
+            return "🔄 Manual mode (Ctrl+F6 to enable auto)"
+        
+        current_area = status['current_area'] or 'Unknown'
+        in_map = "🗺️ IN MAP" if status['is_in_map'] else "🏠 SAFE ZONE"
+        
+        return f"🤖 Auto mode | {in_map} | Current: {current_area}"
+
     def run(self):
         """Main application loop"""
         try:
@@ -560,6 +653,10 @@ class PoEStatsTracker:
     def _cleanup(self):
         """Clean up resources and display final statistics"""
         print("\n🔄 Shutting down...")
+        
+        # Stop auto detector
+        if self.auto_detector and self.auto_mode_enabled:
+            self.auto_detector.stop()
         
         # Unregister hotkeys
         self.hotkey_manager.unregister_all()

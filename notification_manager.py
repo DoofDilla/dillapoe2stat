@@ -147,3 +147,10 @@ class NotificationManager:
                            f"✅ New session ready!")
         
         notify('New Session Started!', notification_msg, icon=self._get_icon_path())
+    
+    def notify_info(self, title, message):
+        """Create generic info notification"""
+        if not self.config.NOTIFICATION_ENABLED:
+            return
+        
+        notify(title, message, icon=self._get_icon_path())
