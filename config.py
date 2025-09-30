@@ -154,7 +154,7 @@ class Config:
     @classmethod
     def get_icon_path(cls):
         """Get the path for the notification icon"""
-        return cls.get_script_dir() / 'cat64x64.png'
+        return cls.get_script_dir() / 'HasiSkull_64x64.png'
     
     @classmethod
     def get_debug_dir(cls):
