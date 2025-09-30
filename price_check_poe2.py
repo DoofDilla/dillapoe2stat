@@ -71,7 +71,7 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
     """
     Liefert Mapping aus *mehreren* Keys -> Chaos-Wert (primaryValue).
     Keys pro Item: norm(name), slug(name), nopunct(name), norm(id), slug(id), nopunct(id)
-    Für Currency ergänzen wir 'Chaos Orb' = 1.0.
+    Für Currency ergänzen wir 'Chaos Orb' = 1.0 und 'Divine Orb' aus rate-Daten.
     """
     items = _fetch_items_with_aliases(category_key, league)
     prices: Dict[str, float] = {}
@@ -79,6 +79,26 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
         prices[_norm("Chaos Orb")] = 1.0
         prices["chaos"] = 1.0
         prices[_nopunct("Chaos Orb")] = 1.0
+        
+        # Divine Orb als Referenzwährung - berechne aus rate-Daten
+        divine_chaos_value = None
+        for row in items:
+            it = row.get("item") or {}
+            name = (it.get("name") or "").strip()
+            iid = (it.get("id") or "").strip()
+            rate = row.get("rate") or {}
+            
+            # Verwende Chaos Orb rate um Divine-Wert zu berechnen
+            if (name.lower() == "chaos orb" or iid == "chaos") and "divine" in rate:
+                divine_rate = rate["divine"]  # Wieviele Chaos für 1 Divine
+                if divine_rate and divine_rate > 0:
+                    divine_chaos_value = divine_rate  # 1 Divine = X Chaos
+                    break
+        
+        if divine_chaos_value:
+            prices[_norm("Divine Orb")] = divine_chaos_value
+            prices["divine"] = divine_chaos_value
+            prices[_nopunct("Divine Orb")] = divine_chaos_value
 
     for row in items:
         it = row.get("item") or {}
@@ -101,6 +121,11 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
 def exalted_price(league: str = LEAGUE) -> Optional[float]:
     cur = fetch_category_prices("Currency", league)
     return cur.get(_norm("Exalted Orb")) or cur.get("exalted") or cur.get(_nopunct("Exalted Orb"))
+
+@lru_cache(maxsize=1)
+def divine_price(league: str = LEAGUE) -> Optional[float]:
+    cur = fetch_category_prices("Currency", league)
+    return cur.get(_norm("Divine Orb")) or cur.get("divine") or cur.get(_nopunct("Divine Orb"))
 
 def _lookup_name(it: dict) -> str:
     tl = it.get("typeLine") or ""
@@ -155,52 +180,63 @@ def _lookup(prices: Dict[str, float], name: str) -> Optional[float]:
             or prices.get(_nopunct(name)))
 
 def get_value_for_name_and_category(item_name: str, category: str,
-                                    league: str = LEAGUE) -> Tuple[Optional[float], Optional[float]]:
+                                    league: str = LEAGUE) -> Tuple[Optional[float], Optional[float], Optional[float]]:
     prices = fetch_category_prices(category, league)
+    
+    # Spezialbehandlung für Divine Orb - es ist die Referenzwährung
+    if _norm(item_name) == _norm("Divine Orb") or _norm(item_name) == "divine":
+        # Hole Divine-zu-Exalted rate direkt aus API
+        items = _fetch_items_with_aliases("Currency", league)
+        divine_in_ex = None
+        divine_in_chaos = None
+        
+        for row in items:
+            it = row.get("item") or {}
+            name = (it.get("name") or "").strip()
+            iid = (it.get("id") or "").strip()
+            rate = row.get("rate") or {}
+            
+            # Finde Exalted Orb rate um Divine-zu-Exalted zu berechnen
+            if (name.lower() == "exalted orb" or iid == "exalted") and "divine" in rate:
+                # rate["divine"] = wieviele Exalted für 1 Divine
+                divine_in_ex = rate["divine"]
+                break
+                
+        # Hole auch Chaos rate
+        divine_in_chaos = divine_price(league)
+        
+        if divine_in_ex and divine_in_chaos:
+            return divine_in_chaos, divine_in_ex, 1.0
+        return None, None, None
+    
     chaos = _lookup(prices, item_name)
 
-    # kleine Spezialregel: „… Splinter“ → fallback auf „Breach Splinter“, falls direct miss
+    # kleine Spezialregel: „… Splinter" → fallback auf „Breach Splinter", falls direct miss
     if chaos is None and "splinter" in _norm(item_name):
         chaos = _lookup(prices, "Breach Splinter")
 
     if chaos is None:
-        return None, None
-    ex = exalted_price(league)
-    return chaos, (chaos / ex) if ex else None
+        return None, None, None
+    
+    # Berechne Exalted und Divine Werte
+    ex_chaos = exalted_price(league)  # Chaos pro Exalted
+    div_chaos = divine_price(league)  # Chaos pro Divine
+    
+    ex_value = (chaos / ex_chaos) if ex_chaos else None    # Exalted-Wert des Items
+    div_value = (chaos / div_chaos) if div_chaos else None # Divine-Wert des Items
+    
+    return chaos, ex_value, div_value
 
 def get_value_for_inventory_item(it: dict, league: str = LEAGUE) -> Tuple[Optional[float], Optional[float], Optional[str]]:
     name = it.get("typeLine") or it.get("baseType") or it.get("name")
     if not name:
         return None, None, None
 
-    # 0) Check manual prices first (highest priority)
-    try:
-        from manual_prices import get_manual_item_price
-        
-        # Try multiple name fields for manual lookup
-        potential_names = [
-            it.get("name"),          # For uniques like "The Grand Project"
-            it.get("typeLine"),      # For normal items
-            it.get("baseType"),      # Fallback
-        ]
-        
-        for potential_name in potential_names:
-            if potential_name:
-                manual_result = get_manual_item_price(potential_name)
-                if manual_result:
-                    chaos, ex, category = manual_result
-                    return chaos, ex, f"Manual-{category}"
-                    
-    except ImportError:
-        pass  # Manual prices module not available
-    except Exception as e:
-        print(f"Warning: Manual price lookup failed for '{name}': {e}")
-
     # 1) Heuristik
     cat = guess_category_from_item(it)
     tried = set()
     if cat:
-        chaos, ex = get_value_for_name_and_category(name, cat, league)
+        chaos, ex, div = get_value_for_name_and_category(name, cat, league)
         tried.add(cat)
         if chaos is not None:
             return chaos, ex, cat
@@ -209,7 +245,7 @@ def get_value_for_inventory_item(it: dict, league: str = LEAGUE) -> Tuple[Option
     for c in DEFAULT_PROBE:
         if c in tried: 
             continue
-        chaos, ex = get_value_for_name_and_category(name, c, league)
+        chaos, ex, div = get_value_for_name_and_category(name, c, league)
         if chaos is not None:
             return chaos, ex, c
 

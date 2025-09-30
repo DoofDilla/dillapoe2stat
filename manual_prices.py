@@ -89,7 +89,7 @@ class ManualPriceDatabase:
             
             # Try different categories to find the target item
             for cat in DEFAULT_PROBE:
-                chaos_per_unit, ex_per_unit = get_value_for_name_and_category(target_item, cat, league)
+                chaos_per_unit, ex_per_unit, div_per_unit = get_value_for_name_and_category(target_item, cat, league)
                 if chaos_per_unit is not None:
                     break
             
