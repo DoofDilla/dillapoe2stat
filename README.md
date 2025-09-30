@@ -7,11 +7,12 @@
 
 The tracker has evolved considerably since the last pull request. Highlights include:
 
-- **Modular v2 main loop:** `poe_stats_refactored_v2.py` is now the recommended entry point, wiring together dedicated managers for display, hotkeys, sessions, notifications, and inventory diffing.
-- **Experimental waystone workflow:** `Ctrl+F2` inspects a waystone before a run, surfaces prefixes/suffixes, and enriches the subsequent `F2` map snapshot with cached tier data.
-- **Smart visual output:** ASCII footer themes, richer emoji mapping, and optional "show all items" tables make the terminal dashboard more legible at a glance.
-- **Notification control:** A centralized `NotificationManager` feeds Windows toasts for startup, experimental waystone checks, map transitions, inventory scans, and session milestones.
-- **Configurable display tables:** New settings in `config.py` expose column widths, ASCII themes, and output preferences so you can tailor summaries without touching core code.
+- **Automatic map detection loop:** A dedicated `AutoMapDetector` watches `Client.txt`, triggers PRE/POST snapshots when you zone between hideouts and maps, and can auto-run the waystone analyzer when you pass configured hubs. Toggle it in-game with `Ctrl+F6` for hands-free logging. 
+- **Modular v2 main loop:** `poe_stats_refactored_v2.py` remains the recommended entry point, wiring together dedicated managers for display, hotkeys, sessions, notifications, and inventory diffing.
+- **HasiSkull startup dashboard:** Tracker initialization now splashes colourful ANSI art beside the configuration summary so you can confirm settings at a glance when the session boots.
+- **Deeper loot insights:** Run analytics highlight efficiency tiers, colour-code top strategies, and surface Divine Orb drop patterns alongside the upgraded price checker that keeps Divine conversions and tiered icons accurate even after poe.ninja API shifts.
+- **Data upgrade utilities:** Existing `runs.jsonl` archives can be migrated to the richer 2.0 format (per-item chaos/exalted values) with `upgrade_runs_data.py`, keeping historic data compatible with the new analyzers.
+- **Configurable display tables:** Settings in `config.py` expose column widths, ASCII themes, and output preferences so you can tailor summaries without touching core code.
 - **OBS overlay mode:** Spin up a Flask-backed overlay server, drop Browser Source URLs into OBS, and keep stream viewers synced with your latest loot and session stats.
 
 ## Table of Contents
@@ -27,6 +28,7 @@ The tracker has evolved considerably since the last pull request. Highlights inc
   - [3. Run the tracker](#3-run-the-tracker)
 - [Usage Guide](#usage-guide)
   - [Hotkeys](#hotkeys)
+  - [Automatic map detection](#automatic-map-detection)
   - [Output modes](#output-modes)
   - [Experimental waystone analyzer](#experimental-waystone-analyzer)
   - [OBS overlay mode](#obs-overlay-mode)
@@ -40,11 +42,12 @@ The tracker has evolved considerably since the last pull request. Highlights inc
 - [Acknowledgements](#acknowledgements)
 
 ## Overview
-DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming sessions. The refreshed `poe_stats_refactored_v2.py` script glues together OAuth-authenticated API calls, poe.ninja price lookups, inventory diffing, and session logging into a streamlined loop that you operate entirely with keyboard shortcuts. Whether you are min-maxing a single character or running long farming sessions, the tracker keeps consistent logs, highlights valuable drops, fires desktop toasts, and summarizes your progress at a glance with customizable ASCII theming.
+DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming sessions. The refreshed `poe_stats_refactored_v2.py` script glues together OAuth-authenticated API calls, poe.ninja price lookups, inventory diffing, and session logging into a streamlined loop that you operate entirely with keyboard shortcuts—or let the automatic detector drive the hotkeys for you. Whether you are min-maxing a single character or running long farming sessions, the tracker keeps consistent logs, highlights valuable drops, fires desktop toasts, and summarizes your progress at a glance with customizable ASCII theming and a celebratory HasiSkull banner at startup.
 
 ## Feature Highlights
 - **Session-first workflow:** Start and finish map runs with two key presses while the tracker records runtimes, loot summaries, and session value trends automatically.
 - **Modular architecture:** Dedicated modules handle configuration, display, logging, API access, hotkeys, notifications, and analytics so you can replace or extend individual layers with minimal friction.
+- **Automatic detection:** Background log monitoring can trigger snapshots and waystone analysis as you zone so your runs log themselves while you focus on gameplay.
 - **Price intelligence:** poe.ninja data is cached and normalized for resilient lookups, ensuring consistent valuations across catalysts, runes, fragments, and more.
 - **Debug-friendly:** Toggle verbose dumps, export inventories to JSON, inspect category breakdowns mid-session without restarting the tool, or search for a single item by name.
 - **Visual polish:** ASCII footer themes, dynamic emoji detection, and comprehensive item tables make the terminal output readable even during marathon sessions.
@@ -54,6 +57,7 @@ DillaPoE2Stat is a Python toolkit that automates your Path of Exile 2 farming se
 ### Core capabilities
 - 🔐 Securely authenticate against the official Path of Exile API, snapshot your character list, and capture inventory states on demand.
 - ⌨️ Bind hotkeys to grab "pre" and "post" map inventories, toggle debug output, and flip between concise and comprehensive reporting without touching your mouse.
+- 🤖 Toggle an automatic loop that watches area transitions, fires PRE/POST snapshots, and piggybacks on waystone hubs for timely tier analysis.
 - 💰 Estimate the chaos- and exalt-equivalent value of your loot by querying poe.ninja's public economy endpoints and aggregating results per item name.
 - 🧪 Analyze a waystone before slotting it in, preview its prefixes/suffixes, and carry its tier data into the next `F2` map snapshot.
 - 📊 Log every map run (inventory deltas, runtime, and pricing) alongside session metadata and present digestible progress summaries right in the terminal.
@@ -120,6 +124,7 @@ Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey
    - `CHAR_TO_CHECK` to the character you want to monitor.
    - `CLIENT_LOG` to the absolute path of your `Client.txt`.
    - Toggle `OUTPUT_MODE`, `DEBUG_ENABLED`, and related flags as desired.
+   - (Optional) Flip `AUTO_DETECTION_ENABLED` to `True` or tweak the `AUTO_*` area sets if you want the automatic loop to start enabled or recognise custom hideouts.
 2. (Optional) Enable OBS overlays by setting `OBS_ENABLED = True`. Adjust `OBS_HOST`, `OBS_PORT`, `OBS_AUTO_START`, and `OBS_QUIET_MODE` if you want the Flask web server to start automatically or surface request logs while testing scene layouts.
 3. Run the configuration sanity check:
    ```bash
@@ -132,7 +137,9 @@ With Path of Exile running and your character logged in:
 ```bash
 python poe_stats_refactored_v2.py
 ```
-You will see a configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer and OBS controls). Keep the terminal open while you play.
+You will see a HasiSkull banner plus the configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer, OBS controls, and the auto-detection toggle). Keep the terminal open while you play.
+
+Tap `Ctrl+F6` after the startup banner if you prefer the tracker to trigger PRE/POST snapshots automatically while you focus on gameplay.
 
 If the OBS server is enabled (or you toggle it on mid-run with `F9`), the console prints the Browser Source URLs you can paste into OBS Studio.
 
@@ -149,12 +156,19 @@ If the OBS server is enabled (or you toggle it on mid-run with `F9`), the consol
 | `F4` | Toggle debug mode (enables verbose inventory dumps and file exports via `InventoryDebugger`). |
 | `F5` | Run an on-demand inventory scan and display your current stash value with smart emoji hints. |
 | `F6` | End the active session (persist summary) and immediately start a fresh one. |
+| `Ctrl+F6` | Toggle the automatic map detection loop that fires `F2`/`F3` (and optional waystone scans) when you zone. |
 | `F7` | Print the current session dashboard, including the last five maps. |
 | `F8` | Switch between `normal` (valuable items only) and `comprehensive` output modes. |
 | `F9` | Toggle the OBS overlay web server on/off (prints Browser Source URLs when enabled). |
 | `Ctrl+Esc` | Gracefully exit the tracker and unregister all hotkeys. |
 
 > Tip: The hotkeys are registered globally through the `keyboard` package—no terminal focus required.
+
+### Automatic map detection
+- Press `Ctrl+F6` once to let the tracker watch `Client.txt` for area transitions. Hideout/town → map triggers an automatic PRE snapshot, while map → hideout fires the POST snapshot so your runs are logged without touching `F2`/`F3`.
+- When you pass through configured hubs (e.g., Well of Souls) the detector can queue a waystone analysis automatically, mimicking a manual `Ctrl+F2`.
+- The loop respects abyss/breach detours so it stays in “map mode” until you actually zone home again.
+- Tweak intervals and which area codes count as hideouts, towns, or waystone triggers via the `AUTO_*` settings near the bottom of `config.py` if your layout differs.
 
 ### Output modes
 - **Normal:** Minimal clutter; highlights only items whose chaos/exalt totals exceed 0.01.
@@ -191,26 +205,28 @@ Switch modes on the fly with `F8`.
 - Theme rendering gracefully falls back to safe ASCII if your terminal cannot display the chosen Unicode glyphs.
 
 ## Data & Logs
-- **Run history:** `runs.jsonl` stores a JSON record per map containing runtime, map metadata (augmented with cached waystone tiers when available), aggregated loot, and valuation totals.
+- **Run history:** `runs.jsonl` stores a JSON record per map containing runtime, map metadata (augmented with cached waystone tiers when available), aggregated loot, and per-item chaos/exalted valuations in the enhanced 2.0 format.
 - **Session history:** `sessions.jsonl` records session start/end events, runtime, cumulative value, and per-map history for the in-terminal dashboard.
+- **Data upgrades:** Run `upgrade_runs_data.py` to back up and convert legacy run entries so every item inherits the new valuation fields without losing history.
 - **Debug exports:** When `DEBUG_TO_FILE` is `True`, inventories are written to timestamped JSON files inside the `debug/` folder.
 - **Icon assets:** `cat64x64.png` is used for Windows toasts—swap it out if you prefer another image.
 
-The session dashboard (triggered via `F7`) reads from `runs.jsonl` to compute averages and shows the five most recent maps so you can track streaks at a glance.
+The session dashboard (triggered via `F7`) reads from `runs.jsonl` to compute averages and shows the five most recent maps so you can track streaks at a glance. For deep dives, the standalone analyzers in `run_analyzer.py` and `session_display.py` crunch the same enhanced logs to colour-code efficiency, surface Divine Orb trends, and recommend waystone strategies.
 
 ## Debugging Toolkit
 - `InventoryDebugger` can print a compact table (`dump_item_summary`), full JSON dumps (`dump_inventory_to_console`), export snapshots to disk, or search for an individual item by name.
 - `InventoryAnalyzer` exposes helpers such as `analyze_changes`, `categorize_items`, and `find_valuable_items` for deeper insights or custom reports.
 - `WaystoneAnalyzer` parses experimental waystone metadata, validates slot placement, and caches attributes for the next run.
+- `run_analyzer.py` and `session_display.py` provide post-run deep dives with colour-coded efficiency tiers, Divine Orb drop breakdowns, and modifier pattern detection for your best maps.
 - Flip `DEBUG_ENABLED` and `DEBUG_TO_FILE` in `config.py` or press `F4` during runtime to toggle diagnostics without restarting.
 - Adjust `DEBUG_SHOW_SUMMARY` to swap between concise summaries and exhaustive JSON dumps.
 
 ## How loot valuation works
 1. The tracker hands `InventoryAnalyzer`'s "added" list to `price_check_poe2.valuate_items_raw`.
 2. `price_check_poe2` fetches poe.ninja overview data per category (currency, catalysts, waystones, etc.) and normalizes item names to improve match rates.
-3. Each item receives a chaos value and, if the Exalted Orb price is known, an exalt equivalent.
-4. Results are aggregated per item type (including stack sizes) to produce totals and net value readouts.
-5. Any items below the `0.01c` threshold are omitted from normal mode to keep noise low.
+3. Each item now receives chaos, exalted, and Divine Orb equivalents while category-aware icons flag catalysts, waystones, fragments, and more.
+4. Results are aggregated per item type (including stack sizes) and persisted back into `runs.jsonl` so every drop keeps its own valuation metadata.
+5. Any items below the `0.01c` threshold are omitted from normal mode to keep noise low, but comprehensive mode and the analyzers still capture the full data for post-run studies.
 
 ## Troubleshooting
 | Symptom | Possible Cause & Fix |
