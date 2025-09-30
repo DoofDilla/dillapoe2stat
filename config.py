@@ -104,6 +104,38 @@ class Config:
     TABLE_CHAOS_WIDTH = 10
     TABLE_EXALTED_WIDTH = 12
     
+    # Auto Map Detection Settings
+    AUTO_DETECTION_ENABLED = False  # Can be toggled with hotkey
+    AUTO_DETECTION_CHECK_INTERVAL = 1.0  # Check every N seconds
+    AUTO_DETECTION_SCAN_BYTES = 50000  # How many bytes to scan from end
+    
+    # Define what areas count as hideouts (customizable per user)
+    AUTO_HIDEOUT_AREAS = {
+        'HideoutFelled',           # Felled Hideout
+        'HideoutOvergrown',        # Overgrown Hideout  
+        'HideoutCoral',            # Coral Hideout
+        'HideoutRitual',           # Ritual Hideout
+        'Hideout',                 # Generic hideout
+        'Hideout1',                # Basic hideout variants
+        'Hideout2',
+        'Hideout3',
+    }
+    
+    # Define what areas count as towns/safe zones (customizable)
+    AUTO_TOWN_AREAS = {
+        'Act1Town',               # Well of Souls - often used for inventory refresh
+        'Act1_Town',
+        'Act2Town',               # Act 2 town
+        'Act2_Town', 
+        'Act3Town',               # Act 3 town
+        'Act3_Town',
+        'WellOfSouls',            # Alternative name for Act 1 town
+        'Town',                   # Generic town
+        'Clearfell',              # Act 1 town alternative name
+        'Ogham',                  # Act 2 town
+        'NakuriForest',           # Act 3 town
+    }
+    
     @classmethod
     def get_script_dir(cls):
         """Get the directory where the script is located"""
