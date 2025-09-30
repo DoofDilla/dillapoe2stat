@@ -130,10 +130,16 @@ class Config:
         'Act3Town',               # Act 3 town
         'Act3_Town',
         'WellOfSouls',            # Alternative name for Act 1 town
+        'Abyss_Hub',              # Well of Souls (confirmed area code)
         'Town',                   # Generic town
         'Clearfell',              # Act 1 town alternative name
         'Ogham',                  # Act 2 town
         'NakuriForest',           # Act 3 town
+    }
+    
+    # Define areas that trigger automatic waystone analysis
+    AUTO_WAYSTONE_TRIGGER_AREAS = {
+        'Abyss_Hub',              # Well of Souls - common waystone checking location
     }
     
     @classmethod
