@@ -157,7 +157,8 @@ class PoEStatsTracker:
             self.config.CLIENT_LOG,
             self.config,
             on_map_enter=self._auto_pre_snapshot,
-            on_map_exit=self._auto_post_snapshot
+            on_map_exit=self._auto_post_snapshot,
+            on_waystone_trigger=self._auto_waystone_analysis
         )
         
         self.display.display_session_header(
@@ -584,7 +585,8 @@ class PoEStatsTracker:
             print("     🏠 Hideout → Map: Auto F2")
             print("     🗺️  Map → Hideout: Auto F3")
             print("     🕳️  Map → Abyss → Map: No triggers (stays in map)")
-            self.notification_manager.notify_info("Auto Detection", "Automatic F2/F3 enabled")
+            print("     ⚡ Well of Souls → Hideout: Auto Ctrl+F2")
+            self.notification_manager.notify_info("Auto Detection", "Automatic F2/F3 + Waystone Analysis enabled")
     
     def _auto_pre_snapshot(self, map_info):
         """Automatic PRE snapshot when entering a map"""
@@ -625,6 +627,26 @@ class PoEStatsTracker:
             
         except Exception as e:
             print(f"⚠️  Auto F3 failed: {e}")
+    
+    def _auto_waystone_analysis(self, area_info):
+        """Automatic waystone analysis when entering trigger areas"""
+        print(f"⚡ AUTO CTRL+F2: Waystone analysis triggered at {area_info['area_name']}")
+        try:
+            # Trigger waystone analysis
+            self.analyze_waystone()
+            
+        except Exception as e:
+            print(f"⚠️  Auto waystone analysis failed: {e}")
+    
+    def _auto_waystone_analysis(self, area_info):
+        """Automatic waystone analysis when entering trigger areas"""
+        print(f"⚡ AUTO CTRL+F2: Waystone analysis triggered at {area_info['area_name']}")
+        try:
+            # Trigger waystone analysis
+            self.analyze_waystone()
+            
+        except Exception as e:
+            print(f"⚠️  Auto waystone analysis failed: {e}")
     
     def get_auto_status(self):
         """Get current auto detection status"""

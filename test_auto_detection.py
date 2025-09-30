@@ -20,12 +20,17 @@ def test_detection():
         print(f"💰 WOULD TRIGGER F3: Finished {map_info['area_name']}")
         print(f"   📊 Ready to process loot and log run")
     
+    def on_waystone_trigger(area_info):
+        print(f"⚡ WOULD TRIGGER CTRL+F2: Waystone analysis at {area_info['area_name']}")
+        print(f"   🔍 Auto-analyzing waystone in top-left inventory slot")
+
     config = Config()
     detector = AutoMapDetector(
         config.CLIENT_LOG,
         config,
         on_map_enter=on_map_enter,
-        on_map_exit=on_map_exit
+        on_map_exit=on_map_exit,
+        on_waystone_trigger=on_waystone_trigger
     )
     
     try:
@@ -40,6 +45,7 @@ def test_detection():
         print("   2. Map → Abyss = Should NOT trigger F3")
         print("   3. Abyss → Map = Should NOT trigger F2")
         print("   4. Map → Hideout = Should trigger F3")
+        print("   5. Well of Souls → Hideout = Should trigger Ctrl+F2")
         print()
         print("🚀 Starting detection... (Ctrl+C to stop)")
         

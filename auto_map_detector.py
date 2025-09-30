@@ -20,7 +20,7 @@ from config import Config
 class AutoMapDetector:
     """Automatic detection of map entry/exit for seamless tracking"""
     
-    def __init__(self, client_log_path: str, config: Config, on_map_enter: Callable = None, on_map_exit: Callable = None):
+    def __init__(self, client_log_path: str, config: Config, on_map_enter: Callable = None, on_map_exit: Callable = None, on_waystone_trigger: Callable = None):
         """
         Initialize the auto detector
         
@@ -29,11 +29,13 @@ class AutoMapDetector:
             config: Config object with hideout/town definitions
             on_map_enter: Callback when entering a map (receives map_info dict)
             on_map_exit: Callback when exiting a map (receives previous map_info dict)
+            on_waystone_trigger: Callback when entering waystone trigger area (receives area_info dict)
         """
         self.client_log_path = Path(client_log_path)
         self.config = config
         self.on_map_enter = on_map_enter
         self.on_map_exit = on_map_exit
+        self.on_waystone_trigger = on_waystone_trigger
         
         # State tracking
         self.current_area = None
@@ -57,6 +59,10 @@ class AutoMapDetector:
                 area_code in self.config.AUTO_TOWN_AREAS or
                 area_code.lower().startswith('hideout') or
                 area_code.lower().startswith('town'))
+    
+    def is_waystone_trigger_area(self, area_code: str) -> bool:
+        """Check if area code should trigger waystone analysis"""
+        return area_code in getattr(self.config, 'AUTO_WAYSTONE_TRIGGER_AREAS', set())
     
     def is_abyss_area(self, area_code: str) -> bool:
         """Check if area code represents an abyss (sub-area within maps)"""
@@ -193,6 +199,17 @@ class AutoMapDetector:
             
             self.current_map_info = None
         
+        # Handle waystone trigger areas (e.g., Well of Souls -> Hideout)
+        elif is_safe_zone and not self.is_in_map and len(self.area_history) >= 2:
+            prev_area = self.area_history[-2]['area_code']
+            if self.is_waystone_trigger_area(prev_area) and area_code in self.config.AUTO_HIDEOUT_AREAS:
+                print(f"⚡ WAYSTONE TRIGGER: {self.area_history[-2]['area_name']} → {area_name}")
+                if self.on_waystone_trigger:
+                    try:
+                        self.on_waystone_trigger(area_info)
+                    except Exception as e:
+                        print(f"⚠️  Error in waystone trigger callback: {e}")
+        
         # Update current area for other transitions
         else:
             self.current_area = area_code
@@ -274,13 +291,17 @@ def test_auto_detector():
     def on_map_exit(map_info):
         print(f"💰 AUTO F3 TRIGGERED: Finished {map_info['area_name']}")
     
+    def on_waystone_trigger(area_info):
+        print(f"⚡ AUTO CTRL+F2 TRIGGERED: Waystone analysis at {area_info['area_name']}")
+    
     # Create detector
     config = Config()  # Use default config
     detector = AutoMapDetector(
         config.CLIENT_LOG,
         config,
         on_map_enter=on_map_enter,
-        on_map_exit=on_map_exit
+        on_map_exit=on_map_exit,
+        on_waystone_trigger=on_waystone_trigger
     )
     
     try:
