@@ -119,6 +119,10 @@ class PoEStatsTracker:
             print("No characters found")
             raise SystemExit
         
+        # Initialize currency cache for better performance
+        from price_check_poe2 import initialize_currency_cache
+        initialize_currency_cache()
+        
         # Initialize gear rarity analyzer with token
         self.gear_rarity_analyzer = GearRarityAnalyzer(self.token)
         self._update_gear_rarity()
