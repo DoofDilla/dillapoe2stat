@@ -9,6 +9,65 @@ LEAGUE = "Rise of the Abyssal"  # ggf. "Abyss"
 BASE   = "https://poe.ninja/poe2/api/economy/temp/overview"
 UA     = "DillaPoE2Stat/0.1 (+you@example.com)"
 
+# Global currency cache for better performance
+class CurrencyCache:
+    def __init__(self):
+        self.chaos_value = 1.0  # Basis
+        self.exalted_value = None  # Chaos per Exalted
+        self.divine_value = None   # Chaos per Divine
+        self.is_loaded = False
+        
+    def load_currency_rates(self, league: str = LEAGUE):
+        """Load basic currency rates once at startup"""
+        try:
+            print("Loading currency exchange rates...")
+            items = _fetch_items_with_aliases("Currency", league)
+            
+            for row in items:
+                it = row.get("item") or {}
+                name = (it.get("name") or "").strip().lower()
+                rate = row.get("rate") or {}
+                
+                if name == "exalted orb" and "chaos" in rate:
+                    # rate["chaos"] = X bedeutet "X Exalted = 1 Chaos"
+                    # Also: 1 Exalted = 1/X Chaos
+                    exalted_per_chaos = float(rate["chaos"])
+                    self.exalted_value = 1.0 / exalted_per_chaos if exalted_per_chaos > 0 else 0.0675
+                    
+                elif name == "chaos orb" and "divine" in rate:
+                    # rate["divine"] = X bedeutet "X Chaos = 1 Divine"
+                    # Also: 1 Divine = X Chaos
+                    self.divine_value = float(rate["divine"]) if rate["divine"] > 0 else 23.0
+                    
+            # Fallback values if not found
+            if self.exalted_value is None:
+                self.exalted_value = 0.0675  # Fallback
+            if self.divine_value is None:
+                self.divine_value = 23.0  # Fallback
+                
+            self.is_loaded = True
+            print(f"Currency rates loaded: 1ex = {self.exalted_value:.4f}c, 1div = {self.divine_value:.2f}c")
+            
+        except Exception as e:
+            print(f"Failed to load currency rates: {e}")
+            # Use fallback values
+            self.exalted_value = 0.0675
+            self.divine_value = 23.0
+            self.is_loaded = True
+            
+    def get_exalted_rate(self) -> float:
+        if not self.is_loaded:
+            self.load_currency_rates()
+        return self.exalted_value
+        
+    def get_divine_rate(self) -> float:
+        if not self.is_loaded:
+            self.load_currency_rates()
+        return self.divine_value
+
+# Global instance
+_currency_cache = CurrencyCache()
+
 # --- Normalizer & Helpers -----------------------------------------------------
 _PUNCT_RE = re.compile(r"[^\w\s-]+", re.UNICODE)
 
@@ -138,26 +197,20 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
 
 @lru_cache(maxsize=1)
 def exalted_price(league: str = LEAGUE) -> Optional[float]:
-    cur = fetch_category_prices("Currency", league)
-    return cur.get(_norm("Exalted Orb")) or cur.get("exalted") or cur.get(_nopunct("Exalted Orb"))
+    """Get Exalted price in Chaos (cached at startup)"""
+    return _currency_cache.get_exalted_rate()
 
-@lru_cache(maxsize=1)
 def divine_price(league: str = LEAGUE) -> Optional[float]:
-    cur = fetch_category_prices("Currency", league)
-    return cur.get(_norm("Divine Orb")) or cur.get("divine") or cur.get(_nopunct("Divine Orb"))
+    """Get Divine price in Chaos (cached at startup)"""
+    return _currency_cache.get_divine_rate()
 
-@lru_cache(maxsize=1)
 def divine_to_chaos_rate(league: str = LEAGUE) -> Optional[float]:
-    """Hole Divine-zu-Chaos Rate direkt aus Currency API"""
-    currency_items = _fetch_items_once("Currency", league)
-    for item in currency_items:
-        item_info = item.get('item', {})
-        name = (item_info.get('name') or '').strip()
-        if name.lower() == 'chaos orb':
-            rate = item.get('rate', {})
-            if 'divine' in rate:
-                return rate['divine']  # Chaos pro Divine
-    return None
+    """Get the Divine to Chaos conversion rate (cached at startup)"""
+    return _currency_cache.get_divine_rate()
+
+def initialize_currency_cache(league: str = LEAGUE):
+    """Initialize currency cache at startup - call this once!"""
+    _currency_cache.load_currency_rates(league)
 
 def _lookup_name(it: dict) -> str:
     # Try different name sources (API structure changed)
@@ -257,9 +310,9 @@ def get_value_for_name_and_category(item_name: str, category: str,
     if chaos is None:
         return None, None, None
     
-    # Berechne Exalted und Divine Werte
-    ex_chaos = exalted_price(league)  # Chaos pro Exalted
-    div_chaos = divine_price(league)  # Chaos pro Divine
+    # Berechne Exalted und Divine Werte mit gecachten Raten
+    ex_chaos = _currency_cache.get_exalted_rate()  # Chaos pro Exalted
+    div_chaos = _currency_cache.get_divine_rate()  # Chaos pro Divine
     
     ex_value = (chaos / ex_chaos) if ex_chaos else None    # Exalted-Wert des Items
     div_value = (chaos / div_chaos) if div_chaos else None # Divine-Wert des Items
@@ -299,7 +352,7 @@ def valuate_items_raw(items: List[dict], league: str = LEAGUE):
     """
     from collections import defaultdict
 
-    ex_div = exalted_price(league)
+    ex_div = _currency_cache.get_exalted_rate()
     by_name = defaultdict(lambda: {
         "name": None, "qty": 0, "chaos_each": None, "ex_each": None,
         "chaos_total": 0.0, "ex_total": 0.0, "category": None
