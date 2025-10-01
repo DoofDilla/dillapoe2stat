@@ -1,4 +1,10 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        "Do not mention .json files in commit messages.",
+        "Ignore changes to __pycache__, .pyc, .pyo, and .pyd files.",
+        "Focus commit messages only on meaningful source code changes."
+    ]
 }
