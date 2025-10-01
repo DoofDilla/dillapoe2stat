@@ -43,8 +43,8 @@ OVERVIEW_ALIASES: Dict[str, List[str]] = {
     "delirium": ["Delirium", "delirium", "delirious"],
 }
 
-DEFAULT_PROBE = ["Currency", "Ritual", "catalysts", "ultimatum", "runes",
-                 "Fragments", "essences", "waystones", "talismans", "expeditions", "delirium", "abyss"]
+DEFAULT_PROBE = ["Currency", "Ritual", "delirium", "catalysts", "ultimatum", "runes",
+                 "Fragments", "essences", "waystones", "talismans", "expeditions", "abyss"]
 
 # --- Fetch Layer --------------------------------------------------------------
 def _fetch_items_once(overview_name: str, league: str = LEAGUE):
@@ -97,15 +97,22 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
             exalted_per_chaos = float(rate["chaos"])
             chaos_value = 1.0 / exalted_per_chaos if exalted_per_chaos > 0 else 0.0675
         else:
-            # FÜR ALLE ANDEREN ITEMS: primaryValue ist in Divine, rechne in Chaos um
-            divine_chaos_rate = divine_to_chaos_rate(league)
-            
-            if divine_chaos_rate and float(pv) > 0:
-                # primaryValue ist in Divine, multipliziere mit echter API Divine-Rate
-                chaos_value = float(pv) * divine_chaos_rate
+            # NEUE LOGIK: Verwende rate.chaos wenn verfügbar (besser als primaryValue)
+            if "chaos" in rate and float(rate["chaos"]) > 0:
+                # rate["chaos"] = X bedeutet "X Items = 1 Chaos"
+                # Also: 1 Item = 1/X Chaos
+                items_per_chaos = float(rate["chaos"])
+                chaos_value = 1.0 / items_per_chaos
             else:
-                # Fallback: verwende primaryValue direkt
-                chaos_value = float(pv)
+                # Fallback: FÜR ALLE ANDEREN ITEMS: primaryValue ist in Divine, rechne in Chaos um
+                divine_chaos_rate = divine_to_chaos_rate(league)
+                
+                if divine_chaos_rate and float(pv) > 0:
+                    # primaryValue ist in Divine, multipliziere mit echter API Divine-Rate
+                    chaos_value = float(pv) * divine_chaos_rate
+                else:
+                    # Fallback: verwende primaryValue direkt
+                    chaos_value = float(pv)
         
         # Fallback: use primaryValue direkt
         if chaos_value is None:
@@ -153,10 +160,16 @@ def divine_to_chaos_rate(league: str = LEAGUE) -> Optional[float]:
     return None
 
 def _lookup_name(it: dict) -> str:
+    # Try different name sources (API structure changed)
     tl = it.get("typeLine") or ""
     bt = it.get("baseType") or ""
-    name = tl or bt or it.get("name") or ""
+    direct_name = it.get("name") or ""
+    item_name = it.get("item", {}).get("name") or ""  # New API structure
+    
+    # Prefer item.name (new API), then fallback to old structure
+    name = item_name or tl or bt or direct_name or ""
     nlow = _norm(name)
+    
     # Für Waystones lieber baseType (stabil), weil typeLine Magic/Rare-Titel hat
     if "waystone" in nlow and bt:
         return bt
@@ -164,15 +177,18 @@ def _lookup_name(it: dict) -> str:
 
 # --- Category Guess (aus Inventory-Item) -------------------------------------
 def guess_category_from_item(it: dict) -> Optional[str]:
-    name = name = _lookup_name(it)
+    name = _lookup_name(it)
     icon = _norm(it.get("icon") or "")
     frame = it.get("frameType")
     stack = it.get("stackSize")
 
-    txt = name
+    txt = _norm(name) if name else ""
 
     if frame == 5 and (stack or "/currency/" in icon or " orb" in txt):
         return "Currency"
+    # Delirium items zuerst prüfen (vor catalyst/breach splinter check!)
+    if "delirium" in txt or "diluted" in txt or "liquid" in txt or "simulacrum" in txt or "/delirium/" in icon:
+        return "delirium"
     if "catalyst" in txt or "breach splinter" in txt or "/breachcatalyst" in icon:
         return "catalysts"
     if txt.endswith(" rune") or " rune" in txt or "/runes/" in icon:
@@ -189,8 +205,6 @@ def guess_category_from_item(it: dict) -> Optional[str]:
         return "talismans"
     if "expedition" in txt or "artifact" in txt or "/expeditions/" in icon:
         return "expeditions"
-    if "delirium" in txt or "diluted" in txt or "liquid" in txt or "simulacrum" in txt or "/delirium/" in icon:
-        return "delirium"
     if "preserved" in txt or "ancient" in txt or "gnawed" in txt or "/abyss/" in icon:
         return "abyss"
     if "omen" in txt or "/ritual/" in icon:
