@@ -71,35 +71,12 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
     """
     Liefert Mapping aus *mehreren* Keys -> Chaos-Wert (primaryValue).
     Keys pro Item: norm(name), slug(name), nopunct(name), norm(id), slug(id), nopunct(id)
-    Für Currency ergänzen wir 'Chaos Orb' = 1.0 und 'Divine Orb' aus rate-Daten.
+    Für Currency: Chaos Orb = 1.0 (Basis), andere Items umgerechnet in Chaos-Werte.
     """
     items = _fetch_items_with_aliases(category_key, league)
     prices: Dict[str, float] = {}
-    if category_key.lower() == "currency":
-        prices[_norm("Chaos Orb")] = 1.0
-        prices["chaos"] = 1.0
-        prices[_nopunct("Chaos Orb")] = 1.0
-        
-        # Divine Orb als Referenzwährung - berechne aus rate-Daten
-        divine_chaos_value = None
-        for row in items:
-            it = row.get("item") or {}
-            name = (it.get("name") or "").strip()
-            iid = (it.get("id") or "").strip()
-            rate = row.get("rate") or {}
-            
-            # Verwende Chaos Orb rate um Divine-Wert zu berechnen
-            if (name.lower() == "chaos orb" or iid == "chaos") and "divine" in rate:
-                divine_rate = rate["divine"]  # Wieviele Chaos für 1 Divine
-                if divine_rate and divine_rate > 0:
-                    divine_chaos_value = divine_rate  # 1 Divine = X Chaos
-                    break
-        
-        if divine_chaos_value:
-            prices[_norm("Divine Orb")] = divine_chaos_value
-            prices["divine"] = divine_chaos_value
-            prices[_nopunct("Divine Orb")] = divine_chaos_value
-
+    
+    # Zuerst alle Items aus API verarbeiten
     for row in items:
         it = row.get("item") or {}
         name = (it.get("name") or "").strip()
@@ -107,14 +84,49 @@ def fetch_category_prices(category_key: str, league: str = LEAGUE) -> Dict[str, 
         pv   = row.get("primaryValue")
         if not isinstance(pv, (int, float)):
             continue
+            
+        rate = row.get("rate") or {}
+        chaos_value = None
+        
+        # Für ALLE Items: primaryValue ist in Divine, muss in Chaos umgerechnet werden
+        if name.lower() == "chaos orb":
+            chaos_value = 1.0  # Chaos ist immer 1.0 Chaos
+        elif name.lower() == "exalted orb" and "chaos" in rate:
+            # KORREKTUR: rate["chaos"] bedeutet "wieviele Exalted für 1 Chaos"
+            # Also: 1 Exalted = (1 / rate["chaos"]) Chaos
+            exalted_per_chaos = float(rate["chaos"])
+            chaos_value = 1.0 / exalted_per_chaos if exalted_per_chaos > 0 else 0.0675
+        else:
+            # FÜR ALLE ANDEREN ITEMS: primaryValue ist in Divine, rechne in Chaos um
+            divine_chaos_rate = divine_to_chaos_rate(league)
+            
+            if divine_chaos_rate and float(pv) > 0:
+                # primaryValue ist in Divine, multipliziere mit echter API Divine-Rate
+                chaos_value = float(pv) * divine_chaos_rate
+            else:
+                # Fallback: verwende primaryValue direkt
+                chaos_value = float(pv)
+        
+        # Fallback: use primaryValue direkt
+        if chaos_value is None:
+            chaos_value = float(pv)
+        
+        # Speichere unter verschiedenen Keys
         if name:
-            prices[_norm(name)]    = float(pv)
-            prices[_slug(name)]    = float(pv)
-            prices[_nopunct(name)] = float(pv)
+            prices[_norm(name)]    = chaos_value
+            prices[_slug(name)]    = chaos_value
+            prices[_nopunct(name)] = chaos_value
         if iid:
-            prices[_norm(iid)]     = float(pv)
-            prices[_slug(iid)]     = float(pv)
-            prices[_nopunct(iid)]  = float(pv)
+            prices[_norm(iid)]     = chaos_value
+            prices[_slug(iid)]     = chaos_value
+            prices[_nopunct(iid)]  = chaos_value
+    
+    # Stelle sicher dass Chaos Orb korrekt ist (falls nicht in API)
+    if category_key.lower() == "currency":
+        prices[_norm("Chaos Orb")] = 1.0
+        prices["chaos"] = 1.0
+        prices[_nopunct("Chaos Orb")] = 1.0
+    
     return prices
 
 @lru_cache(maxsize=1)
@@ -126,6 +138,19 @@ def exalted_price(league: str = LEAGUE) -> Optional[float]:
 def divine_price(league: str = LEAGUE) -> Optional[float]:
     cur = fetch_category_prices("Currency", league)
     return cur.get(_norm("Divine Orb")) or cur.get("divine") or cur.get(_nopunct("Divine Orb"))
+
+@lru_cache(maxsize=1)
+def divine_to_chaos_rate(league: str = LEAGUE) -> Optional[float]:
+    """Hole Divine-zu-Chaos Rate direkt aus Currency API"""
+    currency_items = _fetch_items_once("Currency", league)
+    for item in currency_items:
+        item_info = item.get('item', {})
+        name = (item_info.get('name') or '').strip()
+        if name.lower() == 'chaos orb':
+            rate = item.get('rate', {})
+            if 'divine' in rate:
+                return rate['divine']  # Chaos pro Divine
+    return None
 
 def _lookup_name(it: dict) -> str:
     tl = it.get("typeLine") or ""
