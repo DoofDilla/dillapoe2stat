@@ -3,9 +3,9 @@
     "python-envs.pythonProjects": [],
     
     "github.copilot.chat.commitMessageGeneration.instructions": [
-        "Do not mention added .json files in commit messages.",
-        "Ignore changes to __pycache__, .pyc, .pyo, and .pyd files.",
-        "Focus commit messages only on meaningful source code changes."
-        "Do not meniton anything related to Mettmanwalking"
+        {
+        "text": "Use conventional commit message format.\n Do not include .json files in commit messages. \n Ignore changes to __pycache__, .pyc, .pyo, and .pyd files.\n Focus commit messages only on meaningful source code changes.\n Do not meniton anything related to Mettmanwalking"
+        }
+
     ]
 }
