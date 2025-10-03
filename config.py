@@ -15,6 +15,13 @@ class Config:
     VERSION = "0.3.1"
     APP_ID = f"{APP_NAME} v{VERSION}"
     
+    # Notification Icons
+    ICON_DEFAULT = 'HasiSkull_64x64.png'
+    ICON_PRE_MAP = 'icon_start_map_64x64.png'
+    ICON_POST_MAP = 'icon_finish_map_64x64.png'
+    ICON_WAYSTONE = 'icon_waypoint_64x64.png'
+    ICON_AUTOMODE = 'icon_automode_64x64.png'
+    
     # API Configuration
     CLIENT_ID = "dillapoe2stat"
     CLIENT_SECRET = "UgraAmlUXdP1"  # Change this to your actual secret
@@ -163,9 +170,23 @@ class Config:
         return cls.get_script_dir() / "sessions.jsonl"
     
     @classmethod
-    def get_icon_path(cls):
-        """Get the path for the notification icon"""
-        return cls.get_script_dir() / 'HasiSkull_64x64.png'
+    def get_icon_path(cls, icon_type=None):
+        """Get the path for notification icons
+        
+        Args:
+            icon_type: Type of icon ('pre_map', 'post_map', 'waystone', 'automode', or None for default)
+        """
+        script_dir = cls.get_script_dir()
+        
+        icon_mapping = {
+            'pre_map': cls.ICON_PRE_MAP,
+            'post_map': cls.ICON_POST_MAP,
+            'waystone': cls.ICON_WAYSTONE,
+            'automode': cls.ICON_AUTOMODE,
+        }
+        
+        icon_filename = icon_mapping.get(icon_type, cls.ICON_DEFAULT)
+        return script_dir / icon_filename
     
     @classmethod
     def get_debug_dir(cls):

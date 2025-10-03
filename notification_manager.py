@@ -28,9 +28,13 @@ class NotificationManager:
         else:
             return f"{minutes}m {secs}s"
     
-    def _get_icon_path(self):
-        """Get the notification icon path"""
-        return f'file://{self.config.get_icon_path()}'
+    def _get_icon_path(self, icon_type=None):
+        """Get the notification icon path
+        
+        Args:
+            icon_type: Type of icon ('pre_map', 'post_map', 'waystone', 'automode', or None for default)
+        """
+        return f'file://{self.config.get_icon_path(icon_type)}'
     
     def _format_currency(self, value):
         """Format currency value for display"""
@@ -53,8 +57,14 @@ class NotificationManager:
         else:
             return f"{secs}s"
     
-    def notify_from_template(self, template_key, **values):
-        """Create notification from template with provided values"""
+    def notify_from_template(self, template_key, icon_type=None, **values):
+        """Create notification from template with provided values
+        
+        Args:
+            template_key: Key for the notification template
+            icon_type: Type of icon to use ('pre_map', 'post_map', 'waystone', 'automode')
+            **values: Template values
+        """
         if not self.config.NOTIFICATION_ENABLED:
             return
         
@@ -69,7 +79,7 @@ class NotificationManager:
             notify(
                 title, 
                 message, 
-                icon=self._get_icon_path(),
+                icon=self._get_icon_path(icon_type),
                 app_id=self.config.APP_ID
             )
         except KeyError as e:
@@ -77,8 +87,15 @@ class NotificationManager:
         except Exception as e:
             print(f"Warning: Failed to send notification '{template_key}': {e}")
     
-    def notify_from_game_state(self, template_key, game_state, **extra_values):
-        """Create notification from template using game state data"""
+    def notify_from_game_state(self, template_key, game_state, icon_type=None, **extra_values):
+        """Create notification from template using game state data
+        
+        Args:
+            template_key: Key for the notification template
+            game_state: Game state object with data
+            icon_type: Type of icon to use ('pre_map', 'post_map', 'waystone', 'automode')
+            **extra_values: Additional template values
+        """
         if not self.config.NOTIFICATION_ENABLED:
             return
         
@@ -103,7 +120,7 @@ class NotificationManager:
         # Add any extra values provided
         values.update(extra_values)
         
-        self.notify_from_template(template_key, **values)
+        self.notify_from_template(template_key, icon_type=icon_type, **values)
     
     def notify_startup(self, session_info):
         """Create notification for application startup"""
@@ -114,15 +131,15 @@ class NotificationManager:
     
     def notify_pre_map(self, game_state):
         """Create notification for PRE-map snapshot using game state"""
-        self.notify_from_game_state('PRE_MAP', game_state)
+        self.notify_from_game_state('PRE_MAP', game_state, icon_type='pre_map')
     
     def notify_post_map(self, game_state):
         """Create notification for POST-map completion using game state"""
-        self.notify_from_game_state('POST_MAP', game_state)
+        self.notify_from_game_state('POST_MAP', game_state, icon_type='post_map')
     
     def notify_experimental_pre_map(self, game_state):
         """Create notification for experimental PRE-map snapshot using game state"""
-        self.notify_from_game_state('EXPERIMENTAL_PRE_MAP', game_state)
+        self.notify_from_game_state('EXPERIMENTAL_PRE_MAP', game_state, icon_type='waystone')
     
     def notify_inventory_check(self, inventory_items):
         """Create notification for inventory check"""
@@ -181,3 +198,7 @@ class NotificationManager:
             milestone_type=milestone_type,
             milestone_value=milestone_value
         )
+    
+    def notify_automode(self, title, message):
+        """Create notification for automode activities"""
+        self.notify_from_template('INFO', icon_type='automode', title=title, message=message)
