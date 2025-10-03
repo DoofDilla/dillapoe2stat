@@ -15,6 +15,7 @@ from hotkey_manager import HotkeyManager
 from inventory_debug import InventoryDebugger
 from waystone_analyzer import WaystoneAnalyzer
 from notification_manager import NotificationManager
+from game_state import GameState
 from utils import format_time, get_current_timestamp
 
 # Import existing modules
@@ -54,6 +55,7 @@ class PoEStatsTracker:
         )
         self.waystone_analyzer = WaystoneAnalyzer(self.config, self.display, self.debugger)
         self.notification_manager = NotificationManager(self.config)
+        self.game_state = GameState()
         
         # OBS Integration (optional) - Only initialize if auto-start enabled
         self.obs_server = None
@@ -80,17 +82,13 @@ class PoEStatsTracker:
             if self.config.DEBUG_ENABLED:
                 print("[DEBUG] Simulation manager not available")
         
-        # State variables
+        # API and System State (kept in main class)
         self.token = None
         self.pre_inventory = None
-        self.current_map_info = None
         self.last_api_call = 0.0
-        self.map_start_time = None
-        self.cached_waystone_info = None  # Cache for waystone info from Ctrl+F2
         
-        # Gear Rarity variables
+        # Functional Components
         self.gear_rarity_analyzer = None  # Initialized after token is available
-        self.current_gear_rarity = None   # Cached gear rarity value
         
         # Auto Map Detection
         self.auto_detector = None
@@ -150,7 +148,7 @@ class PoEStatsTracker:
             self.config.CHAR_TO_CHECK, 
             session_info['session_id'], 
             self.config.OUTPUT_MODE,
-            self.current_gear_rarity
+            self.game_state.current_gear_rarity
         )
         
         # Display gear rarity info separately
@@ -185,28 +183,28 @@ class PoEStatsTracker:
             if self.gear_rarity_analyzer:
                 result = self.gear_rarity_analyzer.calculate_total_gear_rarity(self.config.CHAR_TO_CHECK)
                 if result.get('success', False):
-                    self.current_gear_rarity = result['total_rarity_bonus']
+                    self.game_state.update_gear_rarity(result['total_rarity_bonus'])
                 else:
-                    self.current_gear_rarity = None
+                    self.game_state.update_gear_rarity(None)
                     if self.config.DEBUG_ENABLED:
                         print(f"[DEBUG] Gear rarity update failed: {result.get('error', 'Unknown error')}")
         except Exception as e:
-            self.current_gear_rarity = None
+            self.game_state.update_gear_rarity(None)
             if self.config.DEBUG_ENABLED:
                 print(f"[DEBUG] Gear rarity update exception: {e}")
     
     def get_gear_rarity(self):
         """Get current gear rarity with refresh if needed"""
-        if self.current_gear_rarity is None:
+        if self.game_state.current_gear_rarity is None:
             self._update_gear_rarity()
-        return self.current_gear_rarity
+        return self.game_state.current_gear_rarity
     
     def _display_gear_rarity_info(self):
         """Display gear rarity information"""
-        if self.current_gear_rarity is not None:
+        if self.game_state.current_gear_rarity is not None:
             from display import Colors
-            rarity_color = Colors.GOLD if self.current_gear_rarity > 0 else Colors.GRAY
-            print(f"✨ Gear Rarity: {rarity_color}{self.current_gear_rarity}%{Colors.END}")
+            rarity_color = Colors.GOLD if self.game_state.current_gear_rarity > 0 else Colors.GRAY
+            print(f"✨ Gear Rarity: {rarity_color}{self.game_state.current_gear_rarity}%{Colors.END}")
         elif self.config.DEBUG_ENABLED:
             print("[DEBUG] Gear rarity not available")
     
@@ -214,7 +212,8 @@ class PoEStatsTracker:
         """Take PRE-map inventory snapshot"""
         self.rate_limit()
         try:
-            self.map_start_time = get_current_timestamp()
+            map_start_time = get_current_timestamp()
+            self.game_state.start_map(map_start_time)
             self.pre_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
             
             self.display.display_inventory_count(len(self.pre_inventory), "[PRE]")
@@ -229,7 +228,7 @@ class PoEStatsTracker:
                 metadata = {
                     "character": self.config.CHAR_TO_CHECK,
                     "snapshot_type": "PRE",
-                    "map_info": self.current_map_info
+                    "map_info": self.game_state.current_map_info
                 }
                 self.debugger.dump_inventory_to_file(self.pre_inventory, "pre_inventory", metadata)
             
@@ -240,28 +239,30 @@ class PoEStatsTracker:
             )
             
             # Combine client.txt info with cached waystone info if available
-            if self.cached_waystone_info and client_map_info:
+            if self.game_state.cached_waystone_info and client_map_info:
                 # Use map name from client.txt but add waystone attributes
-                self.current_map_info = {
+                map_info = {
                     'map_name': client_map_info['map_name'],
                     'level': client_map_info['level'],
                     'seed': client_map_info['seed'],
                     'source': 'client_log_with_waystone',
                     # Add waystone attributes for logging (but not prefixes/suffixes)
-                    'waystone_tier': self.cached_waystone_info['tier'],
-                    'area_modifiers': self.cached_waystone_info['area_modifiers'],
-                    'modifier_count': len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes'])
+                    'waystone_tier': self.game_state.cached_waystone_info['tier'],
+                    'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
+                    'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])
                 }
-                print(f"📊 Enhanced with waystone data: T{self.cached_waystone_info['tier']}, {self.current_map_info['modifier_count']} modifiers")
+                print(f"📊 Enhanced with waystone data: T{self.game_state.cached_waystone_info['tier']}, {map_info['modifier_count']} modifiers")
             else:
                 # Use standard client.txt info
-                self.current_map_info = client_map_info
+                map_info = client_map_info
             
-            self.display.display_map_info(self.current_map_info)
+            self.game_state.update_map_info(map_info)
+            self.display.display_map_info(self.game_state.current_map_info)
             
-            # Send PRE-map notification
+            # Update session progress and send PRE-map notification
             progress = self.session_manager.get_session_progress()
-            self.notification_manager.notify_pre_map(self.current_map_info, progress)
+            self.game_state.update_session_progress(progress)
+            self.notification_manager.notify_pre_map(self.game_state)
                 
         except Exception as e:
             self.display.display_error("PRE", str(e))
@@ -283,7 +284,7 @@ class PoEStatsTracker:
                 self.display.display_experimental_waystone_info(waystone_info)
                 
                 # Cache waystone info for later use by F2
-                self.cached_waystone_info = waystone_info
+                self.game_state.update_waystone_info(waystone_info)
                 print(f"💾 Waystone info cached for F2 map start")
                 
                 # Debug output
@@ -292,11 +293,12 @@ class PoEStatsTracker:
                 
                 # Send experimental analysis notification
                 progress = self.session_manager.get_session_progress()
-                self.notification_manager.notify_experimental_pre_map(waystone_info, progress)
+                self.game_state.update_session_progress(progress)
+                self.notification_manager.notify_experimental_pre_map(self.game_state)
                 
             else:
                 print("⚠️  No waystone found in top-left inventory position (0,0)")
-                self.cached_waystone_info = None
+                self.game_state.update_waystone_info(None)
                 
         except Exception as e:
             self.display.display_error("WAYSTONE ANALYSIS", str(e))
@@ -330,8 +332,8 @@ class PoEStatsTracker:
             
             # Calculate map runtime
             map_runtime = None
-            if self.map_start_time is not None:
-                map_runtime = time.time() - self.map_start_time
+            if self.game_state.map_start_time is not None:
+                map_runtime = time.time() - self.game_state.map_start_time
                 self.display.display_runtime(map_runtime)
             
             # Analyze inventory changes
@@ -362,7 +364,7 @@ class PoEStatsTracker:
                     progress = self.session_manager.get_session_progress()
                     
                     # Add map runtime to map_info for OBS display
-                    obs_map_info = self.current_map_info.copy() if self.current_map_info else {}
+                    obs_map_info = self.game_state.current_map_info.copy() if self.game_state.current_map_info else {}
                     if map_runtime is not None:
                         obs_map_info['map_runtime_seconds'] = map_runtime
                     
@@ -386,7 +388,10 @@ class PoEStatsTracker:
             
             # Send POST-map notification AFTER session update
             progress = self.session_manager.get_session_progress()
-            self.notification_manager.notify_post_map(self.current_map_info, map_runtime, map_value, progress)
+            # Update game state with map completion data
+            self.game_state.complete_map(map_value, map_runtime)
+            self.game_state.update_session_progress(progress)
+            self.notification_manager.notify_post_map(self.game_state)
             
             # Display session progress
             if progress:
@@ -397,19 +402,19 @@ class PoEStatsTracker:
                 self.config.CHAR_TO_CHECK, 
                 analysis['added'], 
                 analysis['removed'], 
-                self.current_map_info, 
+                self.game_state.current_map_info, 
                 map_value, 
                 self.config.get_log_file_path(), 
                 map_runtime, 
                 self.session_manager.session_id,
-                self.current_gear_rarity
+                self.game_state.current_gear_rarity
             )
             
         except Exception as e:
             self.display.display_error("POST", str(e))
         finally:
             self.pre_inventory = None
-            self.map_start_time = None
+            # Map state is handled by game_state now
     
     def check_current_inventory_value(self):
         """Check and display the value of the current inventory"""
@@ -496,19 +501,21 @@ class PoEStatsTracker:
             pre_data, _ = self.simulation_manager.get_simulation_data()
             
             # Set up simulated state
-            self.map_start_time = time.time()
+            self.game_state.start_map(time.time())
             self.pre_inventory = pre_data
             
             # Create simulated map info
-            self.current_map_info = self.simulation_manager.create_simulated_map_info()
+            map_info = self.simulation_manager.create_simulated_map_info()
+            self.game_state.update_map_info(map_info)
             
             # Cache simulated waystone info (like experimental waystone analysis)
-            self.cached_waystone_info = self.simulation_manager.create_simulated_waystone_info()
+            waystone_info = self.simulation_manager.create_simulated_waystone_info()
+            self.game_state.update_waystone_info(waystone_info)
             
             self.display.display_inventory_count(len(self.pre_inventory), "[SIMULATED PRE]")
-            self.display.display_map_info(self.current_map_info)
+            self.display.display_map_info(self.game_state.current_map_info)
             
-            print(f"🧪 Simulated waystone: T{self.cached_waystone_info['tier']} with {len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes'])} modifiers")
+            print(f"🧪 Simulated waystone: T{self.game_state.cached_waystone_info['tier']} with {len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])} modifiers")
             print("💾 Ready for simulated POST (Ctrl+Shift+F3)")
             
         except Exception as e:
@@ -607,11 +614,11 @@ class PoEStatsTracker:
             }
             
             # Combine with cached waystone info if available
-            if self.cached_waystone_info:
-                self.current_map_info.update({
-                    'waystone_tier': self.cached_waystone_info['tier'],
-                    'area_modifiers': self.cached_waystone_info['area_modifiers'],
-                    'modifier_count': len(self.cached_waystone_info['prefixes']) + len(self.cached_waystone_info['suffixes']),
+            if self.game_state.cached_waystone_info:
+                self.game_state.current_map_info.update({
+                    'waystone_tier': self.game_state.cached_waystone_info['tier'],
+                    'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
+                    'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes']),
                     'source': 'auto_detection_with_waystone'
                 })
                 print(f"📊 Enhanced with waystone data: T{self.cached_waystone_info['tier']}, {self.current_map_info['modifier_count']} modifiers")
