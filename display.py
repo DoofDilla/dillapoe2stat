@@ -364,8 +364,17 @@ class DisplayManager:
               f"💰 Total Value: {Colors.GOLD}{fmt(total_value)}ex{Colors.END}")
         
         if avg_value is not None and avg_time is not None:
+            # Calculate session ex/h if we have runtime data
+            session_ex_per_hour = 0.0
+            if runtime_seconds and runtime_seconds > 0:
+                session_ex_per_hour = total_value / (runtime_seconds / 3600)
+            
             print(f"📊 Avg/Map: {Colors.GOLD}{fmt(avg_value)}ex{Colors.END} | "
                   f"⏱️  Avg Time: {Colors.CYAN}{avg_time:.1f}m{Colors.END}")
+            
+            # Show ex/h if we calculated it
+            if session_ex_per_hour > 0:
+                print(f"📈 Session: {Colors.GOLD}{fmt(session_ex_per_hour)}ex/h{Colors.END}")
         
         print(f"🎯 {Colors.GREEN}Ready for next map!{Colors.END}")
         self._display_session_footer()

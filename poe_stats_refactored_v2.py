@@ -16,6 +16,7 @@ from inventory_debug import InventoryDebugger
 from waystone_analyzer import WaystoneAnalyzer
 from notification_manager import NotificationManager
 from game_state import GameState
+from app_registration import AppRegistration
 from utils import format_time, get_current_timestamp
 
 # Import existing modules
@@ -40,6 +41,9 @@ class PoEStatsTracker:
     def __init__(self, config=None):
         # Use provided config or default
         self.config = config or Config()
+        
+        # Ensure app is registered for proper toast notifications
+        AppRegistration.ensure_app_registered()
         
         # Initialize managers
         self.display = DisplayManager(self.config.OUTPUT_MODE)
