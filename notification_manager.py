@@ -66,7 +66,12 @@ class NotificationManager:
         try:
             title = template['title'].format(**values)
             message = template['template'].format(**values)
-            notify(title, message, icon=self._get_icon_path())
+            notify(
+                title, 
+                message, 
+                icon=self._get_icon_path(),
+                app_id=self.config.APP_ID
+            )
         except KeyError as e:
             print(f"Warning: Missing template value {e} for template '{template_key}'")
         except Exception as e:

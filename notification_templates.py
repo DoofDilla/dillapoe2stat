@@ -82,7 +82,7 @@ class NotificationTemplates:
     
     # Map Templates  
     PRE_MAP = {
-        'title': '🚀 {map_name}',
+        'title': '🚀 {map_name} • {map_level}',
         'template': (
             '📊 Session: {session_maps_completed} • {session_total_value_fmt}ex • {session_value_per_hour_fmt}ex/h\n'
             '⚡ Starting new map run!'
@@ -90,7 +90,7 @@ class NotificationTemplates:
     }
     
     POST_MAP = {
-        'title': '🏁 {map_name} — {map_runtime_fmt} • +{map_value_fmt}ex',
+        'title': '🏁 {map_name} • {map_level} — {map_runtime_fmt} • +{map_value_fmt}ex',
         'template': (
             '📊 Session: {session_maps_completed} • {session_total_value_fmt}ex • {session_value_per_hour_fmt}ex/h\n'
             '🗺️ This Map: {map_value_per_hour_fmt}ex/h • 📈 Avg: {session_avg_value_fmt}ex/map\n'

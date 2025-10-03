@@ -10,6 +10,11 @@ from pathlib import Path
 class Config:
     """Configuration settings for the PoE Stats Tracker"""
     
+    # Application Information
+    APP_NAME = "BoneBunnyStats"
+    VERSION = "0.3.1"
+    APP_ID = f"{APP_NAME} v{VERSION}"
+    
     # API Configuration
     CLIENT_ID = "dillapoe2stat"
     CLIENT_SECRET = "UgraAmlUXdP1"  # Change this to your actual secret
