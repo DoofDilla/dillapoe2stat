@@ -77,15 +77,22 @@ class NotificationManager:
         if not self.config.NOTIFICATION_ENABLED:
             return
         
-        # Get base data from game state
+        # Get base data from game state (should already include calculated values)
         values = game_state.get_notification_data()
         
-        # Add formatted values
+        # Add formatted values only - no business logic here
         values.update({
+            # Map formatting
             'map_value_fmt': self._format_currency(values['map_value']),
             'map_runtime_fmt': self._format_time_duration(values['map_runtime']),
+            'map_value_per_hour_fmt': self._format_currency(values['map_value_per_hour']),   # ex/h for this map
+            
+            # Session formatting (using existing calculated values)
             'session_total_value_fmt': self._format_currency(values['session_total_value']),
-            'session_avg_value_fmt': self._format_currency(values['session_avg_value']),
+            'session_avg_value_fmt': self._format_currency(values['session_avg_value']),     # ex/map
+            'session_avg_time_fmt': self._format_time_duration(values['session_avg_time'] * 60 if values['session_avg_time'] else 0),  # min to seconds
+            'session_maps_per_hour_fmt': f"{values['session_maps_per_hour']:.1f}",           # maps/h
+            'session_value_per_hour_fmt': self._format_currency(values['session_value_per_hour']),  # ex/h
         })
         
         # Add any extra values provided
@@ -125,20 +132,23 @@ class NotificationManager:
             total_items = len([r for r in rows if r['qty'] > 0])
             
             if total_e and total_e > 0.01:
-                value_str = f"{fmt(total_e)}ex"
+                value_str = f"{self._format_currency(total_e)}ex"
             elif total_c and total_c > 0.01:
-                value_str = f"{fmt(total_c)}c"
+                value_str = f"{self._format_currency(total_c)}c"
             else:
-                value_str = "No valuable items"
+                value_str = "0c"
             
-            notification_msg = (f"💼 {total_items} items scanned\n"
-                               f"💎 {len(valuable_items)} valuable items found\n"
-                               f"💰 Total Value: {value_str}\n"
-                               f"✅ Inventory check complete!")
-            
-            notify('Inventory Check', notification_msg, icon=self._get_icon_path())
+            self.notify_from_template('INVENTORY_CHECK',
+                total_items=total_items,
+                valuable_items=len(valuable_items),
+                inventory_value=value_str
+            )
         except Exception:
-            notify('Inventory Check', 'Current inventory scanned!', icon=self._get_icon_path())
+            self.notify_from_template('INVENTORY_CHECK',
+                total_items="?",
+                valuable_items="?",
+                inventory_value="?"
+            )
     
     def notify_session_start(self, session_info):
         """Create notification for new session start"""

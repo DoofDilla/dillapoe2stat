@@ -259,7 +259,7 @@ class PoEStatsTracker:
             self.game_state.update_map_info(map_info)
             self.display.display_map_info(self.game_state.current_map_info)
             
-            # Update session progress and send PRE-map notification
+            # Update session progress and send PRE-map notification  
             progress = self.session_manager.get_session_progress()
             self.game_state.update_session_progress(progress)
             self.notification_manager.notify_pre_map(self.game_state)
@@ -388,6 +388,7 @@ class PoEStatsTracker:
             
             # Send POST-map notification AFTER session update
             progress = self.session_manager.get_session_progress()
+            
             # Update game state with map completion data
             self.game_state.complete_map(map_value, map_runtime)
             self.game_state.update_session_progress(progress)
@@ -604,7 +605,7 @@ class PoEStatsTracker:
         print(f"🤖 AUTO F2: Entering {map_info['area_name']}")
         try:
             # Set the map info from auto detection
-            self.current_map_info = {
+            detected_map_info = {
                 'map_name': map_info['area_name'],
                 'level': map_info['level'],
                 'seed': map_info['seed'],
@@ -615,13 +616,16 @@ class PoEStatsTracker:
             
             # Combine with cached waystone info if available
             if self.game_state.cached_waystone_info:
-                self.game_state.current_map_info.update({
+                detected_map_info.update({
                     'waystone_tier': self.game_state.cached_waystone_info['tier'],
                     'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
                     'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes']),
                     'source': 'auto_detection_with_waystone'
                 })
-                print(f"📊 Enhanced with waystone data: T{self.cached_waystone_info['tier']}, {self.current_map_info['modifier_count']} modifiers")
+                print(f"📊 Enhanced with waystone data: T{self.game_state.cached_waystone_info['tier']}, {detected_map_info['modifier_count']} modifiers")
+            
+            # Update game state with the complete map info
+            self.game_state.update_map_info(detected_map_info)
             
             # Trigger the actual pre snapshot
             self.take_pre_snapshot()
