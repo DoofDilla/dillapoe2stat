@@ -47,10 +47,17 @@ class WaystoneAnalyzer:
             if clean_mod:
                 prefixes.append(clean_mod)
         
-        # Extract suffixes from implicit mods
+        # Extract suffixes from implicit mods and enchant mods
         suffixes = []
         implicit_mods = waystone_item.get('implicitMods', [])
         for mod in implicit_mods:
+            clean_mod = mod.strip()
+            if clean_mod:
+                suffixes.append(clean_mod)
+        
+        # Also check enchant mods for suffixes
+        enchant_mods = waystone_item.get('enchantMods', [])
+        for mod in enchant_mods:
             clean_mod = mod.strip()
             if clean_mod:
                 suffixes.append(clean_mod)
@@ -66,7 +73,8 @@ class WaystoneAnalyzer:
             'Item Rarity': 'item_rarity',
             'Item Quantity': 'item_quantity',
             'Waystone Drop Chance': 'waystone_drop_chance',
-            'Pack Size': 'pack_size'
+            'Pack Size': 'pack_size',
+            'Monster Pack Size': 'pack_size'  # Alternative name for pack size
         }
         
         for prop in properties:
