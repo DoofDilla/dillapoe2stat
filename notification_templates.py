@@ -89,7 +89,7 @@ class NotificationTemplates:
     PRE_MAP = {
         'title': '🚀 {map_name} ◉ {map_level}',
         'template': (
-            '📊 Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
             '⚡ Starting new map run!'
         )
     }
@@ -97,8 +97,8 @@ class NotificationTemplates:
     POST_MAP = {
         'title': '🏁 {map_name} ◉ {map_level} ◉ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
-            '📊 Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
-            '🗺️ This Map: {map_value_per_hour_fmt}{currency_icon}/h 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
+            'Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Map: {map_value_per_hour_fmt}{currency_icon}/h 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
             '✅ Map completed!'
         )
     }
