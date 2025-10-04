@@ -362,14 +362,18 @@ class PoEStatsTracker:
             
             self.display.display_completion_separator()
             
-            # Update session tracking FIRST
+            # Get session progress BEFORE adding this map (for accurate comparison in notification)
+            progress_before = self.session_manager.get_session_progress()
+            
+            # Update session tracking
             self.session_manager.add_completed_map(map_value)
+            
+            # Get updated progress for OBS and display
+            progress_after = self.session_manager.get_session_progress()
             
             # Update OBS overlays if available
             if self.obs_server:
                 try:
-                    progress = self.session_manager.get_session_progress()
-                    
                     # Add map runtime to map_info for OBS display
                     obs_map_info = self.game_state.current_map_info.copy() if self.game_state.current_map_info else {}
                     if map_runtime is not None:
@@ -385,20 +389,18 @@ class PoEStatsTracker:
                     self.obs_server.update_item_table(
                         processed_added, 
                         [], 
-                        progress, 
+                        progress_after, 
                         obs_map_info
                     )
-                    self.obs_server.update_session_stats(progress)
+                    self.obs_server.update_session_stats(progress_after)
                 except Exception as e:
                     if self.config.DEBUG_ENABLED:
                         print(f"[DEBUG] OBS update failed: {e}")
             
-            # Send POST-map notification AFTER session update
-            progress = self.session_manager.get_session_progress()
-            
             # Update game state with map completion data
             self.game_state.complete_map(map_value, map_runtime)
-            self.game_state.update_session_progress(progress)
+            # Use progress BEFORE this map for notification comparison
+            self.game_state.update_session_progress(progress_before)
             
             # Update top drops and best map tracking
             # Get items with value data from valuate_items_raw
@@ -407,11 +409,12 @@ class PoEStatsTracker:
                 added_rows, _ = valuate_items_raw(analysis['added'])
                 self.game_state.update_map_completion(added_rows)
             
+            # Send POST-map notification (uses progress_before for comparison)
             self.notification_manager.notify_post_map(self.game_state)
             
-            # Display session progress
-            if progress:
-                self.display.display_session_progress(**progress)
+            # Display session progress (use updated progress_after)
+            if progress_after:
+                self.display.display_session_progress(**progress_after)
             
             # Log the run
             log_run(

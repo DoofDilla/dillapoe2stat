@@ -136,8 +136,9 @@ class NotificationTemplates:
     POST_MAP = {
         'title': '🏁 {map_name} ▷ {map_level} ◷ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
+            'Map: {map_value_per_hour_fmt}{currency_icon}/h 🆚 Avg: {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Best Drop: {map_drop_1_name} x{map_drop_1_stack} ({map_drop_1_value}{currency_icon})\n'
             'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
-            'Map: {map_value_per_hour_fmt}{currency_icon}/◷ 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
             '✅ Map completed!'
         )
     }
