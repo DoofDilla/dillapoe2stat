@@ -592,7 +592,7 @@ class PoEStatsTracker:
             self.auto_detector.stop()
             self.auto_mode_enabled = False
             print("🔄 Auto mode OFF - Manual F2/F3 required")
-            self.notification_manager.notify_info("Auto Detection", "Manual mode enabled")
+            self.notification_manager.notify_automode("Auto Detection", "Manual mode enabled")
         else:
             # Turn on auto mode  
             self.auto_detector.start()
@@ -602,7 +602,7 @@ class PoEStatsTracker:
             print("     🗺️  Map → Hideout: Auto F3")
             print("     🕳️  Map → Abyss → Map: No triggers (stays in map)")
             print("     ⚡ Well of Souls → Hideout: Auto Ctrl+F2")
-            self.notification_manager.notify_info("Auto Detection", "Automatic F2/F3 + Waystone Analysis enabled")
+            self.notification_manager.notify_automode("Auto Detection", "Automatic F2/F3 + Waystone Analysis enabled")
     
     def _auto_pre_snapshot(self, map_info):
         """Automatic PRE snapshot when entering a map"""

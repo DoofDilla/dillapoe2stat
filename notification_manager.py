@@ -28,13 +28,16 @@ class NotificationManager:
         else:
             return f"{minutes}m {secs}s"
     
-    def _get_icon_path(self, icon_type=None):
-        """Get the notification icon path
+    def _get_icon_config(self, icon_type=None):
+        """Get the notification icon configuration
         
         Args:
             icon_type: Type of icon ('pre_map', 'post_map', 'waystone', 'automode', or None for default)
         """
-        return f'file://{self.config.get_icon_path(icon_type)}'
+        return {
+            'src': f'file://{self.config.get_icon_path(icon_type)}',
+            'placement': 'appLogoOverride'
+        }
     
     def _format_currency(self, value):
         """Format currency value for display"""
@@ -79,7 +82,7 @@ class NotificationManager:
             notify(
                 title, 
                 message, 
-                icon=self._get_icon_path(icon_type),
+                icon=self._get_icon_config(icon_type),
                 app_id=self.config.APP_ID
             )
         except KeyError as e:
