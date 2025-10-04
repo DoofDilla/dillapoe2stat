@@ -435,6 +435,10 @@ class PoEStatsTracker:
                 self.game_state.current_gear_rarity
             )
             
+            # Reset current map state now that it's completed and logged
+            # (data has been moved to last_map_info by update_map_completion)
+            self.game_state.reset_current_map()
+            
         except Exception as e:
             self.display.display_error("POST", str(e))
         finally:

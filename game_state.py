@@ -48,6 +48,15 @@ class GameState:
         self.map_value = map_value
         self.map_runtime = map_runtime
     
+    def reset_current_map(self):
+        """Reset current map state after POST (map is completed, data moved to last_map_info)"""
+        self.current_map_info = None
+        self.map_start_time = None
+        self.map_value = 0.0
+        self.map_runtime = None
+        self.current_map_top_drops = []
+        # Note: cached_waystone_info stays until next Ctrl+F2 (user might check same waystone again)
+    
     def update_waystone_info(self, waystone_info):
         """Update cached waystone information"""
         self.cached_waystone_info = waystone_info
