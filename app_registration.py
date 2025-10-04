@@ -16,8 +16,9 @@ class AppRegistration:
         """Ensure app is registered with Windows for proper toast notification display"""
         try:
             config = Config()
-            toast_app_id = config.TOAST_APP_ID  # Use stable ID for registry (no version!)
-            app_name = config.APP_NAME
+            # Use stable TOAST_APP_ID (no version!) for registry
+            toast_app_id = config.TOAST_APP_ID  # "DoofDilla.BoneBunnyStats"
+            display_name = config.APP_NAME  # "BoneBunnyStats"
             
             # Use ICO file for app icon
             ico_path = config.get_icon_path().parent / 'HasiSkull_64x64_toast.ico'
@@ -26,17 +27,17 @@ class AppRegistration:
             if not ico_path.exists():
                 AppRegistration._create_ico_from_png(config.get_icon_path(), ico_path)
             
-            # Registry path for toast notifications (uses stable ID!)
+            # Registry path for toast notifications (stable key!)
             reg_path = r"SOFTWARE\Classes\AppUserModelId\\" + toast_app_id
             
             # Check if already registered correctly
-            if AppRegistration._is_correctly_registered(reg_path, app_name, ico_path):
+            if AppRegistration._is_correctly_registered(reg_path, display_name, ico_path):
                 return True  # Already registered correctly
             
             # Create/update registry entry
             with winreg.CreateKey(winreg.HKEY_CURRENT_USER, reg_path) as key:
-                # Set display name
-                winreg.SetValueEx(key, "DisplayName", 0, winreg.REG_SZ, app_name)
+                # Set display name (no version)
+                winreg.SetValueEx(key, "DisplayName", 0, winreg.REG_SZ, display_name)
                 
                 # Set icon path (ICO format for app icon)
                 winreg.SetValueEx(key, "IconUri", 0, winreg.REG_SZ, str(ico_path.absolute()))

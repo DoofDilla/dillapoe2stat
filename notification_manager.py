@@ -92,7 +92,7 @@ class NotificationManager:
                 title, 
                 message, 
                 icon=self._get_icon_config(icon_type),
-                app_id=self.config.TOAST_APP_ID  # Use stable ID for registry lookup
+                app_id=self.config.TOAST_APP_ID  # Use stable ID (no version pollution)
             )
         except KeyError as e:
             print(f"Warning: Missing template value {e} for template '{template_key}'")
