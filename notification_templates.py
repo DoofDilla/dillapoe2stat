@@ -59,9 +59,14 @@ OTHER:
 class NotificationTemplates:
     """Template definitions for all notification types"""
     
+    # Currency Display Configuration
+    # Change these to customize how currency is displayed in notifications
+    CURRENCY_ICON = '💰'  # Options: '💰', 'ex', '🪙', '💎', etc.
+    CURRENCY_SUFFIX = ''  # Optional suffix like 'ex' or 'exalted'
+    
     # Startup Templates
     STARTUP = {
-        'title': '🎮 DillaPoE2Stat Started!',
+        'title': '🐰 BoneBunnyStats Started!',
         'template': (
             '🎮 Character: {character}\n'
             '🆔 Session: {session_id_short}...\n'
@@ -82,35 +87,35 @@ class NotificationTemplates:
     
     # Map Templates  
     PRE_MAP = {
-        'title': '🚀 {map_name} • {map_level}',
+        'title': '🚀 {map_name} ◉ {map_level}',
         'template': (
-            '📊 Session: {session_maps_completed} • {session_total_value_fmt}ex • {session_value_per_hour_fmt}ex/h\n'
+            '📊 Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
             '⚡ Starting new map run!'
         )
     }
     
     POST_MAP = {
-        'title': '🏁 {map_name} • {map_level} — {map_runtime_fmt} • +{map_value_fmt}ex',
+        'title': '🏁 {map_name} ◉ {map_level} ◉ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
-            '📊 Session: {session_maps_completed} • {session_total_value_fmt}ex • {session_value_per_hour_fmt}ex/h\n'
-            '🗺️ This Map: {map_value_per_hour_fmt}ex/h • 📈 Avg: {session_avg_value_fmt}ex/map\n'
+            '📊 Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
+            '🗺️ This Map: {map_value_per_hour_fmt}{currency_icon}/h 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
             '✅ Map completed!'
         )
     }
     
     # Experimental/Waystone Templates
     EXPERIMENTAL_PRE_MAP = {
-        'title': '🧪 {waystone_name} (T{waystone_tier})',
+        'title': '🗺️ {waystone_name} ◉ (T{waystone_tier})',
         'template': (
-            '⚗️ Prefixes: {waystone_prefixes} • 🔮 Suffixes: {waystone_suffixes}\n'
-            '📊 Area Mods: Magic +{magic_monsters}% • Rare +{rare_monsters}% • Rarity +{item_rarity}%\n'
-            '🚀 Experimental mode activated!'
+            '⚗️ Prefixes: {waystone_prefixes} ● 🔮 Suffixes: {waystone_suffixes}\n'
+            '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Way {waystone_rarity}%\n'
+            '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}%\n'
         )
     }
     
     # Inventory Templates
     INVENTORY_CHECK = {
-        'title': '💼 {total_items} items • {inventory_value}',
+        'title': '💼 {total_items} items ◉ {inventory_value}{currency_icon}',
         'template': (
             '💎 {valuable_items} valuable items found\n'
             '✅ Inventory scan complete!'
@@ -125,7 +130,7 @@ class NotificationTemplates:
     
     # High Value Loot Template (neue Idee)
     HIGH_VALUE_LOOT = {
-        'title': '💎 {item_name} • +{item_value}ex',
+        'title': '💎 {item_name} • +{item_value}{currency_icon}',
         'template': (
             '🗺️ {map_name}\n'
             '🎉 Great find!'

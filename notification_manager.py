@@ -76,6 +76,10 @@ class NotificationManager:
             print(f"Warning: Template '{template_key}' not found")
             return
         
+        # Add currency icon to values
+        values['currency_icon'] = self.templates.CURRENCY_ICON
+        values['currency_suffix'] = self.templates.CURRENCY_SUFFIX
+        
         try:
             title = template['title'].format(**values)
             message = template['template'].format(**values)
