@@ -25,9 +25,9 @@ MAP DATA (current/just completed map):
 MAP TOP DROPS (top 3 items from current/just completed map):
 - map_drop_1_name: Name of #1 drop (e.g. "Greater Exalted Orb")
 - map_drop_1_stack: Stack size of #1 drop (number)
-- map_drop_1_value: Value of #1 drop in ex (number)
-- map_drop_2_name, map_drop_2_stack, map_drop_2_value: #2 drop
-- map_drop_3_name, map_drop_3_stack, map_drop_3_value: #3 drop
+- map_drop_1_value_fmt: Formatted value of #1 drop (e.g. "100")
+- map_drop_2_name, map_drop_2_stack, map_drop_2_value_fmt: #2 drop
+- map_drop_3_name, map_drop_3_stack, map_drop_3_value_fmt: #3 drop
 
 WAYSTONE DATA:
 - waystone_name: Waystone name (e.g. "Grimhaven Waystone")
@@ -72,22 +72,22 @@ LAST MAP DATA (previous completed map - available after first POST):
 LAST MAP TOP DROPS (top 3 items from previous completed map):
 - last_map_drop_1_name: Name of #1 drop (e.g. "Greater Exalted Orb")
 - last_map_drop_1_stack: Stack size of #1 drop (number)
-- last_map_drop_1_value: Value of #1 drop in ex (number)
-- last_map_drop_2_name, last_map_drop_2_stack, last_map_drop_2_value: #2 drop
-- last_map_drop_3_name, last_map_drop_3_stack, last_map_drop_3_value: #3 drop
+- last_map_drop_1_value_fmt: Formatted value of #1 drop (e.g. "100")
+- last_map_drop_2_name, last_map_drop_2_stack, last_map_drop_2_value_fmt: #2 drop
+- last_map_drop_3_name, last_map_drop_3_stack, last_map_drop_3_value_fmt: #3 drop
 
 BEST MAP IN SESSION:
 - best_map_name: Name of best map (e.g. "Necropolis")
 - best_map_tier: Tier of best map (e.g. "15")
-- best_map_value: Value of best map in ex (number)
+- best_map_value_fmt: Formatted value of best map (e.g. "480")
 - best_map_runtime: Runtime of best map in seconds (number)
 
 SESSION TOP DROPS (cumulative top 3 drops across all maps):
 - session_drop_1_name: Name of #1 drop (e.g. "Divine Orb")
 - session_drop_1_stack: Stack size of #1 drop (number)
-- session_drop_1_value: Value of #1 drop in ex (number)
-- session_drop_2_name, session_drop_2_stack, session_drop_2_value: #2 drop
-- session_drop_3_name, session_drop_3_stack, session_drop_3_value: #3 drop
+- session_drop_1_value_fmt: Formatted value of #1 drop (e.g. "150")
+- session_drop_2_name, session_drop_2_stack, session_drop_2_value_fmt: #2 drop
+- session_drop_3_name, session_drop_3_stack, session_drop_3_value_fmt: #3 drop
 
 OTHER:
 - character: Character name
@@ -130,18 +130,18 @@ class NotificationTemplates:
     PRE_MAP = {
         'title': '🚀 {map_name} ▷ {map_level}',
         'template': (
-            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
-            '⚡ Starting new map run!'
+            '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Way {waystone_drop_chance}%\n'
+            '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}% 🌀 {waystone_delirious}%\n'
+            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h'
         )
     }
     
     POST_MAP = {
         'title': '🏁 {map_name} ▷ {map_level} ◷ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
-            'Map: {map_value_per_hour_fmt}{currency_icon}/h 🆚 Avg: {session_value_per_hour_before_fmt}{currency_icon}/h\n'
-            'Best Drop: {map_drop_1_name} x{map_drop_1_stack} ({map_drop_1_value}{currency_icon})\n'
-            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
-            '✅ Map completed!'
+            'Run: {map_value_per_hour_fmt}{currency_icon}/h 🆚 Avg: {session_value_per_hour_before_fmt}{currency_icon}/h\n'
+            'Best Drop: {map_drop_1_name} x{map_drop_1_stack} ({map_drop_1_value_fmt}{currency_icon})\n'
+            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h'
         )
     }
     
@@ -149,9 +149,9 @@ class NotificationTemplates:
     EXPERIMENTAL_PRE_MAP = {
         'title': '🗺️ {waystone_name} ▷ (T{waystone_tier})',
         'template': (
-            'Prefixes: {waystone_prefixes} ● Suffixes: {waystone_suffixes}\n'
+            'P🔹 {waystone_prefixes} S🔸 {waystone_suffixes}\n'
             '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Way {waystone_drop_chance}%\n'
-            '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}%\n'
+            '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}% 🌀 {waystone_delirious}%'
         )
     }
     

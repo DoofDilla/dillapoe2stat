@@ -128,6 +128,24 @@ class NotificationManager:
             'session_maps_per_hour_fmt': f"{values['session_maps_per_hour']:.1f}",           # maps/h
             'session_value_per_hour_fmt': self._format_currency(values['session_value_per_hour']),  # ex/h
             'session_value_per_hour_before_fmt': self._format_currency(values['session_value_per_hour_before']),  # ex/h BEFORE current map
+            
+            # Drop value formatting (current map)
+            'map_drop_1_value_fmt': self._format_currency(values['map_drop_1_value']),
+            'map_drop_2_value_fmt': self._format_currency(values['map_drop_2_value']),
+            'map_drop_3_value_fmt': self._format_currency(values['map_drop_3_value']),
+            
+            # Drop value formatting (last map)
+            'last_map_drop_1_value_fmt': self._format_currency(values['last_map_drop_1_value']),
+            'last_map_drop_2_value_fmt': self._format_currency(values['last_map_drop_2_value']),
+            'last_map_drop_3_value_fmt': self._format_currency(values['last_map_drop_3_value']),
+            
+            # Drop value formatting (session cumulative)
+            'session_drop_1_value_fmt': self._format_currency(values['session_drop_1_value']),
+            'session_drop_2_value_fmt': self._format_currency(values['session_drop_2_value']),
+            'session_drop_3_value_fmt': self._format_currency(values['session_drop_3_value']),
+            
+            # Best map formatting
+            'best_map_value_fmt': self._format_currency(values['best_map_value']),
         })
         
         # Add any extra values provided
