@@ -132,6 +132,9 @@ class PoEStatsTracker:
         # Start new session
         session_info = self.session_manager.start_new_session()
         
+        # Reset session-specific tracking in game state
+        self.game_state.reset_session_tracking()
+        
         # Setup hotkeys
         if not self.hotkey_manager.setup_default_hotkeys(self):
             print("Warning: Some hotkeys failed to register")
@@ -396,6 +399,14 @@ class PoEStatsTracker:
             # Update game state with map completion data
             self.game_state.complete_map(map_value, map_runtime)
             self.game_state.update_session_progress(progress)
+            
+            # Update top drops and best map tracking
+            # Get items with value data from valuate_items_raw
+            from price_check_poe2 import valuate_items_raw
+            if analysis['added']:
+                added_rows, _ = valuate_items_raw(analysis['added'])
+                self.game_state.update_map_completion(added_rows)
+            
             self.notification_manager.notify_post_map(self.game_state)
             
             # Display session progress
@@ -487,6 +498,10 @@ class PoEStatsTracker:
     def start_new_session(self):
         """Start a new session"""
         session_info = self.session_manager.start_new_session()
+        
+        # Reset session-specific tracking in game state
+        self.game_state.reset_session_tracking()
+        
         self.display.display_session_header(
             session_info['session_id'],
             session_info['start_time_str']

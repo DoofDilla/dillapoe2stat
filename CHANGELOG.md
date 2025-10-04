@@ -7,25 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2025-10-04
+
+### Added
+- **Top Drops Tracking**: Track top 3 most valuable items per map and across session
+  - `current_map_top_drops`: Top drops from current/just completed map
+  - `last_map_info.top_drops`: Top drops from previous completed map
+  - `session_top_drops`: Cumulative top 3 drops across entire session
+- **Best Map Tracking**: Automatically track highest value map in session
+  - `best_map_info`: Name, tier, value, and runtime of best performing map
+- **Enhanced Notification Variables**: All tracking data available in notification templates
+  - `map_drop_1/2/3_name/stack/value`: Current map top drops
+  - `last_map_drop_1/2/3_name/stack/value`: Previous map top drops
+  - `session_drop_1/2/3_name/stack/value`: Session cumulative top drops
+  - `best_map_name/tier/value/runtime`: Best map in session
+- Documentation updates for new tracking features
+
+### Changed
+- Game state now maintains both current and previous map top drops for flexible templating
+- Improved notification template documentation with clearer data flow explanations
+
+## [0.3.1] - 2025-10-04
+
 ### Added
 - Centralized version management system with `version.py`
 - Version information exposed to notification templates
 - Version display in startup banner
 - Changelog tracking for release history
+- Stable Windows toast notification App ID to prevent registry pollution
 
 ### Changed
 - Refactored version management to single source of truth
 - Updated config.py to use centralized version module
-
-## [0.3.1] - 2025-10-04
+- Split App ID into display version (with version number) and registry version (stable)
 
 ### Fixed
 - Waystone notification template using correct `waystone_drop_chance` variable
 - Consistent variable naming across waystone area modifiers
 - Template label clarity: "Way" renamed to "Waystone" for better readability
-
-### Changed
-- Improved notification template variable naming consistency
+- Windows registry pollution from versioned toast App IDs
 
 ## [0.3.0] - 2025-09-30
 
