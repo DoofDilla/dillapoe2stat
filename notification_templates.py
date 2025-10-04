@@ -108,7 +108,7 @@ class NotificationTemplates:
         'title': '🗺️ {waystone_name} ◉ (T{waystone_tier})',
         'template': (
             '⚗️ Prefixes: {waystone_prefixes} ● 🔮 Suffixes: {waystone_suffixes}\n'
-            '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Waystone {waystone_drop_chance}%\n'
+            '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Way {waystone_drop_chance}%\n'
             '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}%\n'
         )
     }
