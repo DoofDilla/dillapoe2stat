@@ -40,10 +40,11 @@ class NotificationManager:
         }
     
     def _format_currency(self, value):
-        """Format currency value for display"""
+        """Format currency value for display in notifications (1 decimal place)"""
         if value is None or value <= 0.01:
             return "0"
-        return fmt(value)
+        # Use 1 decimal place for notifications to keep them concise
+        return fmt(value, prec=1)
     
     def _format_time_duration(self, seconds):
         """Format time duration for notifications"""
