@@ -148,7 +148,9 @@ class DisplayManager:
     def _load_hasiskull_ansi(self):
         """Load HasiSkull 32x32 colored blocks ANSI art"""
         try:
-            with open('hasiskull_colored_blocks_32x32.ansi', 'r', encoding='utf-8') as f:
+            from config import Config
+            ansi_path = Config.get_ansi_path()
+            with open(ansi_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             
             # Skip header comments and empty lines, return only ANSI art lines

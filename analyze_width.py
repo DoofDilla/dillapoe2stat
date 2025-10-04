@@ -1,6 +1,8 @@
 import re
 
-with open('hasiskull_colored_blocks_32x32.ansi', 'r') as f:
+from config import Config
+
+with open(Config.get_ansi_path(), 'r') as f:
     lines = f.readlines()
 
 print("Analyzing ANSI art line widths:")

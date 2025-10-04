@@ -10,10 +10,33 @@ from pathlib import Path
 class Config:
     """Configuration settings for the PoE Stats Tracker"""
     
-    # Application Information
+    # ============================================================================
+    # APPLICATION INFORMATION
+    # ============================================================================
     APP_NAME = "BoneBunnyStats"
     VERSION = "0.3.1"
     APP_ID = f"{APP_NAME} v{VERSION}"
+    
+    # ============================================================================
+    # USER SETTINGS - Customize these for your setup
+    # ============================================================================
+    
+    # Character & Account
+    CHAR_TO_CHECK = "Mettmanwalking"  # Change this to your character name
+    
+    # PoE2 Client
+    CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
+    
+    # API Authentication
+    CLIENT_ID = "dillapoe2stat"
+    CLIENT_SECRET = "UgraAmlUXdP1"  # Change this to your actual secret
+    
+    # ============================================================================
+    # ASSETS & RESOURCES
+    # ============================================================================
+    
+    # Images Directory
+    IMAGES_DIR = 'images'
     
     # Notification Icons
     ICON_DEFAULT = 'HasiSkull_64x64.png'
@@ -22,48 +45,112 @@ class Config:
     ICON_WAYSTONE = 'icon_waypoint_64x64.png'
     ICON_AUTOMODE = 'icon_automode_64x64.png'
     
-    # API Configuration
-    CLIENT_ID = "dillapoe2stat"
-    CLIENT_SECRET = "UgraAmlUXdP1"  # Change this to your actual secret
+    # ANSI Art Files
+    ANSI_HASISKULL_SOURCE = 'HasiSkull_64x64.png'  # Source image for ANSI conversion
+    ANSI_HASISKULL_DEFAULT = 'hasiskull_colored_blocks_32x32.ansi'  # Default startup banner
     
-    # Character Configuration
-    CHAR_TO_CHECK = "Mettmanwalking"  # Change this to your character name
+    # ASCII Theme Configuration
+    ASCII_THEME = "celestial"  # Options: "default", "ancient", "elegant", "minimal", "hardcore", "royal", "cyber", "stars", "celestial"
     
-    # File Paths
-    CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
+    # ============================================================================
+    # DISPLAY SETTINGS
+    # ============================================================================
     
-    # Debug Settings - Control what debug information is displayed and logged
-    # DEBUG_ENABLED: Master switch for debug mode. When True, enables additional debug output
-    #                and console logging. Can be toggled at runtime with F4 hotkey.
-    #                - False: Normal operation, minimal debug output
-    #                - True: Enhanced debugging with detailed item information
+    OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
+    SHOW_ALL_ITEMS = True  # Show items without value (with '-' for price)
+    
+    # Table Display
+    TABLE_SEPARATOR_CHAR = '─'
+    TABLE_MIN_NAME_WIDTH = 35
+    TABLE_QTY_WIDTH = 4
+    TABLE_CATEGORY_WIDTH = 12
+    TABLE_CHAOS_WIDTH = 10
+    TABLE_EXALTED_WIDTH = 12
+    
+    # ============================================================================
+    # DEBUG SETTINGS
+    # ============================================================================
+    
+    # Master switch for debug mode (toggleable with F4 hotkey)
     DEBUG_ENABLED = False
     
-    # DEBUG_TO_FILE: Controls whether debug snapshots are saved to JSON files in /debug folder
-    #                Useful for troubleshooting inventory parsing issues or API responses
-    #                - False: No file output, debug info only shown in console
-    #                - True: Saves PRE/POST inventory snapshots as timestamped JSON files
+    # Save debug snapshots to JSON files in /debug folder
     DEBUG_TO_FILE = False
     
-    # DEBUG_SHOW_SUMMARY: When debug is enabled, controls the level of detail shown
-    #                     This setting determines console output verbosity in debug mode
-    #                     - True: Show concise item summaries (name, quantity, location)
-    #                     - False: Show full detailed item dumps (all properties, IDs, etc.)
+    # Show concise summaries (True) vs full detailed dumps (False)
     DEBUG_SHOW_SUMMARY = True
     
-    # Display Settings
-    OUTPUT_MODE = "normal"  # "normal" or "comprehensive"
+    # ============================================================================
+    # NOTIFICATIONS
+    # ============================================================================
     
-    # OBS Integration Settings
-    OBS_HOST = "localhost"  # Host for OBS web server
-    OBS_PORT = 5000  # Port for OBS web server
-    OBS_AUTO_START = False  # Automatically start OBS server on tracker startup (F9 always works)
-    OBS_QUIET_MODE = True  # Suppress Flask request logs (cleaner terminal output)
+    NOTIFICATION_ENABLED = True
     
-    # ASCII Theme Configuration - Select your preferred visual theme
-    # Available themes are loaded from ascii_themes.json
-    # You can easily add new themes by editing the JSON file
-    ASCII_THEME = "celestial"  # Options: "default", "ancient", "elegant", "minimal", "hardcore", "royal", "cyber", "stars", "celestial"
+    # ============================================================================
+    # OBS INTEGRATION
+    # ============================================================================
+    
+    OBS_HOST = "localhost"
+    OBS_PORT = 5000
+    OBS_AUTO_START = False  # Auto-start OBS server on tracker startup (F9 always works)
+    OBS_QUIET_MODE = True  # Suppress Flask request logs for cleaner output
+    
+    # ============================================================================
+    # API & RATE LIMITING
+    # ============================================================================
+    
+    API_RATE_LIMIT = 2.5  # Minimum seconds between API calls
+    
+    # ============================================================================
+    # LOG SCANNING
+    # ============================================================================
+    
+    CLIENT_LOG_SCAN_BYTES = 1_500_000  # Bytes to scan from end of client log
+    
+    # ============================================================================
+    # AUTO MAP DETECTION
+    # ============================================================================
+    
+    AUTO_DETECTION_ENABLED = False  # Toggleable with hotkey
+    AUTO_DETECTION_CHECK_INTERVAL = 1.0  # Check every N seconds
+    AUTO_DETECTION_SCAN_BYTES = 50000  # Bytes to scan from end of log
+    
+    # Hideout Areas (safe zones for pre-map snapshots)
+    AUTO_HIDEOUT_AREAS = {
+        'HideoutFelled',           # Felled Hideout
+        'HideoutOvergrown',        # Overgrown Hideout  
+        'HideoutCoral',            # Coral Hideout
+        'HideoutRitual',           # Ritual Hideout
+        'Hideout',                 # Generic hideout
+        'Hideout1',                # Basic hideout variants
+        'Hideout2',
+        'Hideout3',
+    }
+    
+    # Town/Safe Zone Areas
+    AUTO_TOWN_AREAS = {
+        'Act1Town',               # Well of Souls - often used for inventory refresh
+        'Act1_Town',
+        'Act2Town',               # Act 2 town
+        'Act2_Town', 
+        'Act3Town',               # Act 3 town
+        'Act3_Town',
+        'WellOfSouls',            # Alternative name for Act 1 town
+        'Abyss_Hub',              # Well of Souls (confirmed area code)
+        'Town',                   # Generic town
+        'Clearfell',              # Act 1 town alternative name
+        'Ogham',                  # Act 2 town
+        'NakuriForest',           # Act 3 town
+    }
+    
+    # Areas that trigger automatic waystone analysis
+    AUTO_WAYSTONE_TRIGGER_AREAS = {
+        'Abyss_Hub',              # Well of Souls - common waystone checking location
+    }
+    
+    # ============================================================================
+    # METHODS - ASCII Theme Management
+    # ============================================================================
     
     @classmethod
     def get_ascii_theme_config(cls):
@@ -96,68 +183,42 @@ class Config:
         theme_manager = get_theme_manager()
         return theme_manager.preview_theme(theme_name)
     
-    # Rate Limiting
-    API_RATE_LIMIT = 2.5  # Minimum seconds between API calls
+    # ============================================================================
+    # METHODS - Path Helpers
+    # ============================================================================
     
-    # Client Log Scanning
-    CLIENT_LOG_SCAN_BYTES = 1_500_000  # How many bytes to scan from end of client log
-    
-    # Notification Settings
-    NOTIFICATION_ENABLED = True
-    
-    # Display Settings
-    SHOW_ALL_ITEMS = True  # Show items without value (with '-' for price)
-    
-    # Table display settings
-    TABLE_SEPARATOR_CHAR = '─'
-    TABLE_MIN_NAME_WIDTH = 35
-    TABLE_QTY_WIDTH = 4
-    TABLE_CATEGORY_WIDTH = 12
-    TABLE_CHAOS_WIDTH = 10
-    TABLE_EXALTED_WIDTH = 12
-    
-    # Auto Map Detection Settings
-    AUTO_DETECTION_ENABLED = False  # Can be toggled with hotkey
-    AUTO_DETECTION_CHECK_INTERVAL = 1.0  # Check every N seconds
-    AUTO_DETECTION_SCAN_BYTES = 50000  # How many bytes to scan from end
-    
-    # Define what areas count as hideouts (customizable per user)
-    AUTO_HIDEOUT_AREAS = {
-        'HideoutFelled',           # Felled Hideout
-        'HideoutOvergrown',        # Overgrown Hideout  
-        'HideoutCoral',            # Coral Hideout
-        'HideoutRitual',           # Ritual Hideout
-        'Hideout',                 # Generic hideout
-        'Hideout1',                # Basic hideout variants
-        'Hideout2',
-        'Hideout3',
-    }
-    
-    # Define what areas count as towns/safe zones (customizable)
-    AUTO_TOWN_AREAS = {
-        'Act1Town',               # Well of Souls - often used for inventory refresh
-        'Act1_Town',
-        'Act2Town',               # Act 2 town
-        'Act2_Town', 
-        'Act3Town',               # Act 3 town
-        'Act3_Town',
-        'WellOfSouls',            # Alternative name for Act 1 town
-        'Abyss_Hub',              # Well of Souls (confirmed area code)
-        'Town',                   # Generic town
-        'Clearfell',              # Act 1 town alternative name
-        'Ogham',                  # Act 2 town
-        'NakuriForest',           # Act 3 town
-    }
-    
-    # Define areas that trigger automatic waystone analysis
-    AUTO_WAYSTONE_TRIGGER_AREAS = {
-        'Abyss_Hub',              # Well of Souls - common waystone checking location
-    }
+    # ============================================================================
+    # METHODS - Path Helpers
+    # ============================================================================
     
     @classmethod
     def get_script_dir(cls):
         """Get the directory where the script is located"""
         return Path(os.path.dirname(os.path.abspath(__file__)))
+    
+    @classmethod
+    def get_images_dir(cls):
+        """Get the images directory path"""
+        return cls.get_script_dir() / cls.IMAGES_DIR
+    
+    @classmethod
+    def get_ansi_path(cls, ansi_filename=None):
+        """Get path to ANSI art file
+        
+        Args:
+            ansi_filename: Name of ANSI file (defaults to ANSI_HASISKULL_DEFAULT)
+        """
+        filename = ansi_filename or cls.ANSI_HASISKULL_DEFAULT
+        return cls.get_images_dir() / filename
+    
+    @classmethod
+    def get_image_path(cls, image_filename):
+        """Get path to any image file in images directory
+        
+        Args:
+            image_filename: Name of image file
+        """
+        return cls.get_images_dir() / image_filename
     
     @classmethod
     def get_log_file_path(cls):
@@ -176,8 +237,6 @@ class Config:
         Args:
             icon_type: Type of icon ('pre_map', 'post_map', 'waystone', 'automode', or None for default)
         """
-        script_dir = cls.get_script_dir()
-        
         icon_mapping = {
             'pre_map': cls.ICON_PRE_MAP,
             'post_map': cls.ICON_POST_MAP,
@@ -186,12 +245,20 @@ class Config:
         }
         
         icon_filename = icon_mapping.get(icon_type, cls.ICON_DEFAULT)
-        return script_dir / icon_filename
+        return cls.get_images_dir() / icon_filename
     
     @classmethod
     def get_debug_dir(cls):
         """Get the debug output directory"""
         return cls.get_script_dir() / "debug"
+    
+    # ============================================================================
+    # METHODS - Validation & Configuration Management
+    # ============================================================================
+    
+    # ============================================================================
+    # METHODS - Validation & Configuration Management
+    # ============================================================================
     
     @classmethod
     def validate_config(cls):
@@ -274,7 +341,9 @@ class Config:
         return cls.DEBUG_ENABLED
 
 
-# For backward compatibility, create module-level constants
+# ============================================================================
+# BACKWARD COMPATIBILITY - Module-level constants
+# ============================================================================
 CLIENT_ID = Config.CLIENT_ID
 CLIENT_SECRET = Config.CLIENT_SECRET
 CHAR_TO_CHECK = Config.CHAR_TO_CHECK

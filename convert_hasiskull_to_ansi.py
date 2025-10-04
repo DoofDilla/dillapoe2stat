@@ -178,7 +178,8 @@ class HasiSkullANSIConverter:
         results = []
         for format_name, ansi_lines, title in formats:
             if ansi_lines:
-                filename = f"hasiskull_{format_name}.ansi"
+                from config import Config
+                filename = str(Config.get_images_dir() / f"hasiskull_{format_name}.ansi")
                 if self.save_ansi_file(ansi_lines, filename, title):
                     results.append((format_name, filename, len(ansi_lines)))
         
@@ -197,7 +198,8 @@ class HasiSkullANSIConverter:
 
 def main():
     """Main function"""
-    image_path = "HasiSkull_64x64.png"
+    from config import Config
+    image_path = str(Config.get_image_path(Config.ANSI_HASISKULL_SOURCE))
     
     try:
         converter = HasiSkullANSIConverter(image_path)
@@ -236,7 +238,8 @@ def main():
             
     except FileNotFoundError as e:
         print(f"❌ {e}")
-        print("Make sure HasiSkull_64x64.png exists in the current directory.")
+        from config import Config
+        print(f"Make sure {Config.ANSI_HASISKULL_SOURCE} exists in the {Config.IMAGES_DIR} directory.")
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
