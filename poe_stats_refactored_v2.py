@@ -247,10 +247,6 @@ class PoEStatsTracker:
             
             # Combine client.txt info with cached waystone info if available
             if self.game_state.cached_waystone_info and client_map_info:
-                # Debug: Show what delirious value we're using
-                if self.config.DEBUG_ENABLED or True:  # Always show for now
-                    print(f"[DEBUG] Using cached waystone delirious: {self.game_state.cached_waystone_info.get('delirious', 0)}%")
-                
                 # Use map name from client.txt but add waystone attributes
                 map_info = {
                     'map_name': client_map_info['map_name'],
@@ -260,8 +256,7 @@ class PoEStatsTracker:
                     # Add waystone attributes for logging (but not prefixes/suffixes)
                     'waystone_tier': self.game_state.cached_waystone_info['tier'],
                     'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
-                    'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes']),
-                    'delirious': self.game_state.cached_waystone_info.get('delirious', 0)
+                    'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])
                 }
                 print(f"📊 Enhanced with waystone data: T{self.game_state.cached_waystone_info['tier']}, {map_info['modifier_count']} modifiers")
             else:
@@ -653,7 +648,6 @@ class PoEStatsTracker:
                     'waystone_tier': self.game_state.cached_waystone_info['tier'],
                     'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
                     'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes']),
-                    'delirious': self.game_state.cached_waystone_info.get('delirious', 0),
                     'source': 'auto_detection_with_waystone'
                 })
                 print(f"📊 Enhanced with waystone data: T{self.game_state.cached_waystone_info['tier']}, {detected_map_info['modifier_count']} modifiers")
