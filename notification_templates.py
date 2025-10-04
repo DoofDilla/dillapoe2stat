@@ -87,27 +87,27 @@ class NotificationTemplates:
     
     # Map Templates  
     PRE_MAP = {
-        'title': '🚀 {map_name} ◉ {map_level}',
+        'title': '🚀 {map_name} ▷ {map_level}',
         'template': (
-            'Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
             '⚡ Starting new map run!'
         )
     }
     
     POST_MAP = {
-        'title': '🏁 {map_name} ◉ {map_level} ◉ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
+        'title': '🏁 {map_name} ▷ {map_level} ◷ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
-            'Session: {session_maps_completed} ● {session_total_value_fmt}{currency_icon} ● {session_value_per_hour_fmt}{currency_icon}/h\n'
-            'Map: {map_value_per_hour_fmt}{currency_icon}/h 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
+            'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Map: {map_value_per_hour_fmt}{currency_icon}/◷ 📈 Avg: {session_avg_value_fmt}{currency_icon}/map\n'
             '✅ Map completed!'
         )
     }
     
     # Experimental/Waystone Templates
     EXPERIMENTAL_PRE_MAP = {
-        'title': '🗺️ {waystone_name} ◉ (T{waystone_tier})',
+        'title': '🗺️ {waystone_name} ▷ (T{waystone_tier})',
         'template': (
-            '⚗️ Prefixes: {waystone_prefixes} ● 🔮 Suffixes: {waystone_suffixes}\n'
+            'Prefixes: {waystone_prefixes} ● Suffixes: {waystone_suffixes}\n'
             '◯ Pack {pack_size}% ◯ Magic {magic_monsters}% ◯ Way {waystone_drop_chance}%\n'
             '◯ Rare {rare_monsters}% ◯ Rarity {item_rarity}%\n'
         )
@@ -130,7 +130,7 @@ class NotificationTemplates:
     
     # High Value Loot Template (neue Idee)
     HIGH_VALUE_LOOT = {
-        'title': '💎 {item_name} • +{item_value}{currency_icon}',
+        'title': '💎 {item_name} • {item_value}{currency_icon}',
         'template': (
             '🗺️ {map_name}\n'
             '🎉 Great find!'
