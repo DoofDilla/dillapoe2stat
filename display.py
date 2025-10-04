@@ -502,9 +502,17 @@ class DisplayManager:
         if waystone_info['suffixes']:
             print(f"🔮 {Colors.BOLD}Suffixes ({len(waystone_info['suffixes'])}){Colors.END}:")
             for i, suffix in enumerate(waystone_info['suffixes'], 1):
-                print(f"   {Colors.CYAN}{i}.{Colors.END} {Colors.WHITE}{suffix}{Colors.END}")
+                # Highlight delirious suffix
+                if 'delirious' in suffix.lower():
+                    print(f"   {Colors.CYAN}{i}.{Colors.END} {Colors.WHITE}{suffix}{Colors.END} {Colors.BOLD}{Colors.CYAN}[Delirious]{Colors.END}")
+                else:
+                    print(f"   {Colors.CYAN}{i}.{Colors.END} {Colors.WHITE}{suffix}{Colors.END}")
         else:
             print(f"🔮 {Colors.GRAY}No suffixes found{Colors.END}")
+        
+        # Display delirious percentage if present
+        if waystone_info.get('delirious', 0) > 0:
+            print(f"🌀 {Colors.BOLD}{Colors.CYAN}Players in Area are {waystone_info['delirious']}% [Delirious]{Colors.END}")
         
         # Display area modifiers (the bonus stats from properties)
         if waystone_info['area_modifiers']:

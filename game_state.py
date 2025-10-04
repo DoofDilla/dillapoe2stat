@@ -174,12 +174,16 @@ class GameState:
             'map_drop_3_stack': self.current_map_top_drops[2]['stack'] if len(self.current_map_top_drops) > 2 else 0,
             'map_drop_3_value': self.current_map_top_drops[2]['value_ex'] if len(self.current_map_top_drops) > 2 else 0.0,
             
-            # Waystone data
+            # Waystone data - cached_waystone_info has priority (most recent Ctrl+F2 analysis)
             'waystone_name': self.cached_waystone_info.get('name') if self.cached_waystone_info else 'No Waystone',
             'waystone_tier': self.cached_waystone_info.get('tier') if self.cached_waystone_info else '?',
             'waystone_prefixes': len(self.cached_waystone_info.get('prefixes', [])) if self.cached_waystone_info else 0,
             'waystone_suffixes': len(self.cached_waystone_info.get('suffixes', [])) if self.cached_waystone_info else 0,
-            'waystone_delirious': self.cached_waystone_info.get('delirious', 0) if self.cached_waystone_info else 0,
+            'waystone_delirious': (
+                self.cached_waystone_info.get('delirious', 0) if self.cached_waystone_info
+                else self.current_map_info.get('delirious', 0) if self.current_map_info and 'delirious' in self.current_map_info
+                else 0
+            ),
             
             # Waystone area modifiers (extracted from area_modifiers)
             'magic_monsters': self._extract_modifier_value('magic_monsters'),
