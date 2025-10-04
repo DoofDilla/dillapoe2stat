@@ -127,6 +127,7 @@ class NotificationManager:
             'session_avg_time_fmt': self._format_time_duration(values['session_avg_time'] * 60 if values['session_avg_time'] else 0),  # min to seconds
             'session_maps_per_hour_fmt': f"{values['session_maps_per_hour']:.1f}",           # maps/h
             'session_value_per_hour_fmt': self._format_currency(values['session_value_per_hour']),  # ex/h
+            'session_value_per_hour_before_fmt': self._format_currency(values['session_value_per_hour_before']),  # ex/h BEFORE current map
         })
         
         # Add any extra values provided

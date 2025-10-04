@@ -34,6 +34,7 @@ WAYSTONE DATA:
 - waystone_tier: Waystone tier (e.g. "15")
 - waystone_prefixes: Number of prefix modifiers (number)
 - waystone_suffixes: Number of suffix modifiers (number)
+- waystone_delirious: Delirious percentage (number, 0 if not delirious, e.g. 40)
 - magic_monsters: Magic monsters % modifier (number, e.g. 70)
 - rare_monsters: Rare monsters % modifier (number, e.g. 45)
 - item_rarity: Item rarity % modifier (number, e.g. 89)
@@ -60,6 +61,7 @@ FORMATTED SESSION DATA:
 - session_avg_time_fmt: Formatted avg time/map (e.g. "5m0s")
 - session_maps_per_hour_fmt: Formatted maps/h (e.g. "12.0")
 - session_value_per_hour_fmt: Formatted ex/h (e.g. "740")
+- session_value_per_hour_before_fmt: Formatted ex/h BEFORE current map (for comparison)
 
 LAST MAP DATA (previous completed map - available after first POST):
 - last_map_name: Name of last completed map (e.g. "Grimhaven")
@@ -136,7 +138,7 @@ class NotificationTemplates:
     POST_MAP = {
         'title': '🏁 {map_name} ▷ {map_level} ◷ {map_runtime_fmt} ◉ {map_value_fmt}{currency_icon}',
         'template': (
-            'Map: {map_value_per_hour_fmt}{currency_icon}/h 🆚 Avg: {session_value_per_hour_fmt}{currency_icon}/h\n'
+            'Map: {map_value_per_hour_fmt}{currency_icon}/h 🆚 Avg: {session_value_per_hour_before_fmt}{currency_icon}/h\n'
             'Best Drop: {map_drop_1_name} x{map_drop_1_stack} ({map_drop_1_value}{currency_icon})\n'
             'Session: {session_maps_completed} ◉ {session_total_value_fmt}{currency_icon} ◷ {session_value_per_hour_fmt}{currency_icon}/h\n'
             '✅ Map completed!'

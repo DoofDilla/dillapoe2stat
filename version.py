@@ -16,7 +16,9 @@ RELEASE_DATE = "2025-10-04"
 RELEASE_NAME = "Top Drops Tracking"  # Optional codename for major releases
 
 # Data format version (for runs.jsonl compatibility)
-DATA_FORMAT_VERSION = "2.0"
+# 2.0: Initial enhanced format with waystone attributes
+# 2.1: Added delirious tracking
+DATA_FORMAT_VERSION = "2.1"
 
 # Build/commit info (optional, can be populated by CI/CD)
 BUILD_NUMBER = None

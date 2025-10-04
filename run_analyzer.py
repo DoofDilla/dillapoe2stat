@@ -27,6 +27,7 @@ class RunData:
     
     # Waystone attributes
     waystone_tier: int
+    delirious: int
     magic_monsters: int
     rare_monsters: int
     item_rarity: int
@@ -172,6 +173,7 @@ class RunAnalyzer:
                 gear_rarity=run.get('gear_rarity'),
                 
                 waystone_tier=waystone_attrs.get('tier', 0),
+                delirious=waystone_attrs.get('delirious', 0),
                 magic_monsters=waystone_attrs.get('magic_monsters', 0),
                 rare_monsters=waystone_attrs.get('rare_monsters', 0),
                 item_rarity=waystone_attrs.get('item_rarity', 0),

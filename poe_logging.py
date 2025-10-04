@@ -20,6 +20,7 @@ def extract_waystone_attributes(map_info):
         return {
             "hasAttributeInfo": True,
             "tier": int(map_info.get("level", 0)) if map_info.get("level") != "Unknown" else 0,
+            "delirious": map_info.get("delirious", 0),
             "magic_monsters": extract_numeric_value(area_modifiers.get("magic_monsters", {}).get("value", "0")),
             "rare_monsters": extract_numeric_value(area_modifiers.get("rare_monsters", {}).get("value", "0")),
             "item_rarity": extract_numeric_value(area_modifiers.get("item_rarity", {}).get("value", "0")),
@@ -36,6 +37,7 @@ def get_fallback_waystone_attributes():
     return {
         "hasAttributeInfo": False,
         "tier": 0,
+        "delirious": 0,
         "magic_monsters": 0,
         "rare_monsters": 0,
         "item_rarity": 0,

@@ -365,6 +365,12 @@ class PoEStatsTracker:
             # Get session progress BEFORE adding this map (for accurate comparison in notification)
             progress_before = self.session_manager.get_session_progress()
             
+            # Calculate and store ex/h BEFORE this map for notification
+            if progress_before and progress_before.get('runtime_seconds', 0) > 0:
+                self.game_state._session_value_per_hour_before = progress_before.get('total_value', 0) / (progress_before.get('runtime_seconds', 1) / 3600)
+            else:
+                self.game_state._session_value_per_hour_before = 0.0
+            
             # Update session tracking
             self.session_manager.add_completed_map(map_value)
             

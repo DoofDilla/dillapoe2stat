@@ -179,6 +179,7 @@ class GameState:
             'waystone_tier': self.cached_waystone_info.get('tier') if self.cached_waystone_info else '?',
             'waystone_prefixes': len(self.cached_waystone_info.get('prefixes', [])) if self.cached_waystone_info else 0,
             'waystone_suffixes': len(self.cached_waystone_info.get('suffixes', [])) if self.cached_waystone_info else 0,
+            'waystone_delirious': self.cached_waystone_info.get('delirious', 0) if self.cached_waystone_info else 0,
             
             # Waystone area modifiers (extracted from area_modifiers)
             'magic_monsters': self._extract_modifier_value('magic_monsters'),
@@ -204,6 +205,9 @@ class GameState:
             # Calculate per hour values from existing data
             'session_maps_per_hour': (self.session_progress.get('maps_completed', 0) / (self.session_progress.get('runtime_seconds', 1) / 3600)) if self.session_progress and self.session_progress.get('runtime_seconds', 0) > 0 else 0.0,
             'session_value_per_hour': (self.session_progress.get('total_value', 0) / (self.session_progress.get('runtime_seconds', 1) / 3600)) if self.session_progress and self.session_progress.get('runtime_seconds', 0) > 0 else 0.0,
+            
+            # Session ex/h BEFORE current map (for comparison) - stored separately
+            'session_value_per_hour_before': getattr(self, '_session_value_per_hour_before', 0.0),
             
             # Last map data (previous completed map)
             'last_map_name': self.last_map_info['name'] if self.last_map_info else 'None',

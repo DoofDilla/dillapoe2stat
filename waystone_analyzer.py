@@ -62,6 +62,17 @@ class WaystoneAnalyzer:
             if clean_mod:
                 suffixes.append(clean_mod)
         
+        # Extract delirious percentage from first suffix (if present)
+        delirious_percent = 0
+        if suffixes:
+            # First suffix is typically delirious, format: "X% Delirious"
+            first_suffix = suffixes[0]
+            import re
+            # Match patterns like "10% Delirious" or "Delirious 10%"
+            match = re.search(r'(\d+)%?\s*[Dd]elirious|[Dd]elirious\s*(\d+)%?', first_suffix)
+            if match:
+                delirious_percent = int(match.group(1) or match.group(2))
+        
         # Extract area modifiers from properties (Magic Monsters, Item Rarity, etc.)
         area_modifiers = {}
         properties = waystone_item.get('properties', [])
@@ -98,6 +109,7 @@ class WaystoneAnalyzer:
             'tier': tier,
             'prefixes': prefixes,
             'suffixes': suffixes,
+            'delirious': delirious_percent,
             'area_modifiers': area_modifiers,
             'type_line': type_line,
             'full_item': waystone_item
