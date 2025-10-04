@@ -5,6 +5,12 @@ Centralized template definitions for consistent notifications
 Available template variables:
 ==========================
 
+SYSTEM:
+- app_name: Application name (e.g. "BoneBunnyStats")
+- app_version: Application version (e.g. "0.3.1")
+- currency_icon: Currency icon character (e.g. '💰')
+- currency_suffix: Currency suffix string (e.g. 'ex')
+
 MAP DATA:
 - map_name: Name of the current map (e.g. "Grimhaven")
 - map_level: Map level (e.g. "80")
@@ -66,7 +72,7 @@ class NotificationTemplates:
     
     # Startup Templates
     STARTUP = {
-        'title': '🐰 BoneBunnyStats Started!',
+        'title': '🐰 {app_name} v{app_version}',
         'template': (
             '🎮 Character: {character}\n'
             '🆔 Session: {session_id_short}...\n'

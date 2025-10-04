@@ -77,6 +77,10 @@ class NotificationManager:
             print(f"Warning: Template '{template_key}' not found")
             return
         
+        # Add system values
+        values['app_name'] = self.config.APP_NAME
+        values['app_version'] = self.config.VERSION
+        
         # Add currency icon to values
         values['currency_icon'] = self.templates.CURRENCY_ICON
         values['currency_suffix'] = self.templates.CURRENCY_SUFFIX
@@ -88,7 +92,7 @@ class NotificationManager:
                 title, 
                 message, 
                 icon=self._get_icon_config(icon_type),
-                app_id=self.config.APP_ID
+                app_id=self.config.TOAST_APP_ID  # Use stable ID for registry lookup
             )
         except KeyError as e:
             print(f"Warning: Missing template value {e} for template '{template_key}'")

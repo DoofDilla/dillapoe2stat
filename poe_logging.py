@@ -4,6 +4,7 @@ import datetime as dt
 import os
 from pathlib import Path
 from collections import Counter
+from version import DATA_FORMAT_VERSION
 
 def extract_waystone_attributes(map_info):
     """Extract waystone attributes from map_info with proper fallback logic"""
@@ -123,7 +124,7 @@ def log_run(char, added, removed, current_map_info=None, map_value=None, log_fil
         "added": aggregate_with_values(added),  # Enhanced with individual item values
         "removed": aggregate_with_values(removed),
         # Add metadata about the enhanced format
-        "format_version": "2.0",  # Indicates enhanced item format with values
+        "format_version": DATA_FORMAT_VERSION,  # Centralized data format version
         "enhanced_items": True    # Flag for backwards compatibility
     }
     if log_file is None:

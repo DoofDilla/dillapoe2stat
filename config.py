@@ -5,6 +5,7 @@ Centralized configuration management
 
 import os
 from pathlib import Path
+from version import __version__, get_app_identifier, get_toast_app_id
 
 
 class Config:
@@ -14,8 +15,9 @@ class Config:
     # APPLICATION INFORMATION
     # ============================================================================
     APP_NAME = "BoneBunnyStats"
-    VERSION = "0.3.1"
-    APP_ID = f"{APP_NAME} v{VERSION}"
+    VERSION = __version__  # Imported from version.py
+    APP_ID = get_app_identifier()  # Display identifier with version (e.g. "BoneBunnyStats v0.3.1")
+    TOAST_APP_ID = get_toast_app_id()  # Stable registry ID WITHOUT version (e.g. "DoofDilla.BoneBunnyStats")
     
     # ============================================================================
     # USER SETTINGS - Customize these for your setup

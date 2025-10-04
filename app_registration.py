@@ -16,7 +16,7 @@ class AppRegistration:
         """Ensure app is registered with Windows for proper toast notification display"""
         try:
             config = Config()
-            app_id = config.APP_ID
+            toast_app_id = config.TOAST_APP_ID  # Use stable ID for registry (no version!)
             app_name = config.APP_NAME
             
             # Use ICO file for app icon
@@ -26,8 +26,8 @@ class AppRegistration:
             if not ico_path.exists():
                 AppRegistration._create_ico_from_png(config.get_icon_path(), ico_path)
             
-            # Registry path for toast notifications
-            reg_path = r"SOFTWARE\Classes\AppUserModelId\\" + app_id
+            # Registry path for toast notifications (uses stable ID!)
+            reg_path = r"SOFTWARE\Classes\AppUserModelId\\" + toast_app_id
             
             # Check if already registered correctly
             if AppRegistration._is_correctly_registered(reg_path, app_name, ico_path):
@@ -80,8 +80,8 @@ class AppRegistration:
         """Remove app registration from Windows (cleanup on exit)"""
         try:
             config = Config()
-            app_id = config.APP_ID
-            reg_path = r"SOFTWARE\Classes\AppUserModelId\\" + app_id
+            toast_app_id = config.TOAST_APP_ID  # Use stable ID
+            reg_path = r"SOFTWARE\Classes\AppUserModelId\\" + toast_app_id
             
             winreg.DeleteKey(winreg.HKEY_CURRENT_USER, reg_path)
             return True

@@ -4,6 +4,7 @@ Handles all console output, colors, and formatting logic
 """
 
 from price_check_poe2 import valuate_items_raw, fmt
+from version import get_version_display
 
 
 class Colors:
@@ -97,8 +98,8 @@ class DisplayManager:
     
     def display_startup_info(self, character_name, session_id, output_mode, gear_rarity=None):
         """Display startup information"""
-        # Display CONFIGURATION banner first
-        self._display_themed_banner("CONFIGURATION")
+        # Display CONFIGURATION banner with version
+        self._display_themed_banner(f"CONFIGURATION • {get_version_display()}")
         self._display_basic_info(character_name, session_id, output_mode, gear_rarity)
         self._display_hotkey_help()
         self._display_session_footer()
