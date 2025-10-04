@@ -3,17 +3,17 @@ Version management for DillaPoE2Stat
 Single source of truth for all version-related information
 """
 
-__version__ = "0.3.2"
-__version_info__ = (0, 3, 2)
+__version__ = "0.3.3"
+__version_info__ = (0, 3, 3)
 
 # Semantic versioning components
 MAJOR = 0  # Breaking changes
 MINOR = 3  # New features, backwards compatible
-PATCH = 2  # Bug fixes
+PATCH = 3  # Bug fixes
 
 # Release information
-RELEASE_DATE = "2025-10-04"
-RELEASE_NAME = "Top Drops Tracking"  # Optional codename for major releases
+RELEASE_DATE = "2025-10-05"
+RELEASE_NAME = "Delirious Analytics"  # Optional codename for major releases
 
 # Data format version (for runs.jsonl compatibility)
 # 2.0: Initial enhanced format with waystone attributes

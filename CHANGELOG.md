@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-10-05
+
+### Added
+- **Delirious Tracking**: Automatic detection and tracking of Delirious % from waystone suffixes
+  - `waystone_delirious` variable available in notifications and game state
+  - Logged to runs.jsonl for run analysis
+  - Displayed in EXPERIMENTAL_PRE_MAP template
+- **Formatted Drop Values**: All drop value variables now have `_fmt` versions for clean display
+  - `map_drop_1/2/3_value_fmt`: Current map top drops
+  - `last_map_drop_1/2/3_value_fmt`: Previous map top drops
+  - `session_drop_1/2/3_value_fmt`: Session cumulative top drops
+  - `best_map_value_fmt`: Best map value
+- **Session Comparison Metrics**: New variable for accurate map vs session comparison
+  - `session_value_per_hour_before_fmt`: Session ex/h BEFORE current map added
+  - POST_MAP template now shows true comparison (map performance vs pre-existing average)
+
+### Changed
+- Data format version bumped to 2.1 (added delirious field to runs.jsonl)
+- Updated POST_MAP template to use formatted drop values
+- Updated EXPERIMENTAL_PRE_MAP template to show delirious percentage
+- Notification templates now show map ex/h vs session avg BEFORE map (more accurate comparison)
+
+### Fixed
+- Session value comparison now excludes current map from average (prevents self-referential comparison)
+
 ## [0.3.2] - 2025-10-04
 
 ### Added
