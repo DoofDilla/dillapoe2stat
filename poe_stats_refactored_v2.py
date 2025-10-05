@@ -315,7 +315,7 @@ class PoEStatsTracker:
         self.analyze_waystone()
     
     def take_post_snapshot(self, simulated_data=None):
-        """Take POST-map inventory snapshot and analyze differences"""
+        """Take POST-map snapshot and analyze loot"""
         if self.pre_inventory is None:
             self.display.display_info_message("[POST] no PRE snapshot yet. Press F2 first.")
             return
@@ -371,12 +371,6 @@ class PoEStatsTracker:
             else:
                 self.game_state._session_value_per_hour_before = 0.0
             
-            # Update session tracking
-            self.session_manager.add_completed_map(map_value)
-            
-            # Get updated progress for OBS and display
-            progress_after = self.session_manager.get_session_progress()
-            
             # Update OBS overlays if available
             if self.obs_server:
                 try:
@@ -405,8 +399,13 @@ class PoEStatsTracker:
             
             # Update game state with map completion data
             self.game_state.complete_map(map_value, map_runtime)
-            # Use progress BEFORE this map for notification comparison
-            self.game_state.update_session_progress(progress_before)
+            
+            # Update session tracking (this updates progress_after)
+            self.session_manager.add_completed_map(map_value)
+            
+            # Get AFTER progress for display and notification
+            progress_after = self.session_manager.get_session_progress()
+            self.game_state.update_session_progress(progress_after)
             
             # Update top drops and best map tracking
             # Get items with value data from valuate_items_raw
@@ -441,6 +440,9 @@ class PoEStatsTracker:
             
         except Exception as e:
             self.display.display_error("POST", str(e))
+            print(f"[DEBUG POST] Exception occurred: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             self.pre_inventory = None
             # Map state is handled by game_state now

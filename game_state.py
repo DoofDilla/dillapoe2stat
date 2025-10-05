@@ -106,20 +106,21 @@ class GameState:
         """Calculate top 3 most valuable items from a list
         
         Args:
-            items_with_values: List of items with total_value_exalted field
+            items_with_values: List of items from valuate_items_raw with ex_total field
             
         Returns:
             List of top 3 items as {name, stack, value_ex} dicts
         """
         # Filter items with value > 0 and sort by total exalted value
+        # Note: valuate_items_raw returns 'ex_total', not 'total_value_exalted'
         valuable_items = [
             item for item in items_with_values
-            if item.get('total_value_exalted', 0) > 0
+            if item.get('ex_total', 0) > 0
         ]
         
         sorted_items = sorted(
             valuable_items,
-            key=lambda x: x.get('total_value_exalted', 0),
+            key=lambda x: x.get('ex_total', 0),
             reverse=True
         )
         
@@ -128,7 +129,7 @@ class GameState:
             {
                 'name': item.get('name', 'Unknown'),
                 'stack': item.get('qty', 1),
-                'value_ex': item.get('total_value_exalted', 0)
+                'value_ex': item.get('ex_total', 0)
             }
             for item in sorted_items[:3]
         ]
