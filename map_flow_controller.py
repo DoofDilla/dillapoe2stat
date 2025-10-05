@@ -551,14 +551,15 @@ class MapFlowController:
             List of top 3 items sorted by ex_total value
         """
         # Filter items with value > 0 and sort by total exalted value
+        # Ensure ex_total is not None before comparison
         valuable_items = [
             item for item in items_with_values
-            if item.get('ex_total', 0) > 0
+            if item.get('ex_total') is not None and item.get('ex_total', 0) > 0
         ]
         
         sorted_items = sorted(
             valuable_items,
-            key=lambda x: x.get('ex_total', 0),
+            key=lambda x: x.get('ex_total', 0) or 0,
             reverse=True
         )
         

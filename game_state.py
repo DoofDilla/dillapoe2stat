@@ -124,14 +124,15 @@ class GameState:
         """
         # Filter items with value > 0 and sort by total exalted value
         # Note: valuate_items_raw returns 'ex_total', not 'total_value_exalted'
+        # Ensure ex_total is not None before comparison
         valuable_items = [
             item for item in items_with_values
-            if item.get('ex_total', 0) > 0
+            if item.get('ex_total') is not None and item.get('ex_total', 0) > 0
         ]
         
         sorted_items = sorted(
             valuable_items,
-            key=lambda x: x.get('ex_total', 0),
+            key=lambda x: x.get('ex_total', 0) or 0,
             reverse=True
         )
         
