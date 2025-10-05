@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2025-10-05
+
+### Added
+- **Phase-Based Flow Architecture**: Complete refactoring of map tracking flow
+  - New `MapFlowController` class orchestrates PRE/POST flows in 9 clear phases
+  - New `InventorySnapshotService` handles all API calls with rate limiting
+  - New `InventorySnapshot` dataclass for immutable snapshot data
+  - Phase-specific result objects: `DiffResult`, `ValueResult`, `SessionSnapshot`
+- **Comprehensive Flow Documentation**: New `docs/SESSION_FLOW.md`
+  - Complete phase diagrams and flow visualization
+  - Common pitfalls and solutions documented
+  - Testing procedures and debugging guides
+  - Session state lifecycle explained
+- **Architecture Section in README**: Clear overview of modular components and flow
+
+### Changed
+- **Main Script Simplified**: `poe_stats_refactored_v2.py` reduced from 787 to 640 lines (-147 lines)
+  - `take_pre_snapshot()`: Now 9-line wrapper (was 60 lines)
+  - `take_post_snapshot()`: Now 13-line wrapper (was 140 lines)
+  - All complex logic moved to dedicated flow controller
+- **Better Error Messages**: Phase-based errors ("Phase 5 failed" vs generic "POST failed")
+- **Improved Code Documentation**: Enhanced docstrings with architecture overview and flow references
+- **Rate Limiting Refactored**: Moved from main class to `InventorySnapshotService`
+
+### Fixed
+- **Session Double-Counting Prevention**: Single `add_completed_map()` call enforced by architecture
+  - Only Phase 5 of POST flow can add maps to session
+  - Phase 4 captures state BEFORE update for comparison
+  - Clear separation prevents accidental duplicate tracking
+- **State Management Clarity**: Explicit `set_session_comparison_baseline()` method
+  - No more direct attribute assignments
+  - Better encapsulation and intent clarity
+
+### Removed
+- `self.pre_inventory` attribute (replaced by flow controller snapshots)
+- `self.last_api_call` attribute (replaced by rate limiter service)
+- `rate_limit()` method (replaced by `InventorySnapshotService`)
+
+### Technical Improvements
+- **Testability**: Each phase can be tested independently
+- **Maintainability**: Clear phase names make debugging easier
+- **Extensibility**: New phases can be added as `_phase_xyz()` methods
+- **Robustness**: Type hints via dataclasses, immutable snapshots
+- **Documentation**: Flow completely documented for future maintenance
+
 ## [0.3.3] - 2025-10-05
 
 ### Added

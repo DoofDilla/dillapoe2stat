@@ -520,7 +520,7 @@ class MapFlowController:
             self.config.get_log_file_path(),
             map_runtime,
             self.session.session_id,
-            self.game_state.cached_waystone_info
+            self.game_state.current_gear_rarity
         )
     
     def _phase_display_session(self):

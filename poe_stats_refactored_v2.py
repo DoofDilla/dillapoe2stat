@@ -1,7 +1,13 @@
 """
-PoE Stats Tracker - Simplified Main Script
+PoE Stats Tracker - Main Script
 Tracks inventory changes, session statistics, and loot values for Path of Exile 2
-Now refactored into modular components for better maintainability
+
+Architecture:
+- Phase-based flow controller for PRE/POST map tracking
+- Modular components for better maintainability
+- Clean separation of concerns
+
+Flow Documentation: See docs/SESSION_FLOW.md
 """
 
 import time
@@ -18,6 +24,14 @@ from notification_manager import NotificationManager
 from game_state import GameState
 from app_registration import AppRegistration
 from utils import format_time, get_current_timestamp
+
+# Import new flow controller (Phase 2 refactoring)
+from map_flow_controller import MapFlowController
+from inventory_snapshot import InventorySnapshotService
+
+# Import new flow controller (Phase 2 refactoring)
+from map_flow_controller import MapFlowController
+from inventory_snapshot import InventorySnapshotService
 
 # Import existing modules
 from client_parsing import get_last_map_from_client
@@ -36,7 +50,22 @@ except ImportError:
 
 
 class PoEStatsTracker:
-    """Main tracker class - now simplified and modular"""
+    """Main tracker class - Phase-based architecture with modular components
+    
+    Architecture Overview:
+    - MapFlowController: Orchestrates PRE/POST map tracking in clear phases
+    - InventorySnapshotService: Handles API calls with rate limiting
+    - GameState: Central state management
+    - SessionManager: Session tracking and statistics
+    - DisplayManager: Console output formatting
+    - NotificationManager: Windows toast notifications
+    
+    Flow:
+    - PRE (F2):  Snapshot → Parse Map → Update State → Notify
+    - POST (F3): Snapshot → Diff → Value → Track → Update → Notify → Reset
+    
+    See docs/SESSION_FLOW.md for detailed documentation.
+    """
     
     def __init__(self, config=None):
         # Use provided config or default
@@ -86,13 +115,15 @@ class PoEStatsTracker:
             if self.config.DEBUG_ENABLED:
                 print("[DEBUG] Simulation manager not available")
         
-        # API and System State (kept in main class)
+        # API and System State
         self.token = None
-        self.pre_inventory = None
-        self.last_api_call = 0.0
         
         # Functional Components
         self.gear_rarity_analyzer = None  # Initialized after token is available
+        
+        # Flow Controller - Handles all snapshot and map flow logic
+        self.snapshot_service = None
+        self.flow_controller = None
         
         # Auto Map Detection
         self.auto_detector = None
@@ -128,6 +159,22 @@ class PoEStatsTracker:
         # Initialize gear rarity analyzer with token
         self.gear_rarity_analyzer = GearRarityAnalyzer(self.token)
         self._update_gear_rarity()
+        
+        # Initialize flow controller (Phase 2 refactoring)
+        self.snapshot_service = InventorySnapshotService(
+            token=self.token,
+            min_gap_seconds=self.config.API_RATE_LIMIT
+        )
+        self.flow_controller = MapFlowController(
+            snapshot_service=self.snapshot_service,
+            inventory_analyzer=self.inventory_analyzer,
+            game_state=self.game_state,
+            session_manager=self.session_manager,
+            display=self.display,
+            notification=self.notification_manager,
+            config=self.config,
+            debugger=self.debugger
+        )
         
         # Start new session
         session_info = self.session_manager.start_new_session()
@@ -175,14 +222,7 @@ class PoEStatsTracker:
             session_info['start_time_str']
         )
     
-    def rate_limit(self, min_gap=None):
-        """Enforce rate limiting for API calls"""
-        min_gap = min_gap or self.config.API_RATE_LIMIT
-        now = time.time()
-        wait = min_gap - (now - self.last_api_call)
-        if wait > 0:
-            time.sleep(wait)
-        self.last_api_call = time.time()
+    # Note: rate_limit() removed - now handled by InventorySnapshotService
     
     def _update_gear_rarity(self):
         """Update the cached gear rarity value"""
@@ -216,71 +256,24 @@ class PoEStatsTracker:
             print("[DEBUG] Gear rarity not available")
     
     def take_pre_snapshot(self):
-        """Take PRE-map inventory snapshot"""
-        self.rate_limit()
-        try:
-            map_start_time = get_current_timestamp()
-            self.game_state.start_map(map_start_time)
-            self.pre_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
-            
-            self.display.display_inventory_count(len(self.pre_inventory), "[PRE]")
-            
-            # Debug output
-            if self.config.DEBUG_SHOW_SUMMARY:
-                self.debugger.dump_item_summary(self.pre_inventory, "[PRE-SUMMARY]")
-            elif self.config.DEBUG_ENABLED:
-                self.debugger.dump_inventory_to_console(self.pre_inventory, "[PRE-DEBUG]")
-            
-            if self.config.DEBUG_TO_FILE:
-                metadata = {
-                    "character": self.config.CHAR_TO_CHECK,
-                    "snapshot_type": "PRE",
-                    "map_info": self.game_state.current_map_info
-                }
-                self.debugger.dump_inventory_to_file(self.pre_inventory, "pre_inventory", metadata)
-            
-            # Get current map info from client.txt
-            client_map_info = get_last_map_from_client(
-                self.config.CLIENT_LOG, 
-                self.config.CLIENT_LOG_SCAN_BYTES
-            )
-            
-            # Combine client.txt info with cached waystone info if available
-            if self.game_state.cached_waystone_info and client_map_info:
-                # Use map name from client.txt but add waystone attributes
-                map_info = {
-                    'map_name': client_map_info['map_name'],
-                    'level': client_map_info['level'],
-                    'seed': client_map_info['seed'],
-                    'source': 'client_log_with_waystone',
-                    # Add waystone attributes for logging (but not prefixes/suffixes)
-                    'waystone_tier': self.game_state.cached_waystone_info['tier'],
-                    'area_modifiers': self.game_state.cached_waystone_info['area_modifiers'],
-                    'modifier_count': len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])
-                }
-                print(f"📊 Enhanced with waystone data: T{self.game_state.cached_waystone_info['tier']}, {map_info['modifier_count']} modifiers")
-            else:
-                # Use standard client.txt info
-                map_info = client_map_info
-            
-            self.game_state.update_map_info(map_info)
-            self.display.display_map_info(self.game_state.current_map_info)
-            
-            # Update session progress and send PRE-map notification  
-            progress = self.session_manager.get_session_progress()
-            self.game_state.update_session_progress(progress)
-            self.notification_manager.notify_pre_map(self.game_state)
-                
-        except Exception as e:
-            self.display.display_error("PRE", str(e))
+        """Take PRE-map inventory snapshot
+        
+        Delegates to MapFlowController which implements the flow in clear phases:
+        1. Take snapshot → 2. Parse map info → 3. Update state → 4. Notify
+        
+        See docs/SESSION_FLOW.md for detailed flow documentation.
+        """
+        self.flow_controller.execute_pre_map_flow()
     
     def analyze_waystone(self):
         """Analyze waystone from inventory (experimental) - display only, no map start"""
-        self.rate_limit()
-        
         try:
             # Take inventory snapshot for waystone analysis only
-            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            waystone_snapshot = self.snapshot_service.take_snapshot(
+                self.config.CHAR_TO_CHECK,
+                snapshot_type="WAYSTONE"
+            )
+            current_inventory = waystone_snapshot.items
             
             # Find and parse waystone
             waystone = self.waystone_analyzer.find_waystone_in_inventory(current_inventory)
@@ -315,143 +308,27 @@ class PoEStatsTracker:
         self.analyze_waystone()
     
     def take_post_snapshot(self, simulated_data=None):
-        """Take POST-map snapshot and analyze loot"""
-        if self.pre_inventory is None:
-            self.display.display_info_message("[POST] no PRE snapshot yet. Press F2 first.")
-            return
+        """Take POST-map snapshot and analyze loot
         
-        if not simulated_data:
-            self.rate_limit()
+        Delegates to MapFlowController which implements the flow in 9 clear phases:
+        1. Snapshot → 2. Diff → 3. Value → 4. Capture Before → 5. Update State
+        → 6. Notify → 7. Log → 8. Display → 9. Reset
         
-        try:
-            if simulated_data:
-                post_inventory = simulated_data
-                self.display.display_inventory_count(len(post_inventory), "[SIMULATED POST]")
-            else:
-                post_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
-                self.display.display_inventory_count(len(post_inventory), "[POST]")
-            
-            # Debug output
-            if self.config.DEBUG_SHOW_SUMMARY:
-                self.debugger.dump_item_summary(post_inventory, "[POST-SUMMARY]")
-            elif self.config.DEBUG_ENABLED:
-                self.debugger.dump_inventory_to_console(post_inventory, "[POST-DEBUG]")
-            
-            # Calculate map runtime
-            map_runtime = None
-            if self.game_state.map_start_time is not None:
-                map_runtime = time.time() - self.game_state.map_start_time
-                self.display.display_runtime(map_runtime)
-            
-            # Analyze inventory changes
-            analysis = self.inventory_analyzer.analyze_changes(self.pre_inventory, post_inventory)
-            
-            if 'error' in analysis:
-                self.display.display_error("ANALYSIS", analysis['error'])
-                return
-            
-            # Debug: show inventory comparison (comprehensive mode only)
-            if self.config.OUTPUT_MODE == "comprehensive":
-                self.debugger.compare_inventories(self.pre_inventory, post_inventory)
-            
-            # Display changes and price analysis
-            self.display.display_inventory_changes(analysis['added'], analysis['removed'])
-            # Pass inventory data for better emoji analysis
-            map_value = self.display.display_price_analysis(analysis['added'], analysis['removed'], 
-                                                           post_inventory=post_inventory, pre_inventory=self.pre_inventory)
-            
-            self.display.display_completion_separator()
-            
-            # Get session progress BEFORE adding this map (for accurate comparison in notification)
-            progress_before = self.session_manager.get_session_progress()
-            
-            # Calculate and store ex/h BEFORE this map for notification
-            if progress_before and progress_before.get('runtime_seconds', 0) > 0:
-                self.game_state._session_value_per_hour_before = progress_before.get('total_value', 0) / (progress_before.get('runtime_seconds', 1) / 3600)
-            else:
-                self.game_state._session_value_per_hour_before = 0.0
-            
-            # Update OBS overlays if available
-            if self.obs_server:
-                try:
-                    # Add map runtime to map_info for OBS display
-                    obs_map_info = self.game_state.current_map_info.copy() if self.game_state.current_map_info else {}
-                    if map_runtime is not None:
-                        obs_map_info['map_runtime_seconds'] = map_runtime
-                    
-                    # Get the same processed data that terminal displays
-                    from price_check_poe2 import valuate_items_raw
-                    processed_added = []
-                    if analysis['added']:
-                        added_rows, _ = valuate_items_raw(analysis['added'])
-                        processed_added = added_rows
-                    
-                    self.obs_server.update_item_table(
-                        processed_added, 
-                        [], 
-                        progress_after, 
-                        obs_map_info
-                    )
-                    self.obs_server.update_session_stats(progress_after)
-                except Exception as e:
-                    if self.config.DEBUG_ENABLED:
-                        print(f"[DEBUG] OBS update failed: {e}")
-            
-            # Update game state with map completion data
-            self.game_state.complete_map(map_value, map_runtime)
-            
-            # Update session tracking (this updates progress_after)
-            self.session_manager.add_completed_map(map_value)
-            
-            # Get AFTER progress for display and notification
-            progress_after = self.session_manager.get_session_progress()
-            self.game_state.update_session_progress(progress_after)
-            
-            # Update top drops and best map tracking
-            # Get items with value data from valuate_items_raw
-            from price_check_poe2 import valuate_items_raw
-            if analysis['added']:
-                added_rows, _ = valuate_items_raw(analysis['added'])
-                self.game_state.update_map_completion(added_rows)
-            
-            # Send POST-map notification (uses progress_before for comparison)
-            self.notification_manager.notify_post_map(self.game_state)
-            
-            # Display session progress (use updated progress_after)
-            if progress_after:
-                self.display.display_session_progress(**progress_after)
-            
-            # Log the run
-            log_run(
-                self.config.CHAR_TO_CHECK, 
-                analysis['added'], 
-                analysis['removed'], 
-                self.game_state.current_map_info, 
-                map_value, 
-                self.config.get_log_file_path(), 
-                map_runtime, 
-                self.session_manager.session_id,
-                self.game_state.current_gear_rarity
-            )
-            
-            # Reset current map state now that it's completed and logged
-            # (data has been moved to last_map_info by update_map_completion)
-            self.game_state.reset_current_map()
-            
-        except Exception as e:
-            self.display.display_error("POST", str(e))
-            print(f"[DEBUG POST] Exception occurred: {e}")
-            import traceback
-            traceback.print_exc()
-        finally:
-            self.pre_inventory = None
-            # Map state is handled by game_state now
+        See docs/SESSION_FLOW.md for detailed flow documentation.
+        """
+        self.flow_controller.execute_post_map_flow(
+            simulated_data=simulated_data,
+            obs_server=self.obs_server
+        )
     
     def check_current_inventory_value(self):
         """Check and display the value of the current inventory"""
-        self.rate_limit()
         try:
-            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            check_snapshot = self.snapshot_service.take_snapshot(
+                self.config.CHAR_TO_CHECK,
+                snapshot_type="CHECK"
+            )
+            current_inventory = check_snapshot.items
             
             self.display.display_inventory_count(len(current_inventory), "[CURRENT]")
             
@@ -472,9 +349,12 @@ class PoEStatsTracker:
     
     def debug_item_by_name(self, item_name):
         """Debug a specific item by searching current inventory"""
-        self.rate_limit()
         try:
-            current_inventory = snapshot_inventory(self.token, self.config.CHAR_TO_CHECK)
+            debug_snapshot = self.snapshot_service.take_snapshot(
+                self.config.CHAR_TO_CHECK,
+                snapshot_type="DEBUG"
+            )
+            current_inventory = debug_snapshot.items
             print(f"🔍 Searching current inventory for: '{item_name}'")
             self.debugger.find_and_analyze_item_by_name(current_inventory, item_name, "[ITEM_DEBUG]")
         except Exception as e:
@@ -526,7 +406,10 @@ class PoEStatsTracker:
         self.notification_manager.notify_session_start(session_info)
     
     def simulate_pre_snapshot(self):
-        """Simulate PRE-map snapshot using debug files or hardcoded data"""
+        """Simulate PRE-map snapshot using debug files or hardcoded data
+        
+        Note: Simulation creates a fake snapshot in the flow controller for testing.
+        """
         if not self.simulation_manager:
             print("⚠️  Simulation not available")
             return
@@ -535,19 +418,26 @@ class PoEStatsTracker:
             # Get simulation data
             pre_data, _ = self.simulation_manager.get_simulation_data()
             
+            # Create simulated snapshot in flow controller
+            from inventory_snapshot import InventorySnapshot
+            self.flow_controller.pre_snapshot = InventorySnapshot(
+                items=pre_data,
+                snapshot_type="PRE_SIMULATED",
+                timestamp=time.time()
+            )
+            
             # Set up simulated state
             self.game_state.start_map(time.time())
-            self.pre_inventory = pre_data
             
             # Create simulated map info
             map_info = self.simulation_manager.create_simulated_map_info()
             self.game_state.update_map_info(map_info)
             
-            # Cache simulated waystone info (like experimental waystone analysis)
+            # Cache simulated waystone info
             waystone_info = self.simulation_manager.create_simulated_waystone_info()
             self.game_state.update_waystone_info(waystone_info)
             
-            self.display.display_inventory_count(len(self.pre_inventory), "[SIMULATED PRE]")
+            self.display.display_inventory_count(len(pre_data), "[SIMULATED PRE]")
             self.display.display_map_info(self.game_state.current_map_info)
             
             print(f"🧪 Simulated waystone: T{self.game_state.cached_waystone_info['tier']} with {len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])} modifiers")
@@ -562,7 +452,7 @@ class PoEStatsTracker:
             print("⚠️  Simulation not available")
             return
             
-        if self.pre_inventory is None:
+        if not self.flow_controller.pre_snapshot:
             print("⚠️  No PRE snapshot. Use Ctrl+Shift+F2 first.")
             return
         

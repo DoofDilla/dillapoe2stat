@@ -1,17 +1,22 @@
 # DillaPoE2Stat Tracker
 
-> **v0.3.3 "Delirious Analytics"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
+> **v0.3.4 "Phase-Based Architecture"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
 > Optional OBS overlay mode streams your loot breakdown and session dashboard straight into Browser Sources for easy broadcasting.
 
-## What's New in v0.3.3
+## What's New in v0.3.4
 
-- **🌀 Delirious Tracking**: Automatically extracts and tracks Delirious % from waystone suffixes throughout the entire stack (waystone analyzer → game state → logging → run analysis)
-- **💎 Formatted Drop Values**: All notification drop values now display as clean formatted currency (e.g., "12.5ex" instead of "12.456789")
-- **📊 Session Comparison Metrics**: Accurate map vs session comparison - now shows your session average *before* adding the current map (prevents self-referential stats)
-- **🔧 Enhanced Notifications**: POST_MAP template now shows map ex/h vs pre-existing session average with all formatted values
-- **📈 Data Format v2.1**: Extended runs.jsonl schema with delirious field for comprehensive run analysis
+- **�️ Phase-Based Architecture**: Complete refactoring of map tracking flow for better maintainability
+  - `MapFlowController` orchestrates PRE/POST flows in 9 clear, testable phases
+  - Main script reduced from 787 to 640 lines (-18% code reduction)
+  - Each phase has one responsibility: easier debugging and testing
+- **� Flow Documentation**: New `docs/SESSION_FLOW.md` with complete diagrams, pitfalls, and testing guides
+- **🐛 Robust Session Tracking**: Architecture prevents double-counting bugs by design
+  - Single point of session update (Phase 5 only)
+  - Clear BEFORE/AFTER state separation
+- **🔧 Better Error Messages**: Phase-based errors ("Phase 5 failed") instead of generic messages
+- **� Enhanced Documentation**: Architecture section in README, improved docstrings throughout
 
-## Recent Enhancements (v0.3.0 - v0.3.3)
+## Recent Enhancements (v0.3.0 - v0.3.4)
 
 The tracker has evolved considerably with a complete modular rewrite and rich feature additions:
 
@@ -273,6 +278,31 @@ The session dashboard (triggered via `F7`) reads from `runs.jsonl` to compute av
 | No loot valuation shown | poe.ninja may be rate-limiting or lacking data for the selected league; try again later or switch leagues in `price_check_poe2.LEAGUE`. |
 | Toast notifications missing | `win11toast` requires Windows 10/11—disable notifications in `config.py` when running on unsupported systems. |
 
+## Architecture
+
+The tracker uses a **phase-based flow architecture** for clean, maintainable code:
+
+### Core Components
+
+- **`MapFlowController`**: Orchestrates PRE/POST map tracking in 9 clear phases
+  - Phase 1-4 (PRE): Snapshot → Parse → State → Notify
+  - Phase 1-9 (POST): Snapshot → Diff → Value → Capture → Update → Notify → Log → Display → Reset
+- **`InventorySnapshotService`**: API calls with automatic rate limiting
+- **`GameState`**: Central state management for maps, session, tracking data
+- **`SessionManager`**: Session lifecycle and statistics
+- **`DisplayManager`**: Console output formatting
+- **`NotificationManager`**: Windows toast notifications
+
+### Flow Documentation
+
+See **[`docs/SESSION_FLOW.md`](docs/SESSION_FLOW.md)** for detailed flow diagrams, phase descriptions, common pitfalls, and testing procedures.
+
+**Key Benefits:**
+- ✅ Each phase has one clear responsibility
+- ✅ Easy to test individual phases
+- ✅ Clear error messages ("Phase 5 failed" vs "POST failed")
+- ✅ Well-documented session tracking prevents double-counting bugs
+
 ## Extending the Project
 - **Custom Analytics:** Implement stash tab scraping or price thresholds using `InventoryAnalyzer.categorize_items` as a base.
 - **Alternative Notifications:** Swap the notification backend (Discord webhooks, Telegram bots, custom OBS overlays) by editing the notifier calls in `poe_stats_refactored_v2.py` or `notification_manager.py`.
@@ -288,6 +318,6 @@ Thanks to Grinding Gear Games for exposing the Path of Exile API and poe.ninja f
 ## Version History
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Current Version:** 0.3.3 "Delirious Analytics"  
+**Current Version:** 0.3.4 "Phase-Based Architecture"  
 **Data Format Version:** 2.1  
 **Last Updated:** October 5, 2025
