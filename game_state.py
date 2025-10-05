@@ -69,6 +69,17 @@ class GameState:
         """Cache session progress for notifications"""
         self.session_progress = session_progress
     
+    def set_session_comparison_baseline(self, session_value_per_hour: float):
+        """Set the baseline ex/h for comparing current map to session average
+        
+        This value represents the session's ex/h BEFORE the current map was added,
+        enabling notifications to show: "Run: 1440ex/h 🆚 Avg: 740ex/h"
+        
+        Args:
+            session_value_per_hour: Session ex/h before current map
+        """
+        self._session_value_per_hour_before = session_value_per_hour
+    
     def update_map_completion(self, added_items_with_values):
         """Update last map, best map, and top drops after POST-map
         
