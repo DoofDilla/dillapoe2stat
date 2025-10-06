@@ -1,0 +1,2 @@
+{"event_type": "session_start", "session_id": "sample-session-001", "ts": "2025-10-06T12:00:00", "character": "YourCharacter"}
+{"event_type": "session_end", "session_id": "sample-session-001", "ts": "2025-10-06T13:30:00", "character": "YourCharacter", "session_runtime": 5400.0, "total_value": 123.45, "total_maps": 1}

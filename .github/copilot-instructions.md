@@ -66,6 +66,11 @@ PoEStatsTracker (main orchestrator)
 {"event_type": "session_end", "session_id": "xyz", "total_maps": 5, ...}
 ```
 
+**Important:** `runs.jsonl` and `sessions.jsonl` are **NOT tracked in Git** (local data only)
+- Listed in `.gitignore` to prevent accidental commits
+- Sample files provided: `runs.jsonl.sample`, `sessions.jsonl.sample`
+- New users: Copy `.sample` files to create initial data files
+
 **Data Format Versions:**
 - `2.0`: Added per-item valuations (chaos/exalted/divine)
 - `2.1`: Added `delirious` field for waystone tracking
@@ -75,6 +80,29 @@ PoEStatsTracker (main orchestrator)
 1. Bump `DATA_FORMAT_VERSION` in `version.py`
 2. Update `upgrade_runs_data.py` with migration logic
 3. Document in CHANGELOG.md
+
+### Local Backups
+
+**Backup utility:** `backup_session_data.py` creates timestamped backups
+
+```bash
+# Create backup (saves to ./backups/)
+python backup_session_data.py
+
+# Keep only 5 most recent backups
+python backup_session_data.py --keep 5
+
+# Custom backup directory
+python backup_session_data.py --backup-dir C:\MyBackups
+
+# Cleanup old backups only (no new backup)
+python backup_session_data.py --cleanup-only --keep 10
+```
+
+**Auto-backup before major changes:**
+- Run `upgrade_runs_data.py` automatically creates backups
+- Manually backup before version upgrades or major refactoring
+- Backup directory (`backups/`) is ignored by Git
 
 ## Configuration System
 
