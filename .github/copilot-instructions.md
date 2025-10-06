@@ -348,6 +348,63 @@ DATA_FORMAT_VERSION = "2.1"
 
 ## Git Workflow & Commits
 
+### Branching Strategy
+
+**Two-Branch Model:** `main` (stable) + `develop` (active development)
+
+```bash
+# Branch Structure
+main      → v0.3.4, v0.3.5 (tagged releases, production-ready)
+develop   → Active development (30 commits/day is fine here)
+
+# Optional: Feature branches for major work
+feature/* → Short-lived, merge to develop when done
+```
+
+**Daily Workflow:**
+
+```bash
+# Work on develop branch
+git checkout develop
+# ... make changes, commit freely ...
+git add <files>
+git commit -m "feat: ✨ Add new feature"
+git push origin develop
+
+# When ready for release (e.g., v0.3.5)
+git checkout main
+git merge develop --ff-only  # Fast-forward only (keeps history clean)
+git tag v0.3.5
+git push origin main --tags
+
+# Bump version in version.py, commit to develop
+git checkout develop
+# Update __version__ = "0.3.6" in version.py
+git commit -m "chore: 🔖 Bump version to 0.3.6-dev"
+```
+
+**Optional Feature Branch Workflow** (for major features):
+
+```bash
+# Create feature branch from develop
+git checkout develop
+git checkout -b feature/weboverlay-rename
+
+# ... 30 commits on feature branch ...
+
+# Squash merge back to develop (clean history)
+git checkout develop
+git merge --squash feature/weboverlay-rename
+git commit -m "feat: ✨ Rename OBS to WebOverlay with full refactor"
+git branch -d feature/weboverlay-rename
+```
+
+**Why This Works:**
+- ✅ `main` stays clean for users (releases only)
+- ✅ `develop` allows rapid iteration without spamming users
+- ✅ Users download from GitHub Releases (tagged on `main`)
+- ✅ Contributors can follow active development on `develop`
+
 ### Commit Messages with Gitmoji (Windows)
 
 **PowerShell cannot handle UTF-8 emojis** - use Git Bash instead:
@@ -369,6 +426,7 @@ DATA_FORMAT_VERSION = "2.1"
 - 🐛 (bug): `\xF0\x9F\x90\x9B`
 - 🚀 (rocket): `\xF0\x9F\x9A\x80`
 - 🔧 (wrench): `\xF0\x9F\x94\xA7`
+- 🔖 (bookmark): `\xF0\x9F\x94\x96` (version tags)
 
 **Why PowerShell fails:** Even with UTF-8 encoding settings, PowerShell strips Unicode during string processing before Git receives it.
 
