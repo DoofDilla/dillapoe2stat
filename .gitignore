@@ -4,3 +4,16 @@ __pycache__/
 *.pyd
 env/
 venv/
+
+# Session data files (local only, not tracked)
+runs.jsonl
+sessions.jsonl
+
+# Backup directory and files
+backups/
+*.backup
+*.backup_*
+
+# Debug output
+debug/*.json
+!debug/.gitkeep
