@@ -127,6 +127,34 @@ client_id = Config.CLIENT_ID
 
 **Path Helpers:** Always use `Config.get_*_path()` methods (handles absolute paths, creates directories)
 
+### ⚠️ Credentials Security - CRITICAL
+
+**Credentials are stored in `credentials.txt` (NOT in code):**
+
+```
+# credentials.txt (3 lines, NOT tracked in Git)
+client_id_here
+client_secret_here
+CharacterName
+```
+
+**NEVER:**
+- ❌ Hardcode `CLIENT_SECRET` in config.py or any Python file
+- ❌ Commit `credentials.txt` to Git (it's in `.gitignore`)
+- ❌ Include actual secrets in examples, comments, or documentation
+- ❌ Log or print `CLIENT_SECRET` in debug output
+
+**When modifying config loading:**
+- ✅ Keep credentials loading from `credentials.txt`
+- ✅ Provide fallback placeholder values if file missing
+- ✅ Use `credentials.txt.example` template for documentation
+- ✅ If secret accidentally exposed in code, user must regenerate API key
+
+**If you accidentally include a secret:**
+1. Remove it immediately from the code
+2. Inform user to regenerate API credentials at https://www.pathofexile.com/developer/docs/api
+3. Do NOT try to remove from Git history (breaks old versions)
+
 ## PoE API Integration
 
 ### Rate Limiting is Critical
