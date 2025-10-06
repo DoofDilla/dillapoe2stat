@@ -5,6 +5,9 @@ __pycache__/
 env/
 venv/
 
+# Credentials file (contains API secrets)
+credentials.txt
+
 # Session data files (local only, not tracked)
 runs.jsonl
 sessions.jsonl
