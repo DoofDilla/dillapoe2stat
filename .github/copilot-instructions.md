@@ -346,6 +346,34 @@ DATA_FORMAT_VERSION = "2.1"
 - **Support new hideout:** Add area code to `AUTO_HIDEOUT_AREAS` in `config.py`
 - **Custom price source:** Extend `price_check_poe2.py` `_fetch_items_with_aliases()`
 
+## Git Workflow & Commits
+
+### Commit Messages with Gitmoji (Windows)
+
+**PowerShell cannot handle UTF-8 emojis** - use Git Bash instead:
+
+```bash
+# Use Git Bash with printf and hex-encoded UTF-8 bytes
+& "C:\Program Files\Git\bin\bash.exe" -c "
+  cd /c/temp/dillapoe2stat && 
+  git add <files> && 
+  printf 'type: \xF0\x9F\x93\x9D Description\n\n* Details...\n' > commit_msg.txt && 
+  git commit -F commit_msg.txt && 
+  rm commit_msg.txt
+"
+```
+
+**Common gitmoji hex codes:**
+- 📝 (memo): `\xF0\x9F\x93\x9D`
+- ✨ (sparkles): `\xE2\x9C\xA8`
+- 🐛 (bug): `\xF0\x9F\x90\x9B`
+- 🚀 (rocket): `\xF0\x9F\x9A\x80`
+- 🔧 (wrench): `\xF0\x9F\x94\xA7`
+
+**Why PowerShell fails:** Even with UTF-8 encoding settings, PowerShell strips Unicode during string processing before Git receives it.
+
+**Commit format:** Follow `.copilot-commit-message-instructions.md` (Conventional Commits + gitmoji)
+
 ## Questions to Ask User
 
 When unclear:
