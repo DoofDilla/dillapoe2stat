@@ -23,15 +23,22 @@ class Config:
     # USER SETTINGS - Customize these for your setup
     # ============================================================================
     
-    # Character & Account
-    CHAR_TO_CHECK = "Mettmanwalking"  # Change this to your character name
+    # Load credentials from credentials.txt (not tracked in Git)
+    _credentials_file = Path(__file__).parent / "credentials.txt"
+    if _credentials_file.exists():
+        with open(_credentials_file, 'r', encoding='utf-8') as f:
+            _lines = [line.strip() for line in f.readlines()]
+            CLIENT_ID = _lines[0] if len(_lines) > 0 else "your_client_id"
+            CLIENT_SECRET = _lines[1] if len(_lines) > 1 else "your_client_secret"
+            CHAR_TO_CHECK = _lines[2] if len(_lines) > 2 else "YourCharacterName"
+    else:
+        # Fallback values if credentials.txt doesn't exist
+        CLIENT_ID = "your_client_id"
+        CLIENT_SECRET = "your_client_secret"
+        CHAR_TO_CHECK = "YourCharacterName"
     
     # PoE2 Client
     CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
-    
-    # API Authentication
-    CLIENT_ID = "dillapoe2stat"
-    CLIENT_SECRET = "UgraAmlUXdP1"  # Change this to your actual secret
     
     # ============================================================================
     # ASSETS & RESOURCES
