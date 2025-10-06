@@ -17,3 +17,6 @@ backups/
 # Debug output
 debug/*.json
 !debug/.gitkeep
+
+# Cache files
+cache/
