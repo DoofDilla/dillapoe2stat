@@ -8,6 +8,9 @@ venv/
 # Credentials file (contains API secrets)
 credentials.txt
 
+# MCP configuration (contains local paths)
+.vscode/mcp.json
+
 # Session data files (local only, not tracked)
 runs.jsonl
 sessions.jsonl
