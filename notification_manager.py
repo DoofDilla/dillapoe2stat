@@ -99,18 +99,18 @@ class NotificationManager:
         except Exception as e:
             print(f"Warning: Failed to send notification '{template_key}': {e}")
     
-    def notify_from_game_state(self, template_key, game_state, icon_type=None, **extra_values):
-        """Create notification from template using game state data
+    def get_template_variables(self, game_state):
+        """Extract template variables from game state for overlay/notifications
+        
+        This method provides the same 40+ template variables used by notifications,
+        enabling zero-duplication between notification templates and overlay templates.
         
         Args:
-            template_key: Key for the notification template
             game_state: Game state object with data
-            icon_type: Type of icon to use ('pre_map', 'post_map', 'waystone', 'automode')
-            **extra_values: Additional template values
+            
+        Returns:
+            dict: Template variables with formatted values
         """
-        if not self.config.NOTIFICATION_ENABLED:
-            return
-        
         # Get base data from game state (should already include calculated values)
         values = game_state.get_notification_data()
         
@@ -147,6 +147,23 @@ class NotificationManager:
             # Best map formatting
             'best_map_value_fmt': self._format_currency(values['best_map_value']),
         })
+        
+        return values
+    
+    def notify_from_game_state(self, template_key, game_state, icon_type=None, **extra_values):
+        """Create notification from template using game state data
+        
+        Args:
+            template_key: Key for the notification template
+            game_state: Game state object with data
+            icon_type: Type of icon to use ('pre_map', 'post_map', 'waystone', 'automode')
+            **extra_values: Additional template values
+        """
+        if not self.config.NOTIFICATION_ENABLED:
+            return
+        
+        # Get template variables (reuses get_template_variables logic)
+        values = self.get_template_variables(game_state)
         
         # Add any extra values provided
         values.update(extra_values)

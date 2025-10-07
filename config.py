@@ -105,6 +105,13 @@ class Config:
     OBS_QUIET_MODE = True  # Suppress Flask request logs for cleaner output
     
     # ============================================================================
+    # KISS OVERLAY
+    # ============================================================================
+    
+    KISS_OVERLAY_ENABLED = True  # Enable file-based overlay state updates
+    KISS_OVERLAY_STATE_FILE = "overlay_state.json"  # State file path (relative to project root)
+    
+    # ============================================================================
     # API & RATE LIMITING
     # ============================================================================
     

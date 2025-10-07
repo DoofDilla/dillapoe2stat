@@ -102,7 +102,8 @@ class MapFlowController:
         display: DisplayManager,
         notification: NotificationManager,
         config,
-        debugger=None
+        debugger=None,
+        tracker=None
     ):
         """Initialize flow controller with all required services
         
@@ -115,6 +116,7 @@ class MapFlowController:
             notification: Notification manager for toasts
             config: Configuration object
             debugger: Optional debug helper
+            tracker: Main tracker instance (for overlay_writer access)
         """
         self.snapshot_service = snapshot_service
         self.inventory_analyzer = inventory_analyzer
@@ -124,9 +126,36 @@ class MapFlowController:
         self.notify = notification
         self.config = config
         self.debugger = debugger
+        self.tracker = tracker
         
         # Snapshot storage
         self.pre_snapshot: Optional[InventorySnapshot] = None
+    
+    def update_overlay(self, phase: str):
+        """Update overlay state file with current phase
+        
+        Args:
+            phase: Phase identifier (e.g. 'post_update_session')
+        """
+        # Check if overlay is enabled and initialized
+        if not self.config.KISS_OVERLAY_ENABLED:
+            return
+        
+        if not self.tracker or not hasattr(self.tracker, 'overlay_writer'):
+            return
+        
+        if not self.tracker.overlay_writer:
+            return
+        
+        # Get template variables from notification manager
+        # (This is the SAME data used for notifications!)
+        template_vars = self.notify.get_template_variables(self.game_state)
+        
+        # Write to overlay state file
+        self.tracker.overlay_writer.update(
+            current_phase=phase,
+            template_variables=template_vars
+        )
     
     # ============================================================================
     # PRE-MAP FLOW (4 Phases)
@@ -146,15 +175,19 @@ class MapFlowController:
         """
         try:
             # Phase 1: Snapshot
+            self.update_overlay('pre_snapshot')
             self.pre_snapshot = self._phase_pre_snapshot()
             
             # Phase 2: Parse map info
+            self.update_overlay('pre_parse')
             map_info = self._phase_parse_map_info()
             
             # Phase 3: Update state
+            self.update_overlay('pre_update_state')
             self._phase_update_pre_state(map_info)
             
             # Phase 4: Notify
+            self.update_overlay('pre_notify')
             self._phase_pre_notification()
             
             return True
@@ -280,33 +313,42 @@ class MapFlowController:
         
         try:
             # Phase 1: Snapshot
+            self.update_overlay('post_snapshot')
             post_snapshot = self._phase_post_snapshot(simulated_data)
             
             # Phase 2: Diff inventories
+            self.update_overlay('post_diff')
             diff_result = self._phase_inventory_diff(post_snapshot)
             
             # Phase 3: Calculate value
+            self.update_overlay('post_value')
             value_result = self._phase_calculate_value(diff_result, post_snapshot)
             
             # Calculate map runtime
             map_runtime = self._calculate_map_runtime()
             
             # Phase 4: Capture session state BEFORE update (for notification comparison)
+            self.update_overlay('post_capture_session')
             session_before = self._phase_capture_session_before()
             
             # Phase 5: Update session & state
+            self.update_overlay('post_update_session')
             self._phase_update_post_state(value_result, map_runtime, obs_server)
             
             # Phase 6: Notify
+            self.update_overlay('post_notify')
             self._phase_post_notification(session_before)
             
             # Phase 7: Log the run
+            self.update_overlay('post_log')
             self._phase_log_run(diff_result, value_result.total_value_ex, map_runtime)
             
             # Phase 8: Display session progress
+            self.update_overlay('post_display')
             self._phase_display_session()
             
             # Phase 9: Reset current map
+            self.update_overlay('post_reset')
             self._phase_reset_map()
             
             return True
