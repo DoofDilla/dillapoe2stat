@@ -26,3 +26,4 @@ debug/*.json
 
 # Cache files
 cache/
+.vscode/mcp.json
