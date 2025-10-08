@@ -175,4 +175,10 @@ if __name__ == "__main__":
     print("   - Drag with left mouse to move")
     print("   - Close window to exit")
     
-    overlay.run()
+    try:
+        overlay.run()
+    except KeyboardInterrupt:
+        print("\n✅ KISS Overlay closed cleanly")
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        raise
