@@ -110,6 +110,7 @@ def _build_modifiers_section(template_vars: dict) -> str:
     modifiers = []
     
     modifier_map = {
+        'waystone_delirious': 'Delirium: {waystone_delirious}%',
         'pack_size': 'Pack Size: +{pack_size}%',
         'magic_monsters': 'Magic Monsters: +{magic_monsters}%',
         'rare_monsters': 'Rare Monsters: +{rare_monsters}%',
