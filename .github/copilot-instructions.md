@@ -428,9 +428,11 @@ DATA_FORMAT_VERSION = "2.1"
 |------|---------|-----------|
 | `docs/SESSION_FLOW.md` | Phase flow diagrams | Modifying tracking logic |
 | `notification_templates.py` | All 40+ template vars | Adding notification data |
+| `kiss_overlay/kiss_overlay_templates.py` | Overlay templates | Modifying overlay display |
 | `config.py` | All settings + validation | Adding config options |
 | `game_state.py` | Central state management | Understanding state lifecycle |
 | `CHANGELOG.md` | Release history | Understanding version changes |
+| `docs/REFACTORING_SUMMARY_v034.md` | v0.3.4 refactoring details | Understanding recent changes |
 
 ## Quick Wins for Contributors
 

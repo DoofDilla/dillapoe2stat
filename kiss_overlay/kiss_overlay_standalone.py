@@ -280,7 +280,7 @@ class KISSOverlayStandalone:
         try:
             if not os.path.exists(self.state_file):
                 self.data_label.config(
-                    text="Waiting for tracker...\n\n(overlay_state.json not found)",
+                    text="Waiting for tracker...\n\n(kiss_overlay_state.json not found)",
                     fg="#888888"
                 )
             else:
@@ -310,7 +310,7 @@ class KISSOverlayStandalone:
         Update overlay display with state data using template system
         
         Args:
-            state: Parsed overlay_state.json content
+            state: Parsed kiss_overlay_state.json content
         """
         phase = state.get("current_phase", "unknown")
         phase_name = state.get("phase_display_name", "Unknown Phase")
