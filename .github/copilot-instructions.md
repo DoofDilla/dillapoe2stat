@@ -527,6 +527,51 @@ git branch -d feature/weboverlay-rename
 
 **Commit format:** Follow `.copilot-commit-message-instructions.md` (Conventional Commits + gitmoji)
 
+## Memory Management
+
+**MCP Memory Server** is available for persistent knowledge storage across chat sessions.
+
+### When to Update Memory
+
+Automatically update memory graph after:
+- ✅ **Major features** - New systems like KISS Overlay, WebOverlay, Waystone Intelligence
+- ✅ **Architecture changes** - Phase flow modifications, new patterns, core refactorings
+- ✅ **Bug fixes** - Critical fixes that change behavior or require awareness
+- ✅ **Important decisions** - Design choices, rejected approaches, lessons learned
+- ✅ **Session milestones** - End of productive session with multiple commits
+
+### Memory Entity Types
+
+Use appropriate entity types for different knowledge:
+- `feature` - Completed features (KISS Overlay, Auto-Detection, etc.)
+- `architecture` - Design patterns (Phase-Based Flow, Template System)
+- `core_pattern` - Critical rules (Session double-counting prevention)
+- `security` - Security practices (credentials.txt handling)
+- `workflow` - Development workflows (Git branching, gitmoji commits)
+- `roadmap` - Planned features (WebOverlay rename, PySide6 migration)
+- `session_notes` - Session summaries with commits and changes
+- `user` - User preferences and environment details
+
+### Memory Relations
+
+Connect entities with meaningful relations:
+- `is_feature_of` - Feature belongs to project
+- `is_core_pattern_of` - Pattern is fundamental to project
+- `powers` / `uses` - Component dependencies
+- `documents_work_on` - Session notes about specific work
+- `planned_for` - Future features for project
+- `preferred_by` - User preferences
+
+### Memory Best Practices
+
+- 🎯 **Be specific** - Include file names, phase names, exact behavior
+- 📊 **Quantify** - "40+ template variables", "9 POST phases", "500ms poll interval"
+- 🔗 **Link entities** - Create relations to show connections
+- 📝 **Session notes** - Document daily work with dates and commit references
+- 🔄 **Update observations** - Add to existing entities instead of creating duplicates
+
+**Note:** Memory is shared across all chat sessions - use it to maintain context!
+
 ## Questions to Ask User
 
 When unclear:
