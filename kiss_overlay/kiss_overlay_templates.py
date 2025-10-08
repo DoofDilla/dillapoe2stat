@@ -56,7 +56,7 @@ TEMPLATE_PRE_SNAPSHOT = (
 )
 
 TEMPLATE_PRE_NOTIFY = (
-    '🗺️  IN MAP\n'
+    '{phase_name}\n'
     '────────────────────────────────────\n'
     'Area: {map_name}\n'
     'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
@@ -79,7 +79,7 @@ TEMPLATE_POST_UPDATE_SESSION = (
 )
 
 TEMPLATE_POST_RESET = (
-    '✅ MAP COMPLETE\n'
+    '{phase_name}\n'
     '────────────────────────────────────\n'
     'Last Map: {map_name}\n'
     'Value: {map_value_fmt}\n'

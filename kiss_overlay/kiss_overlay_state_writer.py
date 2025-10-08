@@ -35,7 +35,7 @@ PHASE_DISPLAY_NAMES = {
     'pre_snapshot': 'PRE-1: Snapshot',
     'pre_parse': 'PRE-2: Parse Map',
     'pre_update_state': 'PRE-3: Update State',
-    'pre_notify': 'PRE-4: Notify',
+    'pre_notify': 'IN MAP 🗺️',
     'post_snapshot': 'POST-1: Snapshot',
     'post_diff': 'POST-2: Diff Items',
     'post_value': 'POST-3: Value Items',
@@ -44,7 +44,7 @@ PHASE_DISPLAY_NAMES = {
     'post_notify': 'POST-6: Notify',
     'post_log': 'POST-7: Log',
     'post_display': 'POST-8: Display',
-    'post_reset': 'POST-9: Reset',
+    'post_reset': 'MAP COMPLETE ✅',
     'waystone_analysis': 'Waystone Analysis'
 }
 
