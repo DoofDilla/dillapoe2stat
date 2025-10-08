@@ -97,10 +97,11 @@ notification = TEMPLATE.format(**template_vars)
 
 # Overlay System (SAME VARS!)
 template_vars = get_template_variables(game_state)
-overlay_text = build_overlay_text(phase, template_vars)
+overlay_text = get_template_for_phase(phase, phase_name, template_vars)
 ```
 
 **Zero duplication** of data extraction logic!
+**Same string template format** as notifications (single-line with \n)!
 
 ---
 
@@ -123,13 +124,17 @@ overlay_text = build_overlay_text(phase, template_vars)
 Edit `kiss_overlay_templates.py`:
 
 ```python
-def build_post_update_session_text(template_vars: dict) -> str:
-    """Custom template for Phase 5"""
-    return f"""⚠️ CRITICAL PHASE ⚠️
-────────────────────────────────────
-Adding map to session...
-Value: {template_vars['map_value_fmt']}
-"""
+# Add custom template (matches notification_templates.py style)
+TEMPLATE_CUSTOM_PHASE = (
+    '⚠️ CRITICAL PHASE ⚠️\n'
+    '────────────────────────────────────\n'
+    'Adding map to session...\n'
+    'Value: {map_value_fmt}'
+)
+
+# Use in get_template_for_phase() dispatcher
+elif phase == 'custom_phase':
+    return TEMPLATE_CUSTOM_PHASE.format(**vars_copy)
 ```
 
 ### Custom Phase Display

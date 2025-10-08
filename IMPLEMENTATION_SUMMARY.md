@@ -14,12 +14,13 @@ All components of the KISS Overlay v4 have been successfully implemented.
 - **PHASE_DISPLAY_NAMES** dict (human-readable names)
 - Silent failure pattern (overlay not critical for tracker)
 
-### 2. `kiss_overlay_templates.py` (169 lines)
-- **build_overlay_text()** - Generic template for all phases
-- **build_waystone_analysis_text()** - Ctrl+F2 waystone template
-- **build_pre_snapshot_text()** - PRE-1 minimalist template  
-- **build_post_update_session_text()** - POST-5 critical phase (red warning)
-- **get_template_for_phase()** - Template selector with fallback
+### 2. `kiss_overlay_templates.py` (200 lines)
+- **String-based templates** matching `notification_templates.py` style
+- **SECTION_*** - Reusable template sections (waystone, session, drops)
+- **TEMPLATE_*** - Phase-specific templates (default, pre, post, waystone)
+- **get_template_for_phase()** - Template dispatcher with conditional sections
+- **Helper functions** - `_build_modifiers_section()`, `_build_session_context()`
+- **Format:** Single-line strings with `\n` (no triple-quotes)
 
 ### 3. `kiss_overlay_standalone.py` (182 lines)
 - **KISSOverlayStandalone** Tkinter window class
@@ -191,7 +192,7 @@ python kiss_overlay_standalone.py
 | Component | Lines | Purpose |
 |-----------|-------|---------|
 | overlay_state_writer.py | 95 | JSON writer |
-| kiss_overlay_templates.py | 169 | Display templates |
+| kiss_overlay_templates.py | 200 | String templates (notification style) |
 | kiss_overlay_standalone.py | 182 | Tkinter overlay |
 | test_overlay_templates.py | 30 | Testing |
 | KISS_OVERLAY_README.md | 300+ | Documentation |

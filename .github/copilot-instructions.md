@@ -226,6 +226,43 @@ Config.APP_ID = "BoneBunnyStats v0.3.4"
 
 `AppRegistration.ensure_app_registered()` runs on startup - handles registry setup
 
+## KISS Overlay System (v0.3.4+)
+
+### String-Based Templates
+
+**Critical:** Overlay templates in `kiss_overlay_templates.py` **must match** `notification_templates.py` format:
+
+```python
+# ✅ CORRECT - Single-line strings with \n
+SECTION_WAYSTONE = (
+    'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
+    'Pack Size: +{waystone_pack_size}%\n'
+    'Magic Monsters: +{magic_monsters}%'
+)
+
+# ❌ WRONG - Triple-quote multi-line strings
+SECTION_WAYSTONE = """Waystone: T{waystone_tier}
+Pack Size: +{waystone_pack_size}%"""
+```
+
+**Template Architecture:**
+- `SECTION_*` → Reusable template sections (waystone, session, drops)
+- `TEMPLATE_*` → Phase-specific full templates (default, pre, post, waystone)
+- `get_template_for_phase()` → Main dispatcher with conditional logic
+- Helper functions → `_build_modifiers_section()`, `_build_session_context()`
+
+**Template Variable Reuse:**
+- Overlay uses **same 40+ variables** as notifications via `get_template_variables()`
+- Zero duplication of data extraction logic
+- Add variables once in `GameState` / `SessionManager`, available everywhere
+
+**When modifying overlay templates:**
+1. Always use single-line format with `\n` (never `"""` multi-line)
+2. Use parentheses for multi-line template definitions
+3. Add new sections as `SECTION_*` constants
+4. Update `get_template_for_phase()` dispatcher for new phases
+5. Test with `test_kiss_templates.py` (if exists)
+
 ## Hotkey System
 
 ### Global Keyboard Bindings
