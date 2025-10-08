@@ -11,7 +11,7 @@ Uses conditional sections for dynamic content
 
 SECTION_WAYSTONE = (
     'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
-    'Pack Size: +{waystone_pack_size}%\n'
+    'Pack Size: +{pack_size}%\n'
     'Magic Monsters: +{magic_monsters}%\n'
     'Rare Monsters: +{rare_monsters}%\n'
     'Item Rarity: +{item_rarity}%\n'
@@ -20,7 +20,7 @@ SECTION_WAYSTONE = (
 
 SECTION_SESSION = (
     'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
-    'Runtime: {session_runtime_str}'
+    'Runtime: {session_time}'
 )
 
 SECTION_LAST_MAP = (
@@ -61,12 +61,12 @@ TEMPLATE_PRE_NOTIFY = (
     'Area: {map_name}\n'
     'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
     '────────────────────────────────────\n'
-    'Pack Size: +{waystone_pack_size}%\n'
+    'Pack Size: +{pack_size}%\n'
     'Magic: +{magic_monsters}% | Rare: +{rare_monsters}%\n'
     'Rarity: +{item_rarity}% | Waystone: +{waystone_drop_chance}%\n'
     '────────────────────────────────────\n'
     'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
-    'Runtime: {session_runtime_str}'
+    'Runtime: {session_time}'
 )
 
 TEMPLATE_POST_UPDATE_SESSION = (
@@ -86,7 +86,7 @@ TEMPLATE_POST_RESET = (
     'Top Drop: {map_drop_1_name} ({map_drop_1_value_fmt})\n'
     '────────────────────────────────────\n'
     'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
-    'Runtime: {session_runtime_str}\n'
+    'Runtime: {session_time}\n'
     'Avg per Map: {session_avg_value_fmt}'
 )
 
