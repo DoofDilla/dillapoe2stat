@@ -9,52 +9,72 @@ Uses conditional sections for dynamic content
 # TEMPLATE SECTIONS (Reusable building blocks)
 # ============================================================================
 
-SECTION_WAYSTONE = """Waystone: T{waystone_tier} | {waystone_delirious}% Delirium
-Pack Size: +{waystone_pack_size}%"""
+SECTION_WAYSTONE = (
+    'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
+    'Pack Size: +{waystone_pack_size}%\n'
+    'Magic Monsters: +{magic_monsters}%\n'
+    'Rare Monsters: +{rare_monsters}%\n'
+    'Item Rarity: +{item_rarity}%\n'
+    'Waystone Drop: +{waystone_drop_chance}%'
+)
 
-SECTION_SESSION = """Session: {session_maps_completed} maps | {session_value_per_hour_fmt}
-Runtime: {session_runtime_str}"""
+SECTION_SESSION = (
+    'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
+    'Runtime: {session_runtime_str}'
+)
 
-SECTION_LAST_MAP = """Last Map: {map_value_fmt}
-Area: {map_name}"""
+SECTION_LAST_MAP = (
+    'Last Map: {map_value_fmt}\n'
+    'Area: {map_name}'
+)
 
-SECTION_TOP_DROP = """Top Drop: {map_drop_1_name} ({map_drop_1_value_fmt})"""
+SECTION_TOP_DROP = 'Top Drop: {map_drop_1_name} ({map_drop_1_value_fmt})'
 
-SECTION_SESSION_BEST = """Session Best: {session_drop_1_name}
-Value: {session_drop_1_value_fmt}"""
+SECTION_SESSION_BEST = (
+    'Session Best: {session_drop_1_name}\n'
+    'Value: {session_drop_1_value_fmt}'
+)
 
 # ============================================================================
 # PHASE-SPECIFIC TEMPLATES
 # ============================================================================
 
-TEMPLATE_DEFAULT = """Phase: {phase_name}
-────────────────────────────────────
-{waystone_section}
-{session_section}
-{last_map_section}
-{session_best_section}"""
+TEMPLATE_DEFAULT = (
+    'Phase: {phase_name}\n'
+    '────────────────────────────────────\n'
+    '{waystone_section}\n'
+    '{session_section}\n'
+    '{last_map_section}\n'
+    '{session_best_section}'
+)
 
-TEMPLATE_PRE_SNAPSHOT = """Phase: PRE-1: Snapshot
-────────────────────────────────────
-Preparing: T{waystone_tier} ({waystone_delirious}% Delirium)
-Taking inventory snapshot..."""
+TEMPLATE_PRE_SNAPSHOT = (
+    'Phase: PRE-1: Snapshot\n'
+    '────────────────────────────────────\n'
+    'Preparing: T{waystone_tier} ({waystone_delirious}% Delirium)\n'
+    'Taking inventory snapshot...'
+)
 
-TEMPLATE_POST_UPDATE_SESSION = """Phase: POST-5: Update Session 🔴
-────────────────────────────────────
-⚠️  CRITICAL: Adding map to session
-────────────────────────────────────
-Map Value: {map_value_fmt}
-Session: {session_maps_completed} maps | {session_value_per_hour_fmt}"""
+TEMPLATE_POST_UPDATE_SESSION = (
+    'Phase: POST-5: Update Session 🔴\n'
+    '────────────────────────────────────\n'
+    '⚠️  CRITICAL: Adding map to session\n'
+    '────────────────────────────────────\n'
+    'Map Value: {map_value_fmt}\n'
+    'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}'
+)
 
-TEMPLATE_WAYSTONE_ANALYSIS = """Waystone Analysis
-────────────────────────────────────
-{waystone_name}
-Tier: {waystone_tier} | Delirium: {waystone_delirious}%
-Prefixes: {waystone_prefixes} | Suffixes: {waystone_suffixes}
-────────────────────────────────────
-{modifiers_section}
-────────────────────────────────────
-{session_context_section}"""
+TEMPLATE_WAYSTONE_ANALYSIS = (
+    'Waystone Analysis\n'
+    '────────────────────────────────────\n'
+    '{waystone_name}\n'
+    'Tier: {waystone_tier} | Delirium: {waystone_delirious}%\n'
+    'Prefixes: {waystone_prefixes} | Suffixes: {waystone_suffixes}\n'
+    '────────────────────────────────────\n'
+    '{modifiers_section}\n'
+    '────────────────────────────────────\n'
+    '{session_context_section}'
+)
 
 # ============================================================================
 # HELPER FUNCTIONS (Minimal logic for conditional sections)
