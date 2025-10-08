@@ -8,6 +8,24 @@
 
 **Core Entry Point:** `poe_stats_refactored_v2.py` - main tracker with global hotkey bindings
 
+## Available MCP Servers
+
+This project has access to specialized MCP servers for enhanced AI assistance:
+
+### Microsoft Learn MCP Server (`microsoft_docs_*`)
+- **Purpose:** Trusted, up-to-date information from official Microsoft documentation
+- **Use for:** Windows API questions, Python on Windows, Azure integration, .NET interop
+- **Tools available:**
+  - `microsoft_docs_search` - Search official docs (returns 10 concise chunks)
+  - `microsoft_code_sample_search` - Find code examples from Microsoft Learn
+  - `microsoft_docs_fetch` - Get full documentation pages in markdown
+- **When to use:** Win32 API questions (like HWND_TOPMOST, WS_EX_TRANSPARENT), ctypes with Windows, Python best practices
+- **Workflow:** Search → Get overview → Fetch full page if needed
+
+### MCP Memory Server (`mcp_memory_*`)
+- **Purpose:** Persistent knowledge graph across chat sessions
+- **See:** "Memory Management" section below for detailed usage guidelines
+
 ## Critical Architecture Patterns
 
 ### Phase-Based Flow Controller (v0.3.4+)
