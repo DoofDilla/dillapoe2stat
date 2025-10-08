@@ -16,8 +16,10 @@ runs.jsonl
 sessions.jsonl
 
 # KISS Overlay state (runtime data)
-overlay_state.json
-overlay_state.json.tmp
+# KISS Overlay runtime files
+kiss_overlay/kiss_overlay_state.json
+kiss_overlay/kiss_overlay_state.json.tmp
+kiss_overlay/kiss_overlay_position.json
 
 # Backup directory and files
 backups/

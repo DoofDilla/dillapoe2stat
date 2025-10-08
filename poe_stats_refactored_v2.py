@@ -94,7 +94,7 @@ class PoEStatsTracker:
         self.overlay_writer = None
         if self.config.KISS_OVERLAY_ENABLED:
             try:
-                from overlay_state_writer import OverlayStateWriter
+                from kiss_overlay.kiss_overlay_state_writer import OverlayStateWriter
                 self.overlay_writer = OverlayStateWriter(
                     state_file=self.config.KISS_OVERLAY_STATE_FILE
                 )

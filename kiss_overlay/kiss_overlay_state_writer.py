@@ -1,4 +1,4 @@
-# overlay_state_writer.py
+# kiss_overlay_state_writer.py
 """
 Simple JSON file writer for KISS Overlay state
 Reuses existing NotificationManager.get_template_variables()
@@ -52,7 +52,7 @@ PHASE_DISPLAY_NAMES = {
 class OverlayStateWriter:
     """Writes overlay state to JSON file using notification template variables"""
     
-    def __init__(self, state_file="overlay_state.json"):
+    def __init__(self, state_file="kiss_overlay/kiss_overlay_state.json"):
         self.state_file = state_file
     
     def update(self, current_phase: str, template_variables: dict):
