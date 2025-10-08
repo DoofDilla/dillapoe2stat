@@ -282,10 +282,6 @@ class PoEStatsTracker:
     def analyze_waystone(self):
         """Analyze waystone from inventory (experimental) - display only, no map start"""
         try:
-            # Update overlay - Waystone Analysis phase
-            if self.flow_controller:
-                self.flow_controller.update_overlay('waystone_analysis')
-            
             # Take inventory snapshot for waystone analysis only
             waystone_snapshot = self.snapshot_service.take_snapshot(
                 self.config.CHAR_TO_CHECK,
@@ -314,13 +310,17 @@ class PoEStatsTracker:
                 self.game_state.update_session_progress(progress)
                 self.notification_manager.notify_experimental_pre_map(self.game_state)
                 
-                # Update overlay again with waystone data
+                # Update overlay with complete waystone data (moved to end, after all state updates)
                 if self.flow_controller:
                     self.flow_controller.update_overlay('waystone_analysis')
                 
             else:
                 print("⚠️  No waystone found in top-left inventory position (0,0)")
                 self.game_state.update_waystone_info(None)
+                
+                # Update overlay to show "no waystone" state
+                if self.flow_controller:
+                    self.flow_controller.update_overlay('waystone_analysis')
                 
         except Exception as e:
             self.display.display_error("WAYSTONE ANALYSIS", str(e))
