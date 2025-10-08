@@ -109,7 +109,7 @@ class Config:
     # ============================================================================
     
     KISS_OVERLAY_ENABLED = True  # Enable file-based overlay state updates
-    KISS_OVERLAY_STATE_FILE = "kiss_overlay/kiss_overlay_state.json"  # State file path (relative to project root)
+    KISS_OVERLAY_STATE_FILE = "kiss_overlay/kiss_overlay_state.json"  # State file (relative to project root)
     
     # ============================================================================
     # API & RATE LIMITING

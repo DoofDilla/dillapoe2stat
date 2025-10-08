@@ -84,4 +84,5 @@ class OverlayStateWriter:
             
         except Exception as e:
             # Silent failure - overlay not critical for tracker
+            # Uncomment for debugging: print(f"Overlay write failed: {e}")
             pass

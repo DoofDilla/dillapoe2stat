@@ -12,6 +12,11 @@ Features:
 Hotkeys:
 - F10: Toggle overlay visibility (show/hide)
 - Shift+F10: Toggle click-through mode (green) / draggable mode (orange)
+
+Usage:
+    python kiss_overlay_standalone.py
+    python kiss_overlay_standalone.py --state-file ../kiss_overlay_state.json
+    python kiss_overlay_standalone.py --poll-interval 250
 """
 
 import tkinter as tk
@@ -23,6 +28,7 @@ import ctypes
 from ctypes import wintypes
 import keyboard
 import atexit
+import signal
 
 
 # Import template builder
@@ -35,11 +41,17 @@ except ImportError:
 
 
 class KISSOverlayStandalone:
-    def __init__(self, state_file="../kiss_overlay_state.json", poll_interval_ms=500, 
-                 position_file="kiss_overlay_position.json"):
+    def __init__(self, state_file="kiss_overlay_state.json", poll_interval_ms=500, 
+                 position_file=None):
         self.state_file = state_file
         self.poll_interval_ms = poll_interval_ms
+        
+        # Default position file: Same directory as state file
+        if position_file is None:
+            state_dir = os.path.dirname(os.path.abspath(state_file))
+            position_file = os.path.join(state_dir, "kiss_overlay_position.json")
         self.position_file = position_file
+        
         self.last_mtime = 0
         self.click_through_active = True  # Start with click-through ON
         self.hwnd = None  # Store window handle for Win32 operations
@@ -111,8 +123,7 @@ class KISSOverlayStandalone:
         # Setup hotkeys (global)
         self._setup_hotkeys()
         
-        # Save position on exit
-        atexit.register(self._save_position)
+        # Position will be saved on exit (but NOT via atexit to avoid Tkinter destruction issues)
         
         # Apply Win32 API enhancements after window is created
         self.root.update_idletasks()  # Ensure window is created
@@ -324,8 +335,39 @@ class KISSOverlayStandalone:
         self.data_label.config(text=display_text, fg=color)
     
     def run(self):
-        """Start Tkinter mainloop"""
+        """Start Tkinter mainloop with proper signal handling"""
+        # Set up signal handler for Ctrl+C
+        def signal_handler(sig, frame):
+            print("\n✅ KISS Overlay closing (Ctrl+C)...")
+            self._save_position()  # Save position BEFORE destroying window
+            try:
+                keyboard.unhook_all()
+            except:
+                pass
+            try:
+                self.root.quit()
+                self.root.destroy()
+            except:
+                pass
+            sys.exit(0)
+        
+        signal.signal(signal.SIGINT, signal_handler)
+        
+        # Set up protocol handler for window close button
+        self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
+        
+        # Start mainloop
         self.root.mainloop()
+    
+    def _on_window_close(self):
+        """Handle window close button (save position before closing)"""
+        self._save_position()
+        try:
+            keyboard.unhook_all()
+        except:
+            pass
+        self.root.quit()
+        self.root.destroy()
 
 
 if __name__ == "__main__":
@@ -334,8 +376,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="KISS Overlay - Standalone (Win32 Always-on-Top, Click-Through)"
     )
-    parser.add_argument("--state-file", default="../kiss_overlay_state.json", 
-                       help="Path to overlay state JSON file (relative to kiss_overlay/)")
+    
+    # Default state file: Same directory as this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    default_state_file = os.path.join(script_dir, "kiss_overlay_state.json")
+    
+    parser.add_argument("--state-file", default=default_state_file, 
+                       help="Path to overlay state JSON file")
     parser.add_argument("--poll-interval", type=int, default=500,
                        help="File polling interval in milliseconds")
     
@@ -348,6 +395,7 @@ if __name__ == "__main__":
     
     print("🔍 KISS Overlay (Standalone) started")
     print(f"   State file: {args.state_file}")
+    print(f"   Position file: {overlay.position_file}")
     print(f"   Poll interval: {args.poll_interval}ms")
     print("\n   🎮 Hotkeys:")
     print("      F10         → Toggle visibility (show/hide)")
@@ -355,13 +403,27 @@ if __name__ == "__main__":
     print("\n   🎨 Title Colors:")
     print("      🟢 Green    → Click-through ON (clicks pass through)")
     print("      🟠 Orange   → Click-through OFF (draggable)")
-    print("\n   💾 Position saved on exit → kiss_overlay_position.json")
+    print("\n   💾 Position saved on exit")
     print("   ❌ Close window or Ctrl+C to exit\n")
     
     try:
         overlay.run()
     except KeyboardInterrupt:
-        print("\n✅ KISS Overlay closed cleanly")
+        print("\n✅ KISS Overlay closed cleanly (Ctrl+C)")
+        try:
+            keyboard.unhook_all()  # Clean up keyboard hooks
+        except:
+            pass
     except Exception as e:
         print(f"\n❌ Error: {e}")
+        try:
+            keyboard.unhook_all()  # Clean up keyboard hooks even on error
+        except:
+            pass
         raise
+    finally:
+        # Ensure keyboard hooks are always cleaned up
+        try:
+            keyboard.unhook_all()
+        except:
+            pass

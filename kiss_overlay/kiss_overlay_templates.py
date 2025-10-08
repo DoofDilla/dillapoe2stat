@@ -55,6 +55,20 @@ TEMPLATE_PRE_SNAPSHOT = (
     'Taking inventory snapshot...'
 )
 
+TEMPLATE_PRE_NOTIFY = (
+    '🗺️  IN MAP\n'
+    '────────────────────────────────────\n'
+    'Area: {map_name}\n'
+    'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
+    '────────────────────────────────────\n'
+    'Pack Size: +{waystone_pack_size}%\n'
+    'Magic: +{magic_monsters}% | Rare: +{rare_monsters}%\n'
+    'Rarity: +{item_rarity}% | Waystone: +{waystone_drop_chance}%\n'
+    '────────────────────────────────────\n'
+    'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
+    'Runtime: {session_runtime_str}'
+)
+
 TEMPLATE_POST_UPDATE_SESSION = (
     'Phase: POST-5: Update Session 🔴\n'
     '────────────────────────────────────\n'
@@ -62,6 +76,18 @@ TEMPLATE_POST_UPDATE_SESSION = (
     '────────────────────────────────────\n'
     'Map Value: {map_value_fmt}\n'
     'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}'
+)
+
+TEMPLATE_POST_RESET = (
+    '✅ MAP COMPLETE\n'
+    '────────────────────────────────────\n'
+    'Last Map: {map_name}\n'
+    'Value: {map_value_fmt}\n'
+    'Top Drop: {map_drop_1_name} ({map_drop_1_value_fmt})\n'
+    '────────────────────────────────────\n'
+    'Session: {session_maps_completed} maps | {session_value_per_hour_fmt}\n'
+    'Runtime: {session_runtime_str}\n'
+    'Avg per Map: {session_avg_value_fmt}'
 )
 
 TEMPLATE_WAYSTONE_ANALYSIS = (
@@ -165,8 +191,14 @@ def get_template_for_phase(phase: str, phase_name: str, template_vars: dict) -> 
     if phase == 'pre_snapshot':
         return TEMPLATE_PRE_SNAPSHOT.format(**vars_copy)
     
+    elif phase == 'pre_notify':
+        return TEMPLATE_PRE_NOTIFY.format(**vars_copy)
+    
     elif phase == 'post_update_session':
         return TEMPLATE_POST_UPDATE_SESSION.format(**vars_copy)
+    
+    elif phase == 'post_reset':
+        return TEMPLATE_POST_RESET.format(**vars_copy)
     
     elif phase == 'waystone_analysis':
         # Build conditional sections

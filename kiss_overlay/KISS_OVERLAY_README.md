@@ -22,10 +22,17 @@ The tracker will create `overlay_state.json` automatically.
 ### 3. Start Overlay (Separate Process)
 
 ```bash
+# From project root
+cd kiss_overlay
+python kiss_overlay_standalone.py
+
+# Or from kiss_overlay directory
 python kiss_overlay_standalone.py
 ```
 
 **Done!** The overlay now displays current phase and key metrics.
+
+**Note:** The script automatically looks for `kiss_overlay_state.json` in the same directory as the script.
 
 ---
 
@@ -55,7 +62,7 @@ Reuses existing notification variables:
 
 ### Default Settings
 ```bash
-# Default poll interval: 500ms
+# Default poll interval: 500ms (looks for kiss_overlay_state.json in script directory)
 python kiss_overlay_standalone.py
 ```
 
@@ -64,7 +71,7 @@ python kiss_overlay_standalone.py
 # Faster updates (250ms)
 python kiss_overlay_standalone.py --poll-interval 250
 
-# Custom state file
+# Custom state file (absolute path)
 python kiss_overlay_standalone.py --state-file C:\custom\overlay_state.json
 ```
 
