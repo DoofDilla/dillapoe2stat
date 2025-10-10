@@ -100,10 +100,11 @@ OVERVIEW_ALIASES: Dict[str, List[str]] = {
     "expeditions": ["Expedition", "Expedition", "expeditions", "expedition"],
     "waystones": ["waystones", "Waystones", "Waystone", "Maps"],
     "delirium": ["Delirium", "delirium", "delirious"],
+    "uncutgems": ["UncutGems", "UncutGem", "uncutgems"],
 }
 
 DEFAULT_PROBE = ["Currency", "Ritual", "delirium", "catalysts", "ultimatum", "runes",
-                 "Fragments", "essences", "waystones", "talismans", "expeditions", "abyss"]
+                 "Fragments", "essences", "waystones", "talismans", "expeditions", "abyss", "uncutgems"]
 
 # --- Fetch Layer --------------------------------------------------------------
 def _fetch_items_once(overview_name: str, league: str = LEAGUE):
@@ -239,6 +240,9 @@ def guess_category_from_item(it: dict) -> Optional[str]:
 
     if frame == 5 and (stack or "/currency/" in icon or " orb" in txt):
         return "Currency"
+    # Uncut Gems zuerst prüfen (vor anderen gem checks)
+    if "uncut" in txt and "gem" in txt:
+        return "uncutgems"
     # Delirium items zuerst prüfen (vor catalyst/breach splinter check!)
     if "delirium" in txt or "diluted" in txt or "liquid" in txt or "simulacrum" in txt or "/delirium/" in icon:
         return "delirium"
