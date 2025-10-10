@@ -8,6 +8,42 @@
 
 **Core Entry Point:** `poe_stats_refactored_v2.py` - main tracker with global hotkey bindings
 
+## ⚠️ CRITICAL: Git Commit Rules (READ THIS FIRST!)
+
+**EVERY COMMIT MUST HAVE GITMOJI - NO EXCEPTIONS!**
+
+### How to Commit (Windows)
+
+**❌ NEVER do this:**
+```bash
+git commit -m "feat: Add feature"  # Missing gitmoji! PowerShell strips emojis!
+```
+
+**✅ ALWAYS do this:**
+```bash
+& "C:\Program Files\Git\bin\bash.exe" -c "
+  cd /c/temp/dillapoe2stat && 
+  printf 'feat: \xE2\x9C\xA8 Add feature\n\n- Detail 1\n- Detail 2\n' > commit_msg.txt && 
+  git commit -F commit_msg.txt && 
+  rm commit_msg.txt
+"
+```
+
+**Common gitmoji hex codes (MEMORIZE THESE):**
+- ✨ `feat:` new feature → `\xE2\x9C\xA8`
+- 🐛 `fix:` bug fix → `\xF0\x9F\x90\x9B`
+- 📝 `docs:` documentation → `\xF0\x9F\x93\x9D`
+- 🔧 `chore:` config/tooling → `\xF0\x9F\x94\xA7`
+- 🚀 `perf:` performance → `\xF0\x9F\x9A\x80`
+- 🔖 `chore:` version bump → `\xF0\x9F\x94\x96`
+
+**If you forget gitmoji:**
+1. STOP immediately
+2. `git reset --soft HEAD~1`
+3. Re-commit with proper gitmoji using Git Bash
+
+**Why:** PowerShell cannot handle UTF-8 emojis - they get stripped before Git sees them!
+
 ## Available MCP Servers
 
 This project has access to specialized MCP servers for enhanced AI assistance:
@@ -517,33 +553,6 @@ git branch -d feature/weboverlay-rename
 - ✅ `develop` allows rapid iteration without spamming users
 - ✅ Users download from GitHub Releases (tagged on `main`)
 - ✅ Contributors can follow active development on `develop`
-
-### Commit Messages with Gitmoji (Windows)
-
-**PowerShell cannot handle UTF-8 emojis** - use Git Bash instead:
-
-```bash
-# Use Git Bash with printf and hex-encoded UTF-8 bytes
-& "C:\Program Files\Git\bin\bash.exe" -c "
-  cd /c/temp/dillapoe2stat && 
-  git add <files> && 
-  printf 'type: \xF0\x9F\x93\x9D Description\n\n* Details...\n' > commit_msg.txt && 
-  git commit -F commit_msg.txt && 
-  rm commit_msg.txt
-"
-```
-
-**Common gitmoji hex codes:**
-- 📝 (memo): `\xF0\x9F\x93\x9D`
-- ✨ (sparkles): `\xE2\x9C\xA8`
-- 🐛 (bug): `\xF0\x9F\x90\x9B`
-- 🚀 (rocket): `\xF0\x9F\x9A\x80`
-- 🔧 (wrench): `\xF0\x9F\x94\xA7`
-- 🔖 (bookmark): `\xF0\x9F\x94\x96` (version tags)
-
-**Why PowerShell fails:** Even with UTF-8 encoding settings, PowerShell strips Unicode during string processing before Git receives it.
-
-**Commit format:** Follow `.copilot-commit-message-instructions.md` (Conventional Commits + gitmoji)
 
 ## Memory Management
 
