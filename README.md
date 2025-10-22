@@ -22,16 +22,26 @@ Track your farming sessions effortlessly with hotkeys, real-time loot valuation 
 - [Quick Installation](#-quick-installation)
 - [Usage Guide](#-usage-guide)
   - [Essential Hotkeys](#essential-hotkeys)
+  - [Additional Hotkeys](#additional-hotkeys)
   - [Automatic Mode](#automatic-mode-)
 - [Features Explained](#-features-explained)
+  - [Loot Valuation](#loot-valuation)
+  - [Session Analytics](#session-analytics)
+  - [Windows Notifications](#windows-notifications)
+  - [OBS Overlays for Streamers](#obs-overlays-for-streamers)
 - [Advanced Analysis Tools](#-advanced-analysis-tools)
+  - [Run Analyzer](#run-analyzer---deep-dive-into-map-performance)
+  - [Session Analyzer](#session-analyzer---overall-performance-stats)
+  - [Customizing Currency Display](#customizing-currency-display)
 - [Screenshots](#-screenshots)
 - [Configuration](#-configuration)
 - [Data & Logs](#-data--logs)
 - [Troubleshooting](#-troubleshooting)
 - [Advanced Topics](#️-advanced-topics)
 - [Contributing](#-contributing)
+- [License](#-license)
 - [Acknowledgements](#-acknowledgements)
+- [Version Info](#-version-info)
 
 ---
 
@@ -133,7 +143,7 @@ python poe_stats_refactored_v2.py
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+F2` | Analyze waystone (inspect tier, mods, Delirious % before running) |
+| `Ctrl+F2` | Analyze waystone (inspect tier, mods, Delirious % before running) **⚠️ Waystone must be in top-left inventory slot (0,0)** |
 | `F4` | Toggle debug mode |
 | `F6` | End current session and start new one |
 | `F8` | Switch between normal and comprehensive output modes |
@@ -155,7 +165,17 @@ python poe_stats_refactored_v2.py
 - ✅ Hideout → Map transitions (triggers pre-snapshot)
 - ✅ Map → Hideout returns (triggers post-snapshot)
 - ✅ Respects Abyss/Breach detours (stays in map mode until you return home)
-- ✅ Optional: Auto-analyzes waystones when passing through Well of Souls
+- ✅ **Well of Souls waystone analysis** - If you visit Well of Souls after a map, it automatically analyzes any waystone in slot 0,0
+
+**Waystone Analysis Integration:**
+
+When auto-detection is enabled, you can visit **Well of Souls** between maps to auto-analyze your next waystone:
+1. Complete map → Return to hideout (auto F3)
+2. Go to **Well of Souls**
+3. Tracker automatically analyzes waystone in slot 0,0
+4. Return to hideout and start next map (auto F2 with cached waystone data)
+
+💡 **Skip Well of Souls:** Place next waystone in slot 0,0 before leaving your current map, then press `Ctrl+F2` manually after returning to hideout.
 
 **Configuration:**
 
@@ -216,6 +236,36 @@ AUTO_DETECTION_CHECK_INTERVAL = 1.0  # Check Client.txt every second
 - Values shown in: Chaos Orbs, Exalted Orbs, Divine Orbs
 - Smart caching for fast lookups
 
+**💡 Important:** Inventory is fetched from the PoE API. For accurate tracking:
+- **Zone changes refresh inventory** - Enter/exit hideout, town, or waystone to update
+- Press `F5` after zoning to verify your current inventory value
+
+### Waystone Pre-Analysis
+
+Press `Ctrl+F2` to analyze a waystone before running it:
+- **⚠️ Requirement:** Waystone must be in **top-left inventory slot (position 0,0)**
+- Shows: Tier, prefix count, suffix count, Delirious %
+- Results are cached for the next `F2` snapshot
+- Great for deciding if a waystone is worth running!
+
+**Two Workflows:**
+
+**Method 1: Well of Souls Detour (Automatic)**
+1. Complete your map
+2. Return to hideout → `F3` triggers automatically
+3. Go to **Well of Souls** (configured as waystone hub)
+4. Waystone analysis triggers automatically when you enter
+5. Return to hideout and start next map with `F2`
+
+**Method 2: Manual Analysis (Faster)**
+1. **Before leaving your current map**, place next waystone in slot 0,0
+2. Complete the map and return to hideout
+3. Press `Ctrl+F2` manually to analyze the waystone
+4. Start next map with `F2` (analysis is already cached)
+5. ✅ No detour needed!
+
+💡 **Pro Tip:** Method 2 saves time by skipping the Well of Souls visit, but requires you to prepare your next waystone before finishing the current map.
+
 ### Session Analytics
 - **Efficiency tiers** - Color-coded performance metrics
 - **Divine Orb patterns** - Track when and where they drop
@@ -230,6 +280,41 @@ Toast notifications for:
 - Waystone analysis results
 
 Customize templates in `notification_templates.py` (40+ variables available)
+
+**Customizing Notifications:**
+
+Edit `notification_templates.py` to change what appears in your toast notifications!
+
+**Example - Change Map Completion Notification:**
+
+```python
+POST_MAP = {
+    'title': '✅ {map_name} ▷ {map_level} ◉ {map_value_fmt}💰',
+    'template': (
+        'Runtime: {map_runtime_fmt}\n'
+        'Best Drop: {map_drop_1_name} x{map_drop_1_stack}\n'
+        'Total Session Value: {session_total_value_fmt}💰'
+    )
+}
+```
+
+**Available Variables (40+):**
+
+| Category | Variables |
+|----------|-----------|
+| **Map Info** | `map_name`, `map_level`, `map_value_fmt`, `map_runtime_fmt` |
+| **Top Drops** | `map_drop_1_name`, `map_drop_1_value_fmt`, `map_drop_2_name`, etc. |
+| **Waystone** | `waystone_tier`, `waystone_delirious`, `pack_size`, `magic_monsters` |
+| **Session** | `session_total_value_fmt`, `session_maps_completed`, `session_value_per_hour_fmt` |
+| **Best Map** | `best_map_name`, `best_map_value_fmt`, `best_map_tier` |
+
+See the full list of 40+ variables in `notification_templates.py` comments!
+
+**Disable Notifications:**
+```python
+# In config.py
+NOTIFICATION_ENABLED = False
+```
 
 ### OBS Overlays for Streamers
 
@@ -426,6 +511,16 @@ Current version: **2.1**
 - Default location: `Documents\My Games\Path of Exile 2\logs\Client.txt`
 - Update `CLIENT_LOG` in `config.py` with correct path
 - Make sure the game has created the log file (run PoE2 first)
+
+**Inventory values seem wrong or outdated**
+- **Inventory only refreshes when you change zones** (enter/exit hideout, town, waystone)
+- After picking up items, zone out and back in, then press `F5` to check updated value
+- The PoE API caches inventory data until you change zones
+
+**Waystone analyzer says "no waystone found"**
+- Waystone must be in **top-left inventory slot (position 0,0)**
+- Make sure you've zoned at least once after picking up the waystone
+- Try moving it to another slot and back to top-left
 
 **No loot values showing**
 - poe.ninja might be rate-limiting or lacking data
