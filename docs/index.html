@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DillaPoE2Stat - Automatic loot tracking and session analytics for Path of Exile 2">
+    <title>DillaPoE2Stat - PoE2 Loot Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #c9a961;
+            --primary-dark: #8b7340;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #050505;
+            --text: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --accent: #ff6b35;
+            --success: #4ecca3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-darker);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-dark);
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.2em;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            margin-left: 30px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            padding: 100px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--primary-dark);
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(201, 169, 97, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+
+        /* Version Badge */
+        .version-badge {
+            display: inline-block;
+            background: var(--primary-dark);
+            color: var(--text);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: var(--bg-dark);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            color: var(--primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--bg-darker);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--primary-dark);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(201, 169, 97, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 80px 0;
+            background: var(--bg-darker);
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .screenshot-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 2px solid var(--primary-dark);
+            transition: all 0.3s;
+        }
+
+        .screenshot-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Installation Section */
+        .installation {
+            padding: 80px 0;
+            background: var(--bg-dark);
+        }
+
+        .install-steps {
+            max-width: 800px;
+            margin: 40px auto 0;
+        }
+
+        .step {
+            background: var(--bg-darker);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step h3 {
+            display: inline-block;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .step ul {
+            margin-top: 10px;
+            margin-left: 20px;
+            color: var(--text-dim);
+        }
+
+        .step a {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background: var(--bg-dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            overflow-x: auto;
+            border: 1px solid var(--primary-dark);
+        }
+
+        .code-block code {
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 60px 0;
+            background: var(--bg-darker);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-dark);
+            padding: 40px 0;
+            text-align: center;
+            border-top: 2px solid var(--primary-dark);
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            margin: 0 15px;
+            font-size: 1.5em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero p {
+                font-size: 1.1em;
+            }
+
+            .section-title {
+                font-size: 2em;
+            }
+
+            .screenshot-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">💎</span>
+                    DillaPoE2Stat
+                </a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#screenshots">Screenshots</a>
+                    <a href="#installation">Installation</a>
+                    <a href="https://github.com/DoofDilla/dillapoe2stat" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="version-badge">v0.4.0 - OAuth 2.1 Migration</div>
+            <h1>DillaPoE2Stat</h1>
+            <p>Automatic loot tracking and session analytics for Path of Exile 2. Track your farming sessions with hotkeys, real-time valuation, and OBS overlays.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/DoofDilla/dillapoe2stat/releases/latest" class="btn btn-primary">
+                    ⬇️ Download Latest Release
+                </a>
+                <a href="https://github.com/DoofDilla/dillapoe2stat" class="btn btn-secondary">
+                    📚 View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">🔐</span>
+                    <div class="stat-label">OAuth 2.1 Secure</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">⚡</span>
+                    <div class="stat-label">Auto-Detection</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">📊</span>
+                    <div class="stat-label">Rich Analytics</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">🎥</span>
+                    <div class="stat-label">OBS Ready</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">⌨️</div>
+                    <h3>Hotkey-Driven</h3>
+                    <p>Start and finish map runs with two key presses. F2 for pre-snapshot, F3 for post-snapshot - done!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Auto-Detection</h3>
+                    <p>Automatic map transition detection through Client.txt monitoring. No manual hotkey presses required!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">💰</div>
+                    <h3>Real-Time Valuation</h3>
+                    <p>Loot valuation via poe.ninja API with Chaos, Exalted, and Divine Orb equivalents. Cached for fast access.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Windows Notifications</h3>
+                    <p>Desktop toast notifications with top drops, session stats, and formatted currency display.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📺</div>
+                    <h3>OBS Overlays</h3>
+                    <p>Built-in Flask server with Browser Source URLs for loot tables and session dashboards. Stream-ready!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📊</div>
+                    <h3>Session Analytics</h3>
+                    <p>Efficiency tiers, best map tracking, Divine Orb patterns, Delirious % correlation, and more!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔮</div>
+                    <h3>Waystone Pre-Analysis</h3>
+                    <p>Inspect waystones before running them - see tier, mods, and Delirious % to make informed choices.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Top Drops Tracking</h3>
+                    <p>Track the 3 most valuable items per map and across your entire session - see what's making you currency!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Best Map Memory</h3>
+                    <p>Automatically remembers your highest-value map of the session with full stats (name, tier, value, runtime).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots" id="screenshots">
+        <div class="container">
+            <h2 class="section-title">Screenshots</h2>
+            <div class="screenshot-grid">
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_startup.png" alt="HasiSkull startup banner">
+                    <div class="screenshot-caption">HasiSkull Startup Banner with Configuration Summary</div>
+                </div>
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_run_with_toast.png" alt="Map completion with toast">
+                    <div class="screenshot-caption">Map Completion Analysis with Windows Toast</div>
+                </div>
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_analysis_1.png" alt="Session analytics">
+                    <div class="screenshot-caption">Session Analytics with Efficiency Tiers</div>
+                </div>
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_windows_toast.png" alt="Windows 11 toast">
+                    <div class="screenshot-caption">Native Windows 11 Toast Notification</div>
+                </div>
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_obs_overlay_loot.png" alt="OBS loot overlay">
+                    <div class="screenshot-caption">OBS Browser Source Overlay - Loot Table</div>
+                </div>
+                <div class="screenshot-item">
+                    <img src="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_obs_overlay_session.png" alt="OBS session overlay">
+                    <div class="screenshot-caption">OBS Browser Source Overlay - Session Stats</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation" id="installation">
+        <div class="container">
+            <h2 class="section-title">Quick Installation</h2>
+            <div class="install-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <h3>Install Python</h3>
+                    <p>Download and install Python 3.10+ from <a href="https://www.python.org/downloads/" target="_blank">python.org</a></p>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <h3>Download DillaPoE2Stat</h3>
+                    <p>Clone the repository or download the latest release</p>
+                    <div class="code-block">
+                        <code>git clone https://github.com/DoofDilla/dillapoe2stat.git</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <h3>Install Dependencies</h3>
+                    <p>Navigate to the project folder and install required packages</p>
+                    <div class="code-block">
+                        <code>cd dillapoe2stat<br>pip install -r requirements.txt</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <h3>Configure OAuth Client</h3>
+                    <p>Register an OAuth Public Client at the <a href="https://www.pathofexile.com/developer/docs" target="_blank">PoE Developer Portal</a></p>
+                    <ul>
+                        <li>Client Type: Public Client</li>
+                        <li>Redirect URI: http://127.0.0.1:8080/callback</li>
+                        <li>Scopes: account:profile account:characters</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <h3>Edit Configuration</h3>
+                    <p>Update config.py with your character name and Client.txt path</p>
+                    <div class="code-block">
+                        <code>CHAR_TO_CHECK = "YourCharacterName"<br>CLIENT_LOG = "C:\\Path\\To\\Client.txt"</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">6</span>
+                    <h3>Run the Tracker</h3>
+                    <p>Start tracking your loot!</p>
+                    <div class="code-block">
+                        <code>python poe_stats_refactored_v2.py</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Made with 💎 for Path of Exile 2 by <a href="https://github.com/DoofDilla" target="_blank">DoofDilla</a></p>
+            <p style="margin-top: 10px; color: var(--text-dim);">Open Source • Free • Community Driven</p>
+            <div class="social-links">
+                <a href="https://github.com/DoofDilla/dillapoe2stat" target="_blank" title="GitHub">🔗</a>
+                <a href="https://github.com/DoofDilla/dillapoe2stat/issues" target="_blank" title="Report Issues">🐛</a>
+                <a href="https://github.com/DoofDilla/dillapoe2stat/wiki" target="_blank" title="Documentation">📚</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
