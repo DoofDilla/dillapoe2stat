@@ -15,6 +15,26 @@ Track your farming sessions effortlessly with hotkeys, real-time loot valuation 
 
 ---
 
+## 📑 Table of Contents
+
+- [Why Use DillaPoE2Stat?](#-why-use-dillapoe2stat)
+- [Key Features](#-key-features)
+- [Quick Installation](#-quick-installation)
+- [Usage Guide](#-usage-guide)
+  - [Essential Hotkeys](#essential-hotkeys)
+  - [Automatic Mode](#automatic-mode-)
+- [Features Explained](#-features-explained)
+- [Advanced Analysis Tools](#-advanced-analysis-tools)
+- [Screenshots](#-screenshots)
+- [Configuration](#-configuration)
+- [Data & Logs](#-data--logs)
+- [Troubleshooting](#-troubleshooting)
+- [Advanced Topics](#️-advanced-topics)
+- [Contributing](#-contributing)
+- [Acknowledgements](#-acknowledgements)
+
+---
+
 ## 🚀 Why Use DillaPoE2Stat?
 
 - ⌨️ **Hotkey-Driven** - Start/stop tracking with F2/F3
@@ -88,6 +108,7 @@ C:\Users\YourName\Documents\My Games\Path of Exile 2\logs\Client.txt
 ```
 
 **4. Run the Tracker**
+
 ```bash
 python poe_stats_refactored_v2.py
 ```
@@ -220,6 +241,80 @@ Customize templates in `notification_templates.py` (40+ variables available)
 4. Enable "Refresh when scene becomes active"
 
 Test overlays with simulation hotkeys: `Ctrl+Shift+F2` / `Ctrl+Shift+F3`
+
+---
+
+## 📈 Advanced Analysis Tools
+
+After farming some maps, analyze your data to find the most profitable strategies!
+
+### Run Analyzer - Deep Dive into Map Performance
+
+**What it does:**
+- Analyzes waystone modifier impact (item quantity, pack size, delirious %, etc.)
+- Finds your most efficient maps
+- Tracks Divine Orb drop patterns
+- Recommends optimal farming strategies
+
+**How to run:**
+
+```bash
+python run_analyzer.py
+```
+
+**What you'll see:**
+- 📊 Waystone modifier impact analysis
+- ⚡ Map efficiency rankings
+- 💎 Divine Orb drop patterns
+- 🎯 Optimal farming strategies
+
+### Session Analyzer - Overall Performance Stats
+
+**What it does:**
+- Analyzes all your farming sessions
+- Tracks value per hour across sessions
+- Shows best sessions and character performance
+- Provides long-term efficiency metrics
+
+**How to run:**
+
+```bash
+python session_analyzer.py
+```
+
+**What you'll see:**
+- 📊 Total sessions, maps, and value
+- ⏱️ Average session runtime and efficiency
+- 🏆 Best session by value
+- 👤 Per-character statistics
+- 🌟 Top 5 sessions ranked by value
+
+### Customizing Currency Display
+
+Both analyzers support **Exalted** or **Divine** Orb display.
+
+**To change currency:**
+
+Edit the analyzer file (right-click → Edit with Notepad):
+
+**For Divine Orbs:**
+```python
+# In run_analyzer.py or session_analyzer.py
+DEFAULT_CURRENCY_DISPLAY = "divine"  # Shows values in Divine Orbs
+DEFAULT_DIVINE_TO_EXALTED_RATE = 400.0  # Current exchange rate
+```
+
+**For Exalted Orbs:**
+```python
+DEFAULT_CURRENCY_DISPLAY = "exalted"  # Shows values in Exalted Orbs
+```
+
+### Tips for Analysis
+
+💡 **Run analyzers regularly** - After every 10-20 maps to spot trends  
+💡 **Compare characters** - See which build farms more efficiently  
+💡 **Track modifiers** - Learn which waystone mods give best returns  
+💡 **Adjust strategy** - Focus on maps and modifiers that work best for you
 
 ---
 
