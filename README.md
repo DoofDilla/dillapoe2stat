@@ -3,6 +3,54 @@
 > **v0.4.0 "OAuth 2.1 Migration"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
 > Features modern OAuth 2.1 authentication with browser-based authorization and automatic token refresh.
 
+## 📸 Screenshots
+
+### Startup & Session Tracking
+<div align="center">
+  <img src="screenshots/dillapoe2stat_startup.png" alt="HasiSkull startup banner with configuration summary" width="800"/>
+  <p><em>HasiSkull startup banner • Character info • Session ID • Hotkey reference • OAuth 2.1 authentication status</em></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/dillapoe2stat_run_with_toast.png" alt="Map completion with Windows toast notification" width="800"/>
+  <p><em>Map completion analysis • Loot breakdown by category • Session stats • Windows toast notification with top drops</em></p>
+</div>
+
+### Inventory & Analysis
+<div align="center">
+  <img src="screenshots/dillapoe2stat_inventoy.png" alt="Inventory valuation with item breakdown" width="800"/>
+  <p><em>Real-time inventory check • Item-by-item valuation • Chaos/Exalted conversion • Category filtering</em></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/dillapoe2stat_analysis_1.png" alt="Session analytics with efficiency tiers" width="800"/>
+  <p><em>Session analytics • Efficiency tiers • Best map tracking • Divine Orb patterns • Delirious % correlation</em></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/dillapoe2stat_analysis_2.png" alt="Advanced run analysis" width="800"/>
+  <p><em>Advanced run analysis • Ex/hour calculations • Top performing maps • Strategy recommendations</em></p>
+</div>
+
+### Windows Toast Notifications
+<div align="center">
+  <img src="screenshots/dillapoe2stat_windows_toast.png" alt="Windows 11 toast notification example" width="400"/>
+  <p><em>Native Windows 11 toast • Formatted currency values • Top 3 drops display • Session comparison metrics</em></p>
+</div>
+
+### OBS Overlay Integration
+<div align="center">
+  <img src="screenshots/dillapoe2stat_obs_overlay_loot.png" alt="OBS loot table overlay" width="600"/>
+  <p><em>OBS Browser Source overlay (loot table) • Real-time item tracking • Clean transparent background • Stream-ready</em></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/dillapoe2stat_obs_overlay_session.png" alt="OBS session stats overlay" width="400"/>
+  <p><em>OBS Browser Source overlay (session stats) • Maps completed • Total value • Ex/hour tracking • Compact design</em></p>
+</div>
+
+---
+
 ## What's New in v0.4.0
 
 - **🔐 OAuth 2.1 Migration**: Modern OAuth Authorization Code + PKCE flow
