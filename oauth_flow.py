@@ -85,10 +85,13 @@ class CallbackHandler(BaseHTTPRequestHandler):
             error_desc = params.get('error_description', [''])[0]
             
             self.send_response(400)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             html = f"""
             <html>
+            <head>
+                <meta charset="UTF-8">
+            </head>
             <body style="font-family: Arial; text-align: center; padding: 50px;">
                 <h1 style="color: red;">❌ Authorization Failed</h1>
                 <p><strong>Error:</strong> {CallbackHandler.auth_error}</p>
@@ -97,7 +100,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
             </body>
             </html>
             """
-            self.wfile.write(html.encode())
+            self.wfile.write(html.encode('utf-8'))
             return
         
         # Success - extract code and state
@@ -105,10 +108,13 @@ class CallbackHandler(BaseHTTPRequestHandler):
         CallbackHandler.auth_state = params.get('state', [None])[0]
         
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
         html = """
         <html>
+        <head>
+            <meta charset="UTF-8">
+        </head>
         <body style="font-family: Arial; text-align: center; padding: 50px;">
             <h1 style="color: green;">✅ Authorization Successful!</h1>
             <p>You can close this window and return to the application.</p>
@@ -116,7 +122,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-        self.wfile.write(html.encode())
+        self.wfile.write(html.encode('utf-8'))
     
     def log_message(self, format, *args):
         """Suppress HTTP server log messages"""
