@@ -7,7 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.4] - 2025-10-05
+## [0.4.0] - 2025-10-22
+
+### Added
+- **🔐 OAuth 2.1 Migration**: Complete replacement of deprecated client_credentials flow
+  - New `oauth_flow.py` module with PKCE implementation (400 lines)
+  - `PKCEGenerator`: Creates code_verifier and SHA256 code_challenge
+  - `CallbackHandler`: HTTP server receives authorization codes on port 8080
+  - `OAuthFlow`: Browser-based authorization with automatic callback handling
+  - `TokenManager`: Automatic token storage, loading, and refresh logic
+  - Public Client configuration (no client secret required)
+  - Authorization Code Grant with PKCE (Proof Key for Code Exchange)
+  - Token lifetimes: 10h access tokens, 7d refresh tokens
+- **🛡️ Secure Token Storage**: `tokens.json` with automatic gitignore
+  - Stores access_token, refresh_token, expires_at, username
+  - Auto-refresh before expiration
+  - Browser re-authorization after 7 days
+- **🌐 User-Agent Header**: Added to all OAuth requests to prevent Cloudflare blocking
+- **📝 OAuth Documentation**: Updated README with Public Client setup instructions
+
+### Changed
+- **Deprecated Manual Credentials**: `CLIENT_ID`/`CLIENT_SECRET` in `config.py` marked as deprecated
+  - OAuth 2.1 flow handles authentication automatically
+  - Only `CHAR_TO_CHECK` still read from `credentials.txt` (line 3)
+- **Updated `poe_api.py`**: `get_token()` now uses `oauth_flow.get_access_token()`
+  - Removed old AUTH_URL and client_credentials logic
+  - Ignores client_id/client_secret parameters (backwards compatibility)
+- **First-Run Experience**: Tracker opens browser for authorization automatically
+  - Clear console feedback ("🔐 Starting OAuth 2.1 Authorization Flow...")
+  - Status messages guide user through authorization process
+
+### Fixed
+- **Cloudflare 403 Blocking**: Added proper User-Agent headers to token exchange and refresh requests
+- **OAuth Flow Timing**: Improved callback server shutdown handling
+
+### Security
+- **No More Exposed Secrets**: Public client eliminates need to store client_secret
+- **PKCE Protection**: Code challenge prevents authorization code interception attacks
+- **Token Isolation**: tokens.json automatically excluded from Git
+
+### Migration Notes
+- **Breaking Change**: Old OAuth client_credentials no longer works (GGG deprecated)
+- **First Run**: Users must authorize app in browser (one-time setup)
+- **Auto-Refresh**: Tokens auto-refresh for 7 days, then re-authorization required
+- **credentials.txt**: Only line 3 (character name) still used
+
+## [0.3.5] - 2025-10-22
 
 ### Added
 - **Phase-Based Flow Architecture**: Complete refactoring of map tracking flow

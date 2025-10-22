@@ -157,8 +157,8 @@ class PoEStatsTracker:
                 print(f"  ⚠️  {warning}")
             print()
         
-        # Get API token and validate character
-        self.token = get_token(self.config.CLIENT_ID, self.config.CLIENT_SECRET)
+        # Get API token via OAuth 2.1 flow
+        self.token = get_token()
         chars = get_characters(self.token)
         
         if not chars.get("characters"):

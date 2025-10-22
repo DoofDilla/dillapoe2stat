@@ -8,6 +8,9 @@ venv/
 # Credentials file (contains API secrets)
 credentials.txt
 
+# OAuth tokens (contains access tokens and refresh tokens)
+tokens.json
+
 # MCP configuration (contains local paths)
 .vscode/mcp.json
 

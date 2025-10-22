@@ -23,19 +23,13 @@ class Config:
     # USER SETTINGS - Customize these for your setup
     # ============================================================================
     
-    # Load credentials from credentials.txt (not tracked in Git)
-    _credentials_file = Path(__file__).parent / "credentials.txt"
-    if _credentials_file.exists():
-        with open(_credentials_file, 'r', encoding='utf-8') as f:
-            _lines = [line.strip() for line in f.readlines()]
-            CLIENT_ID = _lines[0] if len(_lines) > 0 else "your_client_id"
-            CLIENT_SECRET = _lines[1] if len(_lines) > 1 else "your_client_secret"
-            CHAR_TO_CHECK = _lines[2] if len(_lines) > 2 else "YourCharacterName"
-    else:
-        # Fallback values if credentials.txt doesn't exist
-        CLIENT_ID = "your_client_id"
-        CLIENT_SECRET = "your_client_secret"
-        CHAR_TO_CHECK = "YourCharacterName"
+    # OAuth 2.1 Authentication
+    # Authentication handled automatically via browser-based OAuth flow
+    # Tokens are stored in tokens.json (auto-generated, gitignored)
+    # No CLIENT_ID or CLIENT_SECRET needed in config
+    
+    # Character name to track (UPDATE THIS!)
+    CHAR_TO_CHECK = "Mettmanwalking"
     
     # PoE2 Client
     CLIENT_LOG = r"C:\GAMESSD\Path of Exile 2\logs\Client.txt"  # Update this path
@@ -283,11 +277,8 @@ class Config:
         warnings = []
         
         # Check required settings
-        if cls.CLIENT_SECRET == "":
-            warnings.append("Using default CLIENT_SECRET - please update with your actual secret")
-        
-        if cls.CHAR_TO_CHECK == "":
-            warnings.append("Using default character name - please update CHAR_TO_CHECK")
+        if cls.CHAR_TO_CHECK == "YourCharacterName":
+            warnings.append("Using default character name - please update CHAR_TO_CHECK in config.py")
         
         # Check file paths
         client_log_path = Path(cls.CLIENT_LOG)
@@ -360,8 +351,7 @@ class Config:
 # ============================================================================
 # BACKWARD COMPATIBILITY - Module-level constants
 # ============================================================================
-CLIENT_ID = Config.CLIENT_ID
-CLIENT_SECRET = Config.CLIENT_SECRET
+# CLIENT_ID and CLIENT_SECRET removed in v0.4.0 (OAuth 2.1 migration)
 CHAR_TO_CHECK = Config.CHAR_TO_CHECK
 CLIENT_LOG = Config.CLIENT_LOG
 DEBUG_ENABLED = Config.DEBUG_ENABLED

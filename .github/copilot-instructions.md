@@ -174,42 +174,85 @@ client_id = Config.CLIENT_ID
 ```
 
 **Key config groups:**
-- `CLIENT_ID/CLIENT_SECRET`: OAuth credentials (must have `account:characters account:profile` scopes)
-- `CHAR_TO_CHECK`: Character name (case-sensitive)
+- `CHAR_TO_CHECK`: Character name (case-sensitive, set directly in config.py)
 - `CLIENT_LOG`: Absolute path to `Client.txt` (typically `Documents\My Games\Path of Exile 2\logs`)
 - `AUTO_HIDEOUT_AREAS/AUTO_TOWN_AREAS`: Area codes for auto-detection (extend for custom hideouts)
 
 **Path Helpers:** Always use `Config.get_*_path()` methods (handles absolute paths, creates directories)
 
-### ⚠️ Credentials Security - CRITICAL
+### ⚠️ OAuth 2.1 Authentication - CRITICAL
 
-**Credentials are stored in `credentials.txt` (NOT in code):**
+**OAuth 2.1 uses Public Client flow (v0.4.0+):**
 
+**tokens.json (auto-generated, NOT tracked in Git):**
+```json
+{
+  "access_token": "...",
+  "refresh_token": "...",
+  "expires_at": 1234567890,
+  "username": "CharacterName"
+}
 ```
-# credentials.txt (3 lines, NOT tracked in Git)
-client_id_here
-client_secret_here
-CharacterName
+
+**config.py (character name):**
+```python
+CHAR_TO_CHECK = "YourCharacterName"  # Set this to your PoE2 character
 ```
 
 **NEVER:**
-- ❌ Hardcode `CLIENT_SECRET` in config.py or any Python file
-- ❌ Commit `credentials.txt` to Git (it's in `.gitignore`)
-- ❌ Include actual secrets in examples, comments, or documentation
-- ❌ Log or print `CLIENT_SECRET` in debug output
+- ❌ Commit `tokens.json` to Git (contains access/refresh tokens)
+- ❌ Log or print access tokens in debug output
+- ❌ Share tokens.json with anyone (user-specific credentials)
 
-**When modifying config loading:**
-- ✅ Keep credentials loading from `credentials.txt`
-- ✅ Provide fallback placeholder values if file missing
-- ✅ Use `credentials.txt.example` template for documentation
-- ✅ If secret accidentally exposed in code, user must regenerate API key
+**OAuth 2.1 Flow:**
+1. **First run**: Opens browser for authorization → user logs in → callback receives code
+2. **Token exchange**: Code exchanged for access_token + refresh_token
+3. **Auto-refresh**: Tokens auto-refresh every 10 hours (access token lifetime)
+4. **Re-authorization**: After 7 days (refresh token lifetime), browser re-opens
 
-**If you accidentally include a secret:**
-1. Remove it immediately from the code
-2. Inform user to regenerate API credentials at https://www.pathofexile.com/developer/docs/api
-3. Do NOT try to remove from Git history (breaks old versions)
+**Implementation Details:**
+- `oauth_flow.py`: Complete OAuth 2.1 implementation with PKCE
+- Public Client: No client_secret required (desktop app security model)
+- PKCE: Proof Key for Code Exchange prevents authorization code interception
+- Callback: Local HTTP server on port 8080 receives authorization code
+- User-Agent: Required header to prevent Cloudflare blocking
+
+**When modifying config:**
+- ✅ Character name set directly in `config.py` as `CHAR_TO_CHECK`
+- ✅ OAuth client registration done at https://www.pathofexile.com/developer/docs/api
+- ✅ No credentials file needed - OAuth handles authentication
+
+**Security Notes:**
+- tokens.json is auto-generated and gitignored
+- OAuth Public Client requires no secrets in code
+- Browser-based authorization flow handles all authentication
 
 ## PoE API Integration
+
+### OAuth 2.1 Authentication (v0.4.0+)
+
+**OAuth Flow Module:** `oauth_flow.py` handles all authentication
+
+```python
+from oauth_flow import get_access_token
+
+# Automatic flow - handles browser authorization and token refresh
+token = get_access_token()  # Opens browser on first run
+
+# Token automatically refreshed when expired
+# Re-authorization required after 7 days (refresh token lifetime)
+```
+
+**Key Components:**
+- `PKCEGenerator`: Creates code_verifier and SHA256 challenge
+- `CallbackHandler`: HTTP server on port 8080 receives authorization code
+- `OAuthFlow`: Opens browser, waits for callback, exchanges code for token
+- `TokenManager`: Saves/loads `tokens.json`, auto-refreshes before expiration
+
+**Important:**
+- User-Agent header REQUIRED on all OAuth requests (prevents Cloudflare 403)
+- Public Client: No client_secret needed
+- Authorization warning normal (all Public Clients show this)
 
 ### Rate Limiting is Critical
 
@@ -225,7 +268,7 @@ snapshot_service = InventorySnapshotService(
 ```
 
 **API Endpoints:**
-- `get_token()`: OAuth client credentials flow
+- `get_token()`: OAuth 2.1 flow (via oauth_flow module)
 - `get_characters()`: List characters (for validation)
 - `snapshot_inventory()`: Get current inventory (rate-limited)
 

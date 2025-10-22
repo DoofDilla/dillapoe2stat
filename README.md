@@ -1,40 +1,20 @@
 # DillaPoE2Stat Tracker
 
-> **v0.3.4 "Phase-Based Architecture"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
-> Optional OBS overlay mode streams your loot breakdown and session dashboard straight into Browser Sources for easy broadcasting.
+> **v0.4.0 "OAuth 2.1 Migration"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
+> Features modern OAuth 2.1 authentication with browser-based authorization and automatic token refresh.
 
-## What's New in v0.3.4
+## What's New in v0.4.0
 
-# DillaPoE2Stat Tracker
+- **🔐 OAuth 2.1 Migration**: Modern OAuth Authorization Code + PKCE flow
+  - Browser-based authorization (one-time setup, opens automatically)
+  - Automatic token refresh (10h access tokens, 7d refresh tokens)
+  - Secure token storage in `tokens.json` (gitignored)
+  - No more manual client secret management
+  - Public client setup (no backend server required)
+- **🎨 KISS Overlay**: Lightweight overlay system for streaming
+- **✨ Uncut Gems Support**: Full pricing for Uncut Skill/Spirit/Support Gems
 
-> **v0.3.5 "KISS Overlay"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
-> Features a lightweight KISS overlay for streaming your loot breakdown and session dashboard.
-
-## What's New in v0.3.5
-
-- **🎨 KISS Overlay**: Brand new lightweight overlay system
-  - Standalone overlay window with transparent background
-  - Real-time updates via JSON state file (no Flask server needed)
-  - 500ms polling for instant loot visibility
-  - Template-based system with phase-aware displays
-  - Clean separation: overlay reads state, tracker writes state
-  - Easy to start: `start_overlay.bat` or directly via Python
-- **✨ Uncut Gems Support**: Price checking now includes Uncut Skill/Spirit/Support Gems
-- **📝 Enhanced Documentation**: Improved commit message enforcement with gitmoji rules
-- **🔧 Better Configuration**: Clearer instructions for credentials and API setup
-
-## Recent Enhancements (v0.3.0 - v0.3.5)
-  - `MapFlowController` orchestrates PRE/POST flows in 9 clear, testable phases
-  - Main script reduced from 787 to 640 lines (-18% code reduction)
-  - Each phase has one responsibility: easier debugging and testing
-- **� Flow Documentation**: New `docs/SESSION_FLOW.md` with complete diagrams, pitfalls, and testing guides
-- **🐛 Robust Session Tracking**: Architecture prevents double-counting bugs by design
-  - Single point of session update (Phase 5 only)
-  - Clear BEFORE/AFTER state separation
-- **🔧 Better Error Messages**: Phase-based errors ("Phase 5 failed") instead of generic messages
-- **� Enhanced Documentation**: Architecture section in README, improved docstrings throughout
-
-## Recent Enhancements (v0.3.0 - v0.3.4)
+## Recent Enhancements (v0.3.0 - v0.4.0)
 
 The tracker has evolved considerably with a complete modular rewrite and rich feature additions:
 
@@ -164,29 +144,36 @@ Several legacy or experimental scripts (`poe_stats_with_inv_snapshot_with_hotkey
 ### 1. Gather prerequisites
 - **Operating system:** Windows 10/11 (required for `win11toast` notifications and low-level keyboard hooks).
 - **Python:** 3.10 or newer is recommended.
-- **Path of Exile account:** Create an OAuth client ID/secret via the [Path of Exile Developer Portal](https://www.pathofexile.com/developer/docs/api) with `account:characters` and `account:profile` scopes.
+- **Path of Exile account:** Register an OAuth **Public Client** at the [Path of Exile Developer Portal](https://www.pathofexile.com/developer/docs/api)
+  - Client Type: **Public Client**
+  - Redirect URI: `http://127.0.0.1:8080/callback`
+  - Scopes: `account:profile account:characters`
 - **Game log access:** Locate your `Client.txt` log (typically under `Documents\My Games\Path of Exile 2\logs` or your custom install path).
 - **Python dependencies:** Install the core libraries with `pip install -r requirements.txt`. Optional utilities (used by side scripts) include `pywin32`, `pydualsense`, and `pynput`.
 
 ### 2. Configure the tracker
 1. Open [`config.py`](config.py) and adjust:
-   - `CLIENT_ID` / `CLIENT_SECRET` to match your PoE OAuth application.
-   - `CHAR_TO_CHECK` to the character you want to monitor.
+   - `CHAR_TO_CHECK` to the character you want to monitor (e.g., `"Mettmanwalking"`).
    - `CLIENT_LOG` to the absolute path of your `Client.txt`.
    - Toggle `OUTPUT_MODE`, `DEBUG_ENABLED`, and related flags as desired.
    - (Optional) Flip `AUTO_DETECTION_ENABLED` to `True` or tweak the `AUTO_*` area sets if you want the automatic loop to start enabled or recognise custom hideouts.
 2. (Optional) Enable OBS overlays by setting `OBS_ENABLED = True`. Adjust `OBS_HOST`, `OBS_PORT`, `OBS_AUTO_START`, and `OBS_QUIET_MODE` if you want the Flask web server to start automatically or surface request logs while testing scene layouts.
-3. Run the configuration sanity check:
-   ```bash
-   python -c "from config import Config; Config.print_config_summary()"
-   ```
-   (The `Config.print_config_summary()` helper also runs automatically when `poe_stats_refactored_v2.py` starts.)
 
 ### 3. Run the tracker
 With Path of Exile running and your character logged in:
 ```bash
 python poe_stats_refactored_v2.py
 ```
+
+**First Run (OAuth 2.1 Authorization):**
+- The tracker will automatically open your browser to `https://www.pathofexile.com/oauth/authorize`
+- You'll see a security warning: *"We cannot verify that this request has come from DillaPoe2Stat"* - **This is normal for all Public Client desktop apps**
+- Click **Authorize** to grant access
+- The browser will redirect to a success page, and the tracker will automatically receive your authorization
+- Tokens are saved to `tokens.json` (gitignored) and auto-refresh for 7 days
+- **After 7 days:** Browser will automatically re-open for re-authorization
+
+**Normal Startup:**
 You will see a HasiSkull banner plus the configuration summary, receive a Windows toast that monitoring has begun, and a list of active hotkeys (including the experimental waystone analyzer, OBS controls, and the auto-detection toggle). Keep the terminal open while you play.
 
 Tap `Ctrl+F6` after the startup banner if you prefer the tracker to trigger PRE/POST snapshots automatically while you focus on gameplay.
@@ -336,6 +323,6 @@ Thanks to Grinding Gear Games for exposing the Path of Exile API and poe.ninja f
 ## Version History
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Current Version:** 0.3.4 "Phase-Based Architecture"  
+**Current Version:** 0.4.0 "OAuth 2.1 Migration"  
 **Data Format Version:** 2.1  
-**Last Updated:** October 5, 2025
+**Last Updated:** October 22, 2025
