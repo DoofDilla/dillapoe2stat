@@ -36,3 +36,8 @@ debug/*.json
 # Cache files
 cache/
 .vscode/mcp.json
+
+# Dependency analysis (local development tools)
+analyze_dependencies.py
+dependency_analysis.json
+dependency_analysis.txt
