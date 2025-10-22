@@ -3,7 +3,7 @@ Version management for DillaPoE2Stat
 Single source of truth for all version-related information
 """
 
-__version__ = "0.3.5-dev"
+__version__ = "0.3.5"
 __version_info__ = (0, 3, 5)
 
 # Semantic versioning components
@@ -12,8 +12,8 @@ MINOR = 3  # New features, backwards compatible
 PATCH = 5  # Bug fixes
 
 # Release information
-RELEASE_DATE = "2025-10-06"
-RELEASE_NAME = "Development"  # Optional codename for major releases
+RELEASE_DATE = "2025-10-22"
+RELEASE_NAME = "KISS Overlay"  # Optional codename for major releases
 
 # Data format version (for runs.jsonl compatibility)
 # 2.0: Initial enhanced format with waystone attributes

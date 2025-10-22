@@ -5,7 +5,25 @@
 
 ## What's New in v0.3.4
 
-- **�️ Phase-Based Architecture**: Complete refactoring of map tracking flow for better maintainability
+# DillaPoE2Stat Tracker
+
+> **v0.3.5 "KISS Overlay"** - A hotkey-driven Path of Exile 2 map-tracking assistant that snapshots your inventory, values your loot through poe.ninja, and keeps rich session analytics with desktop notifications.
+> Features a lightweight KISS overlay for streaming your loot breakdown and session dashboard.
+
+## What's New in v0.3.5
+
+- **🎨 KISS Overlay**: Brand new lightweight overlay system
+  - Standalone overlay window with transparent background
+  - Real-time updates via JSON state file (no Flask server needed)
+  - 500ms polling for instant loot visibility
+  - Template-based system with phase-aware displays
+  - Clean separation: overlay reads state, tracker writes state
+  - Easy to start: `start_overlay.bat` or directly via Python
+- **✨ Uncut Gems Support**: Price checking now includes Uncut Skill/Spirit/Support Gems
+- **📝 Enhanced Documentation**: Improved commit message enforcement with gitmoji rules
+- **🔧 Better Configuration**: Clearer instructions for credentials and API setup
+
+## Recent Enhancements (v0.3.0 - v0.3.5)
   - `MapFlowController` orchestrates PRE/POST flows in 9 clear, testable phases
   - Main script reduced from 787 to 640 lines (-18% code reduction)
   - Each phase has one responsibility: easier debugging and testing
