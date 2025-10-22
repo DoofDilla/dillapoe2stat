@@ -90,6 +90,19 @@ class PoEStatsTracker:
         self.notification_manager = NotificationManager(self.config)
         self.game_state = GameState()
         
+        # KISS Overlay Writer (optional) - File-based IPC for overlay
+        self.overlay_writer = None
+        if self.config.KISS_OVERLAY_ENABLED:
+            try:
+                from kiss_overlay.kiss_overlay_state_writer import OverlayStateWriter
+                self.overlay_writer = OverlayStateWriter(
+                    state_file=self.config.KISS_OVERLAY_STATE_FILE
+                )
+                print("🔍 KISS Overlay enabled (file-based IPC)")
+            except Exception as e:
+                print(f"⚠️  KISS Overlay initialization failed: {e}")
+                self.overlay_writer = None
+        
         # OBS Integration (optional) - Only initialize if auto-start enabled
         self.obs_server = None
         if OBS_AVAILABLE and self.config.OBS_AUTO_START:
@@ -173,7 +186,8 @@ class PoEStatsTracker:
             display=self.display,
             notification=self.notification_manager,
             config=self.config,
-            debugger=self.debugger
+            debugger=self.debugger,
+            tracker=self
         )
         
         # Start new session
@@ -296,9 +310,17 @@ class PoEStatsTracker:
                 self.game_state.update_session_progress(progress)
                 self.notification_manager.notify_experimental_pre_map(self.game_state)
                 
+                # Update overlay with complete waystone data (moved to end, after all state updates)
+                if self.flow_controller:
+                    self.flow_controller.update_overlay('waystone_analysis')
+                
             else:
                 print("⚠️  No waystone found in top-left inventory position (0,0)")
                 self.game_state.update_waystone_info(None)
+                
+                # Update overlay to show "no waystone" state
+                if self.flow_controller:
+                    self.flow_controller.update_overlay('waystone_analysis')
                 
         except Exception as e:
             self.display.display_error("WAYSTONE ANALYSIS", str(e))
@@ -415,6 +437,10 @@ class PoEStatsTracker:
             return
         
         try:
+            # Update overlay - Simulated PRE-1
+            if self.flow_controller:
+                self.flow_controller.update_overlay('pre_snapshot')
+            
             # Get simulation data
             pre_data, _ = self.simulation_manager.get_simulation_data()
             
@@ -429,6 +455,10 @@ class PoEStatsTracker:
             # Set up simulated state
             self.game_state.start_map(time.time())
             
+            # Update overlay - Simulated PRE-2 (parse)
+            if self.flow_controller:
+                self.flow_controller.update_overlay('pre_parse')
+            
             # Create simulated map info
             map_info = self.simulation_manager.create_simulated_map_info()
             self.game_state.update_map_info(map_info)
@@ -437,11 +467,19 @@ class PoEStatsTracker:
             waystone_info = self.simulation_manager.create_simulated_waystone_info()
             self.game_state.update_waystone_info(waystone_info)
             
+            # Update overlay - Simulated PRE-3 (update state)
+            if self.flow_controller:
+                self.flow_controller.update_overlay('pre_update_state')
+            
             self.display.display_inventory_count(len(pre_data), "[SIMULATED PRE]")
             self.display.display_map_info(self.game_state.current_map_info)
             
             print(f"🧪 Simulated waystone: T{self.game_state.cached_waystone_info['tier']} with {len(self.game_state.cached_waystone_info['prefixes']) + len(self.game_state.cached_waystone_info['suffixes'])} modifiers")
             print("💾 Ready for simulated POST (Ctrl+Shift+F3)")
+            
+            # Update overlay - Simulated PRE-4 (notify)
+            if self.flow_controller:
+                self.flow_controller.update_overlay('pre_notify')
             
         except Exception as e:
             self.display.display_error("SIMULATION PRE", str(e))

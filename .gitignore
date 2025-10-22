@@ -8,9 +8,18 @@ venv/
 # Credentials file (contains API secrets)
 credentials.txt
 
+# MCP configuration (contains local paths)
+.vscode/mcp.json
+
 # Session data files (local only, not tracked)
 runs.jsonl
 sessions.jsonl
+
+# KISS Overlay state (runtime data)
+# KISS Overlay runtime files
+kiss_overlay/kiss_overlay_state.json
+kiss_overlay/kiss_overlay_state.json.tmp
+kiss_overlay/kiss_overlay_position.json
 
 # Backup directory and files
 backups/

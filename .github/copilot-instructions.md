@@ -8,6 +8,60 @@
 
 **Core Entry Point:** `poe_stats_refactored_v2.py` - main tracker with global hotkey bindings
 
+## ⚠️ CRITICAL: Git Commit Rules (READ THIS FIRST!)
+
+**EVERY COMMIT MUST HAVE GITMOJI - NO EXCEPTIONS!**
+
+### How to Commit (Windows)
+
+**❌ NEVER do this:**
+```bash
+git commit -m "feat: Add feature"  # Missing gitmoji! PowerShell strips emojis!
+```
+
+**✅ ALWAYS do this:**
+```bash
+& "C:\Program Files\Git\bin\bash.exe" -c "
+  cd /c/temp/dillapoe2stat && 
+  printf 'feat: \xE2\x9C\xA8 Add feature\n\n- Detail 1\n- Detail 2\n' > commit_msg.txt && 
+  git commit -F commit_msg.txt && 
+  rm commit_msg.txt
+"
+```
+
+**Common gitmoji hex codes (MEMORIZE THESE):**
+- ✨ `feat:` new feature → `\xE2\x9C\xA8`
+- 🐛 `fix:` bug fix → `\xF0\x9F\x90\x9B`
+- 📝 `docs:` documentation → `\xF0\x9F\x93\x9D`
+- 🔧 `chore:` config/tooling → `\xF0\x9F\x94\xA7`
+- 🚀 `perf:` performance → `\xF0\x9F\x9A\x80`
+- 🔖 `chore:` version bump → `\xF0\x9F\x94\x96`
+
+**If you forget gitmoji:**
+1. STOP immediately
+2. `git reset --soft HEAD~1`
+3. Re-commit with proper gitmoji using Git Bash
+
+**Why:** PowerShell cannot handle UTF-8 emojis - they get stripped before Git sees them!
+
+## Available MCP Servers
+
+This project has access to specialized MCP servers for enhanced AI assistance:
+
+### Microsoft Learn MCP Server (`microsoft_docs_*`)
+- **Purpose:** Trusted, up-to-date information from official Microsoft documentation
+- **Use for:** Windows API questions, Python on Windows, Azure integration, .NET interop
+- **Tools available:**
+  - `microsoft_docs_search` - Search official docs (returns 10 concise chunks)
+  - `microsoft_code_sample_search` - Find code examples from Microsoft Learn
+  - `microsoft_docs_fetch` - Get full documentation pages in markdown
+- **When to use:** Win32 API questions (like HWND_TOPMOST, WS_EX_TRANSPARENT), ctypes with Windows, Python best practices
+- **Workflow:** Search → Get overview → Fetch full page if needed
+
+### MCP Memory Server (`mcp_memory_*`)
+- **Purpose:** Persistent knowledge graph across chat sessions
+- **See:** "Memory Management" section below for detailed usage guidelines
+
 ## Critical Architecture Patterns
 
 ### Phase-Based Flow Controller (v0.3.4+)
@@ -226,6 +280,43 @@ Config.APP_ID = "BoneBunnyStats v0.3.4"
 
 `AppRegistration.ensure_app_registered()` runs on startup - handles registry setup
 
+## KISS Overlay System (v0.3.4+)
+
+### String-Based Templates
+
+**Critical:** Overlay templates in `kiss_overlay_templates.py` **must match** `notification_templates.py` format:
+
+```python
+# ✅ CORRECT - Single-line strings with \n
+SECTION_WAYSTONE = (
+    'Waystone: T{waystone_tier} | {waystone_delirious}% Delirium\n'
+    'Pack Size: +{waystone_pack_size}%\n'
+    'Magic Monsters: +{magic_monsters}%'
+)
+
+# ❌ WRONG - Triple-quote multi-line strings
+SECTION_WAYSTONE = """Waystone: T{waystone_tier}
+Pack Size: +{waystone_pack_size}%"""
+```
+
+**Template Architecture:**
+- `SECTION_*` → Reusable template sections (waystone, session, drops)
+- `TEMPLATE_*` → Phase-specific full templates (default, pre, post, waystone)
+- `get_template_for_phase()` → Main dispatcher with conditional logic
+- Helper functions → `_build_modifiers_section()`, `_build_session_context()`
+
+**Template Variable Reuse:**
+- Overlay uses **same 40+ variables** as notifications via `get_template_variables()`
+- Zero duplication of data extraction logic
+- Add variables once in `GameState` / `SessionManager`, available everywhere
+
+**When modifying overlay templates:**
+1. Always use single-line format with `\n` (never `"""` multi-line)
+2. Use parentheses for multi-line template definitions
+3. Add new sections as `SECTION_*` constants
+4. Update `get_template_for_phase()` dispatcher for new phases
+5. Test with `test_kiss_templates.py` (if exists)
+
 ## Hotkey System
 
 ### Global Keyboard Bindings
@@ -391,9 +482,11 @@ DATA_FORMAT_VERSION = "2.1"
 |------|---------|-----------|
 | `docs/SESSION_FLOW.md` | Phase flow diagrams | Modifying tracking logic |
 | `notification_templates.py` | All 40+ template vars | Adding notification data |
+| `kiss_overlay/kiss_overlay_templates.py` | Overlay templates | Modifying overlay display |
 | `config.py` | All settings + validation | Adding config options |
 | `game_state.py` | Central state management | Understanding state lifecycle |
 | `CHANGELOG.md` | Release history | Understanding version changes |
+| `docs/REFACTORING_SUMMARY_v034.md` | v0.3.4 refactoring details | Understanding recent changes |
 
 ## Quick Wins for Contributors
 
@@ -461,32 +554,50 @@ git branch -d feature/weboverlay-rename
 - ✅ Users download from GitHub Releases (tagged on `main`)
 - ✅ Contributors can follow active development on `develop`
 
-### Commit Messages with Gitmoji (Windows)
+## Memory Management
 
-**PowerShell cannot handle UTF-8 emojis** - use Git Bash instead:
+**MCP Memory Server** is available for persistent knowledge storage across chat sessions.
 
-```bash
-# Use Git Bash with printf and hex-encoded UTF-8 bytes
-& "C:\Program Files\Git\bin\bash.exe" -c "
-  cd /c/temp/dillapoe2stat && 
-  git add <files> && 
-  printf 'type: \xF0\x9F\x93\x9D Description\n\n* Details...\n' > commit_msg.txt && 
-  git commit -F commit_msg.txt && 
-  rm commit_msg.txt
-"
-```
+### When to Update Memory
 
-**Common gitmoji hex codes:**
-- 📝 (memo): `\xF0\x9F\x93\x9D`
-- ✨ (sparkles): `\xE2\x9C\xA8`
-- 🐛 (bug): `\xF0\x9F\x90\x9B`
-- 🚀 (rocket): `\xF0\x9F\x9A\x80`
-- 🔧 (wrench): `\xF0\x9F\x94\xA7`
-- 🔖 (bookmark): `\xF0\x9F\x94\x96` (version tags)
+Automatically update memory graph after:
+- ✅ **Major features** - New systems like KISS Overlay, WebOverlay, Waystone Intelligence
+- ✅ **Architecture changes** - Phase flow modifications, new patterns, core refactorings
+- ✅ **Bug fixes** - Critical fixes that change behavior or require awareness
+- ✅ **Important decisions** - Design choices, rejected approaches, lessons learned
+- ✅ **Session milestones** - End of productive session with multiple commits
 
-**Why PowerShell fails:** Even with UTF-8 encoding settings, PowerShell strips Unicode during string processing before Git receives it.
+### Memory Entity Types
 
-**Commit format:** Follow `.copilot-commit-message-instructions.md` (Conventional Commits + gitmoji)
+Use appropriate entity types for different knowledge:
+- `feature` - Completed features (KISS Overlay, Auto-Detection, etc.)
+- `architecture` - Design patterns (Phase-Based Flow, Template System)
+- `core_pattern` - Critical rules (Session double-counting prevention)
+- `security` - Security practices (credentials.txt handling)
+- `workflow` - Development workflows (Git branching, gitmoji commits)
+- `roadmap` - Planned features (WebOverlay rename, PySide6 migration)
+- `session_notes` - Session summaries with commits and changes
+- `user` - User preferences and environment details
+
+### Memory Relations
+
+Connect entities with meaningful relations:
+- `is_feature_of` - Feature belongs to project
+- `is_core_pattern_of` - Pattern is fundamental to project
+- `powers` / `uses` - Component dependencies
+- `documents_work_on` - Session notes about specific work
+- `planned_for` - Future features for project
+- `preferred_by` - User preferences
+
+### Memory Best Practices
+
+- 🎯 **Be specific** - Include file names, phase names, exact behavior
+- 📊 **Quantify** - "40+ template variables", "9 POST phases", "500ms poll interval"
+- 🔗 **Link entities** - Create relations to show connections
+- 📝 **Session notes** - Document daily work with dates and commit references
+- 🔄 **Update observations** - Add to existing entities instead of creating duplicates
+
+**Note:** Memory is shared across all chat sessions - use it to maintain context!
 
 ## Questions to Ask User
 
