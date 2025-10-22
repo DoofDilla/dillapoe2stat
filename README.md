@@ -121,10 +121,69 @@ python poe_stats_refactored_v2.py
 
 ### Automatic Mode 🤖
 
-Press `Ctrl+F6` to enable automatic map detection:
-- Hideout/town → map = automatic F2 (pre-snapshot)
-- Map → hideout = automatic F3 (post-snapshot)
-- Focus on gameplay, not hotkeys!
+**The Best Way to Track!** Press `Ctrl+F6` to enable automatic map detection and never worry about hotkeys again.
+
+**How It Works:**
+1. You're in your hideout
+2. Enter a waystone portal → **Auto F2** (pre-snapshot taken automatically)
+3. Complete the map
+4. Return to hideout → **Auto F3** (post-snapshot + loot calculation)
+5. Repeat! The tracker handles everything.
+
+**What Gets Tracked Automatically:**
+- ✅ Hideout → Map transitions (triggers pre-snapshot)
+- ✅ Map → Hideout returns (triggers post-snapshot)
+- ✅ Respects Abyss/Breach detours (stays in map mode until you return home)
+- ✅ Optional: Auto-analyzes waystones when passing through Well of Souls
+
+**Configuration:**
+
+Most hideouts are already configured! The tracker recognizes:
+- All standard hideouts (Felled, Overgrown, Coral, Ritual)
+- All town areas (Clearfell, Ogham, Nakuri Forest, Well of Souls)
+
+**If your hideout isn't detected**, add it to `config.py`:
+
+```python
+# Near the bottom of config.py
+AUTO_HIDEOUT_AREAS = {
+    'HideoutFelled',       # Felled Hideout
+    'HideoutOvergrown',    # Overgrown Hideout
+    'HideoutCoral',        # Coral Hideout
+    'HideoutRitual',       # Ritual Hideout
+    'Hideout',             # Generic hideout
+    # Add your hideout name here if needed
+}
+
+AUTO_TOWN_AREAS = {
+    'Clearfell',           # Act 1 town
+    'Ogham',               # Act 2 town
+    'NakuriForest',        # Act 3 town
+    'WellOfSouls',         # Well of Souls
+    # Add custom safe zones here
+}
+
+AUTO_WAYSTONE_TRIGGER_AREAS = {
+    'Abyss_Hub',           # Well of Souls - auto-analyzes waystones
+}
+```
+
+**Finding Your Area Name:**
+1. Enable debug mode (press `F4`)
+2. Watch the console when entering your hideout
+3. Look for the area name in the output (e.g., `"area": "HideoutFelled"`)
+4. Add it to `AUTO_HIDEOUT_AREAS` in `config.py`
+
+**Other Settings:**
+```python
+AUTO_DETECTION_ENABLED = False  # Or toggle with Ctrl+F6
+AUTO_DETECTION_CHECK_INTERVAL = 1.0  # Check Client.txt every second
+```
+
+**Toggle Any Time:**
+- `Ctrl+F6` - Turn auto-detection on/off
+- Works even mid-session
+- Status shown in startup banner
 
 ---
 
