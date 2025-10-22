@@ -591,17 +591,6 @@
 
                 <div class="step">
                     <span class="step-number">4</span>
-                    <h3>Configure OAuth Client</h3>
-                    <p>Register an OAuth Public Client at the <a href="https://www.pathofexile.com/developer/docs" target="_blank">PoE Developer Portal</a></p>
-                    <ul>
-                        <li>Client Type: Public Client</li>
-                        <li>Redirect URI: http://127.0.0.1:8080/callback</li>
-                        <li>Scopes: account:profile account:characters</li>
-                    </ul>
-                </div>
-
-                <div class="step">
-                    <span class="step-number">5</span>
                     <h3>Edit Configuration</h3>
                     <p>Update config.py with your character name and Client.txt path</p>
                     <div class="code-block">
@@ -610,12 +599,15 @@
                 </div>
 
                 <div class="step">
-                    <span class="step-number">6</span>
+                    <span class="step-number">5</span>
                     <h3>Run the Tracker</h3>
-                    <p>Start tracking your loot!</p>
+                    <p>Start tracking your loot! On first run, your browser will automatically open for OAuth 2.1 authorization.</p>
                     <div class="code-block">
                         <code>python poe_stats_refactored_v2.py</code>
                     </div>
+                    <p style="margin-top: 15px; color: var(--text-dim);">
+                        <strong>First Run:</strong> Browser opens automatically → Click "Authorize" → Done! Tokens refresh automatically for 7 days.
+                    </p>
                 </div>
             </div>
         </div>
