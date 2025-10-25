@@ -8,6 +8,15 @@ Track your farming sessions effortlessly with hotkeys, real-time loot valuation 
   <img src="screenshots/dillapoe2stat_startup.png" alt="DillaPoE2Stat in action" width="800"/>
 </div>
 
+### 🎥 Watch It In Action
+
+<div align="center">
+  <a href="https://youtube.com/shorts/UstzgCLo8KY">
+    <img src="https://img.youtube.com/vi/UstzgCLo8KY/maxresdefault.jpg" alt="DillaPoE2Stat Demo Video" width="600"/>
+  </a>
+  <p><em>Click to watch the demo on YouTube</em></p>
+</div>
+
 [![Version](https://img.shields.io/badge/version-0.4.0-c9a961)](https://github.com/DoofDilla/dillapoe2stat/releases)
 [![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

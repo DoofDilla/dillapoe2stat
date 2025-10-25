@@ -3,7 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DillaPoE2Stat - Automatic loot tracking and session analytics for Path of Exile 2">
+    
+    <!-- Primary Meta Tags -->
+    <title>DillaPoE2Stat - Path of Exile 2 Loot Tracker & Session Analytics</title>
+    <meta name="title" content="DillaPoE2Stat - Path of Exile 2 Loot Tracker & Session Analytics">
+    <meta name="description" content="Free open-source automatic loot tracking tool for Path of Exile 2. Track farming sessions, analyze map efficiency, real-time valuation via poe.ninja, OBS overlays for streamers. Windows, OAuth 2.1, hotkey-driven.">
+    <meta name="keywords" content="Path of Exile 2, PoE2, loot tracker, farming tracker, session analytics, poe.ninja, OBS overlay, gaming tools, currency tracker, waystone analyzer, map efficiency, Divine Orb tracker">
+    <meta name="author" content="DoofDilla">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://doofdilla.github.io/dillapoe2stat/">
+    <meta property="og:title" content="DillaPoE2Stat - Path of Exile 2 Loot Tracker & Session Analytics">
+    <meta property="og:description" content="Free open-source automatic loot tracking tool for Path of Exile 2. Track farming sessions, analyze map efficiency, real-time valuation, and OBS overlays.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_startup.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://doofdilla.github.io/dillapoe2stat/">
+    <meta property="twitter:title" content="DillaPoE2Stat - Path of Exile 2 Loot Tracker">
+    <meta property="twitter:description" content="Free open-source automatic loot tracking tool for Path of Exile 2. Track farming sessions, analyze map efficiency, and more.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_startup.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://doofdilla.github.io/dillapoe2stat/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/cat64x64.png">
+    
     <title>DillaPoE2Stat - PoE2 Loot Tracker</title>
     <style>
         * {
@@ -318,6 +346,34 @@
             text-align: center;
         }
 
+        /* Video Section */
+        .video-section {
+            padding: 80px 0;
+            background: var(--bg-darker);
+            text-align: center;
+        }
+
+        .video-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 2px solid var(--primary-dark);
+            box-shadow: 0 10px 40px rgba(201, 169, 97, 0.3);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -438,6 +494,27 @@
                     📚 View on GitHub
                 </a>
             </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <div class="container">
+            <h2 class="section-title">🎥 Watch It In Action</h2>
+            <div class="video-container">
+                <iframe 
+                    width="560" 
+                    height="315" 
+                    src="https://www.youtube.com/embed/UstzgCLo8KY" 
+                    title="DillaPoE2Stat Demo" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: var(--text-dim);">
+                See how DillaPoE2Stat tracks your loot automatically and analyzes your farming efficiency
+            </p>
         </div>
     </section>
 
@@ -659,6 +736,47 @@
                 }
             });
         });
+    </script>
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "DillaPoE2Stat",
+        "description": "Automatic loot tracking and session analytics tool for Path of Exile 2",
+        "url": "https://doofdilla.github.io/dillapoe2stat/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Windows 10, Windows 11",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "DoofDilla",
+            "url": "https://github.com/DoofDilla"
+        },
+        "softwareVersion": "0.4.0",
+        "datePublished": "2025-01-22",
+        "downloadUrl": "https://github.com/DoofDilla/dillapoe2stat/releases/latest",
+        "screenshot": "https://raw.githubusercontent.com/DoofDilla/dillapoe2stat/main/screenshots/dillapoe2stat_startup.png",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5",
+            "ratingCount": "1"
+        },
+        "featureList": [
+            "Automatic loot tracking",
+            "Real-time valuation via poe.ninja",
+            "Session analytics",
+            "Windows notifications",
+            "OBS overlay support",
+            "OAuth 2.1 authentication",
+            "Hotkey-driven interface"
+        ]
+    }
     </script>
 </body>
 </html>
