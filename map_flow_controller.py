@@ -323,7 +323,11 @@ class MapFlowController:
             # Phase 3: Calculate value
             self.update_overlay('post_value')
             value_result = self._phase_calculate_value(diff_result, post_snapshot)
-            
+
+            # Upstream validation: Coalesce None to 0.0 to prevent TypeError in comparisons
+            value_result.total_value_ex = value_result.total_value_ex or 0.0
+            value_result.total_value_chaos = value_result.total_value_chaos or 0.0  # If chaos is used elsewhere
+
             # Calculate map runtime
             map_runtime = self._calculate_map_runtime()
             
@@ -546,13 +550,10 @@ class MapFlowController:
         self.notify.notify_post_map(self.game_state)
     
     def _phase_log_run(self, diff_result: DiffResult, map_value: float, map_runtime: Optional[float]):
-        """Phase 7: Log the run to file
-        
-        Args:
-            diff_result: Inventory diff from Phase 2
-            map_value: Total map value
-            map_runtime: Map runtime in seconds
-        """
+        """Phase 7: Log the run to file"""
+        # Upstream validation: Ensure map_value is a float
+        map_value = map_value or 0.0
+
         log_run(
             self.config.CHAR_TO_CHECK,
             diff_result.added_items,

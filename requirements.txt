@@ -1,4 +1,4 @@
 keyboard
 requests
-win11toast
+#win11toast
 flask

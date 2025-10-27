@@ -1,109 +1,169 @@
 """
-Hotkey management for PoE Stats Tracker
-Handles keyboard shortcuts and their bindings
+Hotkey Manager for PoE Stats Tracker
+Handles global hotkey registration and waiting for user input
 """
 
-import keyboard
+import platform
+import sys
+
+# Conditional import for keyboard library
+if platform.system() == "Windows":
+    import keyboard
+    HOTKEYS_ENABLED = True
+else:
+    HOTKEYS_ENABLED = False
+    keyboard = None  # Placeholder
 
 
 class HotkeyManager:
-    """Manages keyboard hotkeys and their associated actions"""
-    
-    def __init__(self):
-        self.hotkeys = {}
-        self.registered_keys = []
-    
-    def register_hotkey(self, key, callback, description=""):
-        """
-        Register a hotkey with its callback function
-        
-        Args:
-            key: Key combination (e.g., 'f2', 'ctrl+esc')
-            callback: Function to call when hotkey is pressed
-            description: Optional description for the hotkey
-        """
+    """Manages hotkey registration and input waiting"""
+
+    def __init__(self, tracker=None):
+        self.callbacks = {}
+        self.registered_hotkeys = []
+        self.tracker = tracker  # Reference to the tracker for callback execution
+        self.is_linux = platform.system() != "Windows"
+
+        if self.is_linux:
+            print("ℹ️ Hotkeys disabled on Linux (non-privileged mode); use console commands")
+
+    def register_hotkey(self, hotkey, callback):
+        """Register a hotkey with callback function"""
+        # Always store the callback for console mode
+        self.callbacks[hotkey] = callback
+
+        if not HOTKEYS_ENABLED:
+            print(f"ℹ️ Hotkey '{hotkey}' skipped (not supported on this platform)")
+            return False
+
         try:
-            keyboard.add_hotkey(key, callback)
-            self.hotkeys[key] = {
-                'callback': callback,
-                'description': description
-            }
-            self.registered_keys.append(key)
+            keyboard.add_hotkey(hotkey, callback)
+            self.registered_hotkeys.append(hotkey)
+            print(f"✅ Registered hotkey: {hotkey}")
             return True
         except Exception as e:
-            print(f"Failed to register hotkey {key}: {e}")
+            print(f"❌ Failed to register hotkey {hotkey}: {e}")
             return False
-    
-    def unregister_hotkey(self, key):
-        """Unregister a specific hotkey"""
-        try:
-            keyboard.remove_hotkey(key)
-            if key in self.hotkeys:
-                del self.hotkeys[key]
-            if key in self.registered_keys:
-                self.registered_keys.remove(key)
-            return True
-        except Exception as e:
-            print(f"Failed to unregister hotkey {key}: {e}")
-            return False
-    
+
+    def setup_default_hotkeys(self, tracker):
+        """Set up default hotkeys for the tracker"""
+        self.tracker = tracker  # Set tracker reference
+
+        hotkeys = {
+            'f2': lambda: tracker.take_pre_snapshot(),  # Start map tracking (pre-map snapshot)
+            'f3': lambda: tracker.take_post_snapshot(),  # End map tracking (post-map)
+            'ctrl+f6': lambda: tracker.toggle_auto_mode(),  # Toggle auto-detection
+            'f5': lambda: tracker.check_current_inventory_value(),  # Check inventory value
+            'f7': lambda: tracker.display_session_stats(),  # Session dashboard
+            'ctrl+f2': lambda: tracker.take_experimental_pre_snapshot(),  # Analyze waystone
+            'f4': lambda: tracker.toggle_debug_mode(),  # Toggle debug mode
+            'f6': lambda: tracker.start_new_session(),  # End current session and start new one
+            'f8': lambda: tracker.toggle_output_mode(),  # Switch output modes
+            'f9': lambda: tracker.toggle_obs_server(),  # Toggle OBS overlay server
+            'ctrl+shift+f2': lambda: tracker.simulate_pre_snapshot(),  # Simulate pre-snapshot
+            'ctrl+shift+f3': lambda: tracker.simulate_post_snapshot(),  # Simulate post-snapshot
+        }
+
+        success_count = 0
+        for hotkey, callback in hotkeys.items():
+            if self.register_hotkey(hotkey, callback):
+                success_count += 1
+
+        if success_count != len(hotkeys):
+            print("Warning: Some hotkeys failed to register")
+
+        return success_count == len(hotkeys)
+
     def unregister_all(self):
         """Unregister all hotkeys"""
-        for key in self.registered_keys.copy():
-            self.unregister_hotkey(key)
-    
-    def get_hotkey_info(self):
-        """Get information about registered hotkeys"""
-        return self.hotkeys.copy()
-    
+        if HOTKEYS_ENABLED:
+            for hotkey in self.registered_hotkeys:
+                try:
+                    keyboard.remove_hotkey(hotkey)
+                except:
+                    pass
+            self.registered_hotkeys.clear()
+
     def wait_for_exit_key(self, exit_key='ctrl+esc'):
-        """Wait for the specified exit key combination"""
-        try:
+        """Wait for exit key or console command"""
+        if HOTKEYS_ENABLED and not self.is_linux:
+            # Use keyboard library on Windows
             keyboard.wait(exit_key)
-        except KeyboardInterrupt:
-            pass
-    
-    def setup_default_hotkeys(self, tracker_instance):
+        else:
+            # Console-based waiting on Linux: Poll for commands
+            print("\nℹ️ Linux Mode: Enter commands (e.g., 'f2' or 'debug') or 'exit' to quit.")
+            print("Type 'help' for full list.\n")
+
+            while True:
+                try:
+                    user_input = input("Command: ").strip().lower()
+                    if user_input == 'exit':
+                        break
+                    elif user_input == 'help':
+                        self._print_help()
+                        continue
+
+                    # Map command to callback (aliases for ease of use)
+                    command_map = {
+                        # Primary aliases (easy to remember)
+                        'start': 'f2',  # Start map tracking
+                        'end': 'f3',  # End map tracking
+                        'auto': 'ctrl+f6',  # Toggle auto-detection
+                        'inventory': 'f5',  # Check inventory value
+                        'stats': 'f7',  # Session dashboard
+                        'waystone': 'ctrl+f2',  # Analyze waystone
+                        'debug': 'f4',  # Toggle debug mode
+                        'restart': 'f6',  # Restart session
+                        'output': 'f8',  # Toggle output mode
+                        'obs': 'f9',  # Toggle OBS
+                        'simpre': 'ctrl+shift+f2',  # Simulate pre
+                        'simpost': 'ctrl+shift+f3',  # Simulate post
+
+                        # Fallback to direct hotkey strings
+                        'f2': 'f2',
+                        'f3': 'f3',
+                        'ctrl+f6': 'ctrl+f6',
+                        'f5': 'f5',
+                        'f7': 'f7',
+                        'ctrl+f2': 'ctrl+f2',
+                        'f4': 'f4',
+                        'f6': 'f6',
+                        'f8': 'f8',
+                        'f9': 'f9',
+                        'ctrl+shift+f2': 'ctrl+shift+f2',
+                        'ctrl+shift+f3': 'ctrl+shift+f3',
+                    }
+
+                    hotkey = command_map.get(user_input)
+                    if hotkey and hotkey in self.callbacks:
+                        print(f"Executing: {hotkey}")
+                        self.callbacks[hotkey]()  # Trigger the callback
+                    else:
+                        print(f"ℹ️ Unknown command '{user_input}'. Type 'help' for options.")
+
+                except (EOFError, KeyboardInterrupt):
+                    print("\nExiting...")
+                    break
+
+        print("Exiting...")
+
+    def _print_help(self):
+        """Print available console commands"""
+        help_text = """
+Commands (use aliases for simplicity or full hotkey strings):
+- start (or f2): Start map tracking (pre-map snapshot)
+- end (or f3): End map tracking (post-map snapshot)
+- auto (or ctrl+f6): Toggle auto-detection
+- inventory (or f5): Check current inventory value
+- stats (or f7): Display session stats (dashboard)
+- waystone (or ctrl+f2): Analyze waystone (experimental)
+- debug (or f4): Toggle debug mode
+- restart (or f6): End current session and start new one
+- output (or f8): Toggle output mode (normal/comprehensive)
+- obs (or f9): Toggle OBS overlay server
+- simpre (or ctrl+shift+f2): Simulate pre-snapshot
+- simpost (or ctrl+shift+f3): Simulate post-snapshot
+- exit: Quit the application
+- help: Show this help
         """
-        Setup the default hotkeys for the PoE Stats Tracker
-        
-        Args:
-            tracker_instance: The PoEStatsTracker instance to bind callbacks to
-        """
-        hotkey_mappings = [
-            ('f2', tracker_instance.take_pre_snapshot, 'Take PRE-map snapshot'),
-            ('ctrl+f2', tracker_instance.analyze_waystone, 'Analyze waystone (experimental)'),
-            ('f3', tracker_instance.take_post_snapshot, 'Take POST-map snapshot'),
-            ('f4', tracker_instance.toggle_debug_mode, 'Toggle debug mode'),
-            ('f5', tracker_instance.check_current_inventory_value, 'Check current inventory value'),
-            ('f6', tracker_instance.start_new_session, 'Start new session'),
-            ('ctrl+f6', tracker_instance.toggle_auto_mode, 'Toggle automatic map detection'),
-            ('f7', tracker_instance.display_session_stats, 'Display session stats'),
-            ('f8', tracker_instance.toggle_output_mode, 'Toggle output mode'),
-            ('f9', tracker_instance.toggle_obs_server, 'Toggle OBS web server'),
-            ('ctrl+shift+f2', tracker_instance.simulate_pre_snapshot, 'Simulate PRE-map snapshot'),
-            ('ctrl+shift+f3', tracker_instance.simulate_post_snapshot, 'Simulate POST-map snapshot'),
-        ]
-        
-        successful_registrations = 0
-        for key, callback, description in hotkey_mappings:
-            if self.register_hotkey(key, callback, description):
-                successful_registrations += 1
-        
-        return successful_registrations == len(hotkey_mappings)
-    
-    def list_active_hotkeys(self):
-        """Return a formatted string of active hotkeys"""
-        if not self.hotkeys:
-            return "No hotkeys registered"
-        
-        hotkey_list = []
-        for key, info in self.hotkeys.items():
-            desc = info.get('description', 'No description')
-            hotkey_list.append(f"{key.upper()}: {desc}")
-        
-        return " | ".join(hotkey_list)
-    
-    def is_key_registered(self, key):
-        """Check if a specific key is already registered"""
-        return key in self.registered_keys
+        print(help_text)
