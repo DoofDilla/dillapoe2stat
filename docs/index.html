@@ -459,6 +459,28 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: linear-gradient(135deg, #ff6b35 0%, #d63031 100%);
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 3px solid #c0392b;
+            font-weight: bold;
+            font-size: 1.2em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .warning-banner p {
+            margin: 0;
+            padding: 0 20px;
+        }
     </style>
 </head>
 <body>
@@ -479,6 +501,13 @@
             </div>
         </div>
     </header>
+
+    <!-- Warning Banner -->
+    <div class="warning-banner">
+        <div class="container">
+            <p>⚠️ CURRENTLY NOT WORKING: GGG has disabled inventory API access. This tool cannot fetch inventory data until the API is re-enabled.</p>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">

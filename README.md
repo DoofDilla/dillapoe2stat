@@ -1,5 +1,20 @@
 # DillaPoE2Stat 💎
 
+---
+
+## 🚨 **IMPORTANT WARNING** 🚨
+
+> ### ⚠️ **THIS TOOL IS CURRENTLY NOT WORKING** ⚠️
+>
+> **Grinding Gear Games (GGG) has disabled inventory API access.**
+>
+> This tool cannot fetch inventory data until GGG re-enables the API.
+> **All loot tracking functionality is currently unavailable.**
+>
+> We are monitoring the situation and will update as soon as the API is restored.
+
+---
+
 > **Automatic loot tracking and session analytics for Path of Exile 2**
 
 Track your farming sessions effortlessly with hotkeys, real-time loot valuation via poe.ninja, and rich analytics. Features automatic map detection, Windows notifications, and OBS overlay support for streamers.
